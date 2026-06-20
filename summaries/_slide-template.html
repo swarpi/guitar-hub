@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summary · Folio</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#ffffff;--ink:#16130f;--body:#403a33;--muted:#7b7268;--faint:#a79d90;
+    --line:#ece7df;--line2:#dcd5ca;--rule:#1d1a16;--accent:#b0512f;--accent-tint:#fbf3ef;--green:#3d7a50;
+    --sans:'Public Sans',sans-serif;--mono:'JetBrains Mono',monospace;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1024px;height:576px;background:var(--bg);color:var(--body);font-family:var(--sans);overflow:hidden}
+  .pad{padding:44px 56px}
+  .kicker{display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+  .kicker .ln{flex:1;height:1px;background:var(--line2)}
+  .kicker .r{color:var(--muted)}
+  h1{font-size:48px;font-weight:700;letter-spacing:-.03em;color:var(--ink);line-height:1.0}
+  .sub{font-size:16px;color:var(--muted);margin-top:10px;font-family:var(--mono)}
+  .stats{display:flex;margin:28px 0 26px;border-top:1px solid var(--rule);border-bottom:1px solid var(--line)}
+  .stat{flex:1;padding:17px 0;border-right:1px solid var(--line)}
+  .stat:last-child{border:none}
+  .stat .v{font-size:40px;font-weight:700;color:var(--ink);letter-spacing:-.03em;line-height:1}
+  .stat .v.g{color:var(--accent)}
+  .stat .k{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);margin-top:9px}
+  .cols{display:grid;grid-template-columns:1.3fr 1fr;gap:46px;align-items:start}
+  .h{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+  ol{list-style:none;counter-reset:s}
+  li{position:relative;padding:12px 0 12px 32px;border-top:1px solid var(--line);font-size:16px;color:var(--ink);font-weight:500}
+  li:first-child{border-top:none}
+  li::before{counter-increment:s;content:counter(s,decimal-leading-zero);position:absolute;left:0;top:13px;
+    font-family:var(--mono);font-size:11.5px;color:var(--accent);font-weight:400}
+  .dec{padding-top:8px}
+  .dec .lbl{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+  .dec .big{font-size:26px;font-weight:600;color:var(--ink);letter-spacing:-.02em;margin-top:12px;line-height:1.22}
+  .dec .big em{color:var(--accent);font-style:italic}
+  .dec p{font-size:14.5px;color:var(--muted);margin-top:14px;line-height:1.66}
+</style>
+</head>
+<body>
+  <div class="pad">
+    <div class="kicker"><span>HTML Summarizer</span><span class="ln"></span><span class="r">Sprint 4 · Delivered</span></div>
+    <h1>Realtime STATUS</h1>
+    <div class="sub">Live dashboard streaming, end to end · 2026-05-22 → 06-05</div>
+    <div class="stats">
+      <div class="stat"><div class="v">6</div><div class="k">tickets shipped</div></div>
+      <div class="stat"><div class="v g">92%</div><div class="k">criteria passed</div></div>
+      <div class="stat"><div class="v">0</div><div class="k">blockers</div></div>
+      <div class="stat"><div class="v">3,140</div><div class="k">lines changed</div></div>
+    </div>
+    <div class="cols">
+      <div>
+        <div class="h">What shipped</div>
+        <ol>
+          <li>SSE stream endpoint</li>
+          <li>Live dashboard view with auto-repaint</li>
+          <li>Reconnect + heartbeat resilience</li>
+          <li>Backlog markdown auto-sync</li>
+        </ol>
+      </div>
+      <div class="dec">
+        <div class="lbl">Key decision — ADR-014</div>
+        <div class="big">SSE over <em>WebSockets</em></div>
+        <p>One-way push, zero new protocol to operate, and proxy-friendly over plain HTTP.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

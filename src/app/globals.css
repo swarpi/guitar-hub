@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme inline {
+	--color-page: #faf9f3;
+	--color-paper: #f3f1e6;
+	--color-leather: #244234;
+	--color-header: #1f3a2e;
+	--color-ink: #20281f;
+	--color-ink-soft: #5f6b5c;
+	--color-accent: #2f5d45;
+	--color-cream: #f1ede1;
+	--color-line: rgba(31, 58, 46, 0.12);
+	--color-tab-text: #3a2c1e;
+	--color-delete: #9a4424;
+	--color-canvas: #e2e2d6;
+
+	--font-serif: "Spectral", Georgia, serif;
+	--font-mono: "JetBrains Mono", ui-monospace, monospace;
+	--font-display: "Bevan", Georgia, serif;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+::selection {
+	background: rgba(47, 93, 69, 0.2);
+}
+
+input,
+textarea,
+button {
+	font-family: inherit;
+}
+
+textarea {
+	resize: vertical;
+}
+
+pre::-webkit-scrollbar {
+	height: 10px;
+}
+
+pre::-webkit-scrollbar-track {
+	background: rgba(51, 39, 28, 0.06);
+	border-radius: 6px;
+}
+
+pre::-webkit-scrollbar-thumb {
+	background: rgba(122, 106, 85, 0.4);
+	border-radius: 6px;
+}
+
+@keyframes ghFade {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}

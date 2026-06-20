@@ -1,0 +1,34 @@
+name: Project Name
+description: One-line description of the system
+
+zones:
+  - id: zone-client
+    name: Client
+    color: indigo
+  - id: zone-service
+    name: Service
+    color: amber
+  - id: zone-engine
+    name: Engine
+    color: green
+  - id: zone-data
+    name: Data
+    color: blue
+
+components:
+  - id: component_id
+    title: Component Name
+    description: What this component does
+    technology: Main technology used
+    tier: zone-client     # must reference a zone id from the zones list above
+    color: indigo         # indigo | amber | green | blue | rose | teal | purple | slate
+    subcomponents:
+      - name: Sub Name
+        detail: Short description of this subcomponent
+
+connections:
+  - from: component_id
+    to: other_component_id
+    label: What flows between them
+    protocol: HTTP        # WebRTC | HTTP | gRPC | WebSocket | MCP | In-process | etc.
+    style: sync           # sync | async | stream

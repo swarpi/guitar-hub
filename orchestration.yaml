@@ -1,0 +1,203 @@
+name: Hybrid Agentic Workflow
+description: >
+  Agents own the process (decisions, planning, review).
+  Claude Code plan mode owns execution (implementing tickets).
+
+agents:
+  - id: architect
+    kind: decision
+    title: Architect
+    tagline: Shapes the system before anything is built
+    description: Asks clarifying questions and explores alternatives before any code is written. Produces Architecture Decision Records (ADRs) and detailed specs.
+    outputs:
+      - ADRs
+      - Specs
+      - Constraints
+    color: indigo
+    docLink: /.claude/agents/architect.md
+
+  - id: system-architect
+    kind: decision
+    title: System Architect
+    tagline: Maps the runtime system architecture
+    description: Identifies components, connections, protocols, and tiers. Produces a structured architecture.yaml that documents how the system fits together.
+    outputs:
+      - architecture.yaml
+      - Component map
+      - Hand-drawn system sketch
+    color: green
+    docLink: /.claude/agents/system-architect.md
+
+  - id: planner
+    kind: planning
+    title: Planner
+    tagline: Decomposes specs into plan-mode-sized tickets
+    description: Takes ADRs and specs as input. Decomposes work into discrete tickets scoped for a single Claude Code plan mode session.
+    outputs:
+      - Tickets
+      - Milestones
+      - Criteria
+    color: indigo
+    docLink: /.claude/agents/planner.md
+
+  - id: plan-mode
+    kind: execution
+    title: Plan Mode
+    tagline: Claude Code's built-in plan-then-execute cycle
+    description: >
+      Not a custom agent — this is Claude Code's native plan mode (shift+tab).
+      It explores the codebase, proposes a plan, gets approval, then implements.
+      Each ticket from the Planner is executed as a separate plan mode session.
+    outputs:
+      - Code
+      - PRs
+    color: indigo
+    builtin: true
+
+  - id: ticket-verifier
+    kind: validation
+    title: Ticket Verifier
+    tagline: Validates and closes tickets
+    description: >
+      Automatically invoked after plan mode completes a ticket. Validates code
+      and tests against acceptance criteria, updates ticket status, and syncs
+      the backlog. Flags issues back for fixing via plan mode.
+    outputs:
+      - Feedback
+      - Approval
+      - Ticket updates
+      - Backlog sync
+    color: amber
+    docLink: /.claude/agents/ticket-verifier.md
+
+  - id: code-auditor
+    kind: validation
+    title: Code Auditor
+    tagline: Hunts structural issues and AI code slop
+    description: >
+      Optional, manually invoked agent that audits code for over-abstraction,
+      impossible-state guards, reinvented wheels, and subtly wrong assumptions.
+      Ranks findings by severity. Does not fix — flags issues with suggested directions.
+      Claude may proactively suggest running it after large diffs or before commits.
+    outputs:
+      - Audit report
+      - Severity-ranked findings
+    color: red
+    optional: true
+    docLink: /.claude/agents/code-auditor.md
+
+  - id: system-design
+    kind: subskill
+    title: System Design
+    tagline: Alex Xu-style system design explanations
+    description: >
+      Reusable subskill for system design content. Any agent can spawn it for
+      architecture diagrams, back-of-envelope estimations, trade-off tables,
+      and scaling deep dives. Follows Alex Xu's System Design Interview style.
+    outputs:
+      - Estimation tables
+      - Trade-off analyses
+      - Architecture diagrams
+      - Design deep dives
+    color: purple
+    optional: true
+    docLink: /.claude/agents/system-design.md
+
+  - id: learner
+    kind: learning
+    title: Learner
+    tagline: Deep-dives technologies used in the project
+    description: >
+      Finds where a technology or concept actually lives in the code, explains
+      it, produces an interview-ready answer, and quizzes the user. Can render
+      the learning as a Folio explainer deck — a self-contained HTML slide
+      presentation.
+    outputs:
+      - Learning notes
+      - Explainer decks
+    color: teal
+    optional: true
+    docLink: /.claude/agents/learner.md
+
+  - id: html-summarizer
+    kind: reporting
+    title: HTML Summarizer
+    tagline: Produces visual slide decks of delivered work
+    description: Generates self-contained HTML presentations with architecture diagrams, code walkthroughs, and decision records. Opens directly in a browser.
+    outputs:
+      - HTML slide decks
+      - Architecture diagrams
+      - Visual summaries
+    color: teal
+    docLink: /.claude/agents/html-summarizer.md
+
+connections:
+  # Process phase: agents produce artifacts
+  - from: architect
+    to: system-architect
+    artifact: ADRs · Specs
+
+  - from: system-architect
+    to: planner
+    artifact: architecture.yaml
+
+  # Execution phase: plan mode implements tickets
+  - from: planner
+    to: plan-mode
+    artifact: Tickets
+    note: Each ticket becomes a separate plan mode session
+
+  # Validation phase (automatic — ticket-verifier runs after every ticket)
+  - from: plan-mode
+    to: ticket-verifier
+    artifact: Code · Tests
+    type: automatic
+    note: Ticket-verifier is invoked automatically after plan mode completes a ticket
+
+  # Feedback loop
+  - from: ticket-verifier
+    to: plan-mode
+    artifact: Feedback
+    type: feedback
+    note: Fix issues in a new plan mode session
+
+  # Subskill — system-design can be spawned by any agent
+  - from: html-summarizer
+    to: system-design
+    artifact: System design content request
+    type: subskill
+    note: Spawned for architecture diagrams, estimations, and trade-offs in Alex Xu style
+
+  - from: architect
+    to: system-design
+    artifact: Scaling analysis request
+    type: subskill
+
+  - from: learner
+    to: system-design
+    artifact: System design explanation request
+    type: subskill
+
+  # Reporting trigger
+  - from: ticket-verifier
+    to: html-summarizer
+    artifact: Completed work context
+    type: trigger
+
+parallelization:
+  description: >
+    The main session can deploy sub-agents for independent, parallelizable work.
+    Sub-agents run in isolation, report back, and the main thread synthesizes results.
+    Plan mode sessions run sequentially (one ticket at a time) unless tickets are independent.
+  model-routing:
+    low-complexity: haiku
+    medium-complexity: sonnet
+    high-complexity: opus
+  default-model: haiku
+  examples:
+    - parallel research across multiple files
+    - running independent test suites simultaneously
+    - independent tickets can be executed in separate plan mode sessions
+    - concurrent verification (browser + console + tests)
+
+layout: diamond

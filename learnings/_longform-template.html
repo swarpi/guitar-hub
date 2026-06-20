@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSE — Learning · Folio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --ink:#16130f; --body:#403a33; --muted:#7b7268; --faint:#a79d90;
+    --line:#ece7df; --line2:#dcd5ca; --rule:#1d1a16;
+    --accent:#b0512f; --accent-tint:#fbf3ef; --green:#3d7a50;
+    --code-bg:#1a1814; --code-ink:#e7e1d6; --code-faint:#857c6e;
+    --c-key:#e6a06a; --c-str:#a9c08a; --c-com:#7c7363; --c-fn:#e0855f;
+    --sans:'Public Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--body);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;line-height:1.68;font-size:16px}
+  .wrap{max-width:780px;margin:0 auto;padding:66px 60px 100px}
+  /* header */
+  .kicker{display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:30px}
+  .kicker .ln{flex:1;height:1px;background:var(--line2)}
+  h1{font-size:52px;font-weight:700;letter-spacing:-.03em;color:var(--ink);line-height:1.03;max-width:15ch}
+  .meta{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:26px 0 0;
+    font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+  .meta>span{white-space:nowrap}
+  .meta .sep{width:1px;height:13px;background:var(--line2)}
+  .meta .ok{color:var(--green);display:inline-flex;align-items:center;gap:7px}
+  .meta .ok::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+  .lead{font-size:23px;line-height:1.5;color:var(--ink);font-weight:400;margin:40px 0 0;max-width:34ch;
+    letter-spacing:-.011em}
+  .lead b{font-weight:600}
+  /* sections */
+  section{margin-top:60px;padding-top:30px;border-top:1px solid var(--line)}
+  .snum{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+  .snum .n{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500;letter-spacing:.02em}
+  .snum .t{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
+  h2{font-size:27px;font-weight:600;color:var(--ink);letter-spacing:-.018em;margin-bottom:16px;line-height:1.2}
+  p{margin:0 0 17px;max-width:64ch}
+  p:last-child{margin-bottom:0}
+  strong{color:var(--ink);font-weight:600}
+  em{font-style:italic;color:var(--accent)}
+  code{font-family:var(--mono);font-size:13.5px;background:var(--accent-tint);color:#9a4226;
+    padding:1.5px 6px;border-radius:3px}
+  /* dark code terminal */
+  .term{background:var(--code-bg);border-radius:7px;overflow:hidden;margin:8px 0 22px;
+    box-shadow:0 1px 0 rgba(0,0,0,.04),0 14px 34px -22px rgba(40,30,20,.45)}
+  .term .h{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;
+    border-bottom:1px solid #2a2620;font-family:var(--mono);font-size:11.5px;color:var(--code-faint);letter-spacing:.02em}
+  .term .h .fn{color:#cfc7b8}
+  .term pre{padding:18px 18px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.92;color:var(--code-ink)}
+  .k{color:var(--c-key)}.s{color:var(--c-str)}.c{color:var(--c-com)}.f{color:var(--c-fn)}
+  /* lists */
+  ol.gx{list-style:none;counter-reset:g}
+  ol.gx li{position:relative;padding:16px 0 16px 38px;border-top:1px solid var(--line);max-width:66ch}
+  ol.gx li:first-child{border-top:none;padding-top:4px}
+  ol.gx li::before{counter-increment:g;content:counter(g,decimal-leading-zero);position:absolute;left:0;
+    top:17px;font-family:var(--mono);font-size:12px;color:var(--accent)}
+  ol.gx li:first-child::before{top:5px}
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:15px;margin:4px 0}
+  th,td{text-align:left;padding:13px 18px 13px 0;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:11px;text-transform:uppercase;
+    letter-spacing:.06em;color:var(--muted);font-weight:500;padding-bottom:11px}
+  tbody td:first-child,thead th:first-child{color:var(--ink);font-weight:500;font-family:var(--mono);font-size:13px}
+  .yes{color:var(--green);font-weight:600}
+  /* diagram */
+  .diagram{border:1px solid var(--line2);padding:30px 22px 24px;margin:4px 0}
+  .diagram .cap{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.04em;text-align:center;margin-top:14px}
+  /* pull quote */
+  .pull{font-size:31px;line-height:1.36;color:var(--ink);font-weight:600;letter-spacing:-.022em;
+    text-align:center;max-width:22ch;margin:14px auto 6px}
+  .pull span{color:var(--accent)}
+  /* further reading */
+  .foot{margin-top:4px}
+  .foot a{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:16px 0;
+    border-top:1px solid var(--line);color:var(--ink);text-decoration:none;font-size:15.5px;font-weight:500}
+  .foot a:first-child{border-top:none}
+  .foot a:hover .lbl{color:var(--accent)}
+  .foot a .src{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;font-weight:400}
+  .foot a .arr{font-family:var(--mono);color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker"><span>Learner</span><span class="ln"></span><span>Technology explainer</span></div>
+  <h1>Server-Sent Events</h1>
+  <div class="meta">
+    <span class="ok">Verified</span><span class="sep"></span>
+    <span>Intermediate</span><span class="sep"></span>
+    <span>~7 min read</span><span class="sep"></span>
+    <span>Used in · STATUS stream</span><span class="sep"></span>
+    <span>2026-06-05</span>
+  </div>
+
+  <p class="lead">A long-lived HTTP connection that streams text events from server to client. It delivers <b>one-way push over standard HTTP</b>, with automatic reconnection.</p>
+
+  <section>
+    <div class="snum"><span class="n">01</span><span class="t">Mental model</span></div>
+    <h2>One connection, many messages</h2>
+    <p>A standard request completes once its body is sent. SSE instead holds the response <strong>open</strong> and emits events as they occur, each one a <code>data:</code> line followed by a blank line. The browser's <code>EventSource</code> parses each event and dispatches a <code>message</code>. A single connection carries many messages until either party closes it.</p>
+  </section>
+
+  <section>
+    <div class="snum"><span class="n">02</span><span class="t">Why we use it here</span></div>
+    <h2>A read-only channel</h2>
+    <p>The live <strong>STATUS dashboard</strong> reflects git activity and ticket transitions as agents write them. The client never sends data back over this channel, so a bidirectional transport such as WebSocket would add operational overhead without a corresponding benefit. SSE provides the server-to-client stream over standard HTTP, which existing proxies handle without special configuration.</p>
+  </section>
+
+  <section>
+    <div class="snum"><span class="n">03</span><span class="t">How it works</span></div>
+    <div class="term">
+      <div class="h"><span class="fn">client.js</span><span>EventSource</span></div>
+<pre><span class="k">const</span> es = <span class="k">new</span> <span class="f">EventSource</span>(<span class="s">'/status/stream'</span>);
+es.onmessage = (e) => {
+  <span class="k">const</span> update = <span class="f">JSON</span>.parse(e.data);
+  <span class="f">render</span>(update);            <span class="c">// repaint dashboard</span>
+};
+es.addEventListener(<span class="s">'done'</span>, () => es.close());</pre>
+    </div>
+    <div class="term">
+      <div class="h"><span class="fn">server.js</span><span>Node · zero deps</span></div>
+<pre>res.writeHead(<span class="f">200</span>, {
+  <span class="s">'Content-Type'</span>: <span class="s">'text/event-stream'</span>,
+  <span class="s">'Cache-Control'</span>: <span class="s">'no-cache'</span>,
+  <span class="s">'Connection'</span>: <span class="s">'keep-alive'</span>,
+});
+<span class="k">const</span> tick = () => res.write(<span class="s">`data: ${</span>JSON.stringify(state)<span class="s">}\n\n`</span>);</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="snum"><span class="n">04</span><span class="t">Lifecycle</span></div>
+    <div class="diagram">
+      <svg viewBox="0 0 760 158" width="100%">
+        <defs>
+          <filter id="rgh" x="-4%" y="-4%" width="108%" height="108%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="5" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+          <marker id="lh" markerWidth="16" markerHeight="14" refX="8.5" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M1,1 L10,4.5 L1,8" fill="none" stroke="#1f1c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+          <marker id="lha" markerWidth="16" markerHeight="14" refX="8.5" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M1,1 L10,4.5 L1,8" fill="none" stroke="#b0512f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <g filter="url(#rgh)" fill="none" stroke="#1f1c18" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+          <rect x="40" y="48" width="156" height="60" rx="9" fill="#fff"/>
+          <rect x="566" y="48" width="156" height="60" rx="9" fill="#fff"/>
+          <line x1="198" y1="66" x2="562" y2="66" marker-end="url(#lh)"/>
+          <path d="M564,92 L202,92" stroke="#b0512f" stroke-dasharray="6 5" marker-end="url(#lha)"/>
+        </g>
+        <g text-anchor="middle" font-family="'Kalam',cursive">
+          <text x="118" y="84" fill="#16130f" font-size="19">client</text>
+          <text x="644" y="84" fill="#16130f" font-size="19">server</text>
+          <text x="380" y="54" fill="#1f1c18" font-size="15.5">GET /status/stream</text>
+          <text x="380" y="118" fill="#b0512f" font-size="15.5">data: {…} &#160;·&#160; keep-alive</text>
+        </g>
+      </svg>
+      <div class="cap">a single connection remains open; the server emits events until either party closes it</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="snum"><span class="n">05</span><span class="t">Compared</span></div>
+    <h2>SSE vs the alternatives</h2>
+    <table>
+      <thead><tr><th></th><th>SSE</th><th>WebSocket</th><th>Long-poll</th></tr></thead>
+      <tbody>
+        <tr><td>Direction</td><td>server → client</td><td>bidirectional</td><td>server → client</td></tr>
+        <tr><td>Transport</td><td>HTTP/1.1 · 2</td><td>TCP upgrade</td><td>HTTP</td></tr>
+        <tr><td>Reconnect</td><td><span class="yes">built-in</span></td><td>manual</td><td>manual</td></tr>
+        <tr><td>Complexity</td><td><span class="yes">low</span></td><td>medium</td><td>low</td></tr>
+        <tr><td>Best for</td><td>dashboards, logs</td><td>chat, collab</td><td>legacy / simple</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <div class="pull">Choose SSE when updates travel <span>one way</span> and HTTP compatibility outweighs the need for a bidirectional channel.</div>
+  </section>
+
+  <section>
+    <div class="snum"><span class="n">06</span><span class="t">Constraints &amp; trade-offs</span></div>
+    <ol class="gx">
+      <li>The channel is server-to-client only; client requests use a separate <code>fetch()</code> / POST.</li>
+      <li>HTTP/1.1 limits a browser to roughly six concurrent connections per origin; HTTP/2 multiplexing removes the constraint.</li>
+      <li>Intermediaries may buffer the response; disable buffering and emit periodic heartbeats.</li>
+      <li>The protocol carries UTF-8 text only; binary payloads must be base64-encoded.</li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="snum"><span class="n">—</span><span class="t">Further reading</span></div>
+    <div class="foot">
+      <a href="#"><span class="lbl">MDN · Using server-sent events</span><span class="arr">↗</span></a>
+      <a href="#"><span class="lbl">WHATWG · EventSource specification</span><span class="arr">↗</span></a>
+      <a href="#"><span class="lbl">ADR-014 · SSE over WebSockets</span><span class="src">decision</span></a>
+    </div>
+  </section>
+</div>
+</body>
+</html>

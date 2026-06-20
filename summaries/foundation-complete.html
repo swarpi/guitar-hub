@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundation Complete · Guitar Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#ffffff;--ink:#16130f;--body:#403a33;--muted:#7b7268;--faint:#a79d90;
+    --line:#ece7df;--line2:#dcd5ca;--rule:#1d1a16;--accent:#b0512f;--accent-tint:#fbf3ef;--green:#3d7a50;
+    --sans:'Public Sans',sans-serif;--mono:'JetBrains Mono',monospace;--hand:'Kalam',cursive;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:#f5f0ea}
+  body{max-width:1024px;margin:0 auto;background:var(--bg);color:var(--body);font-family:var(--sans)}
+
+  .slide{width:1024px;min-height:576px;background:var(--bg);position:relative;overflow:hidden;border-bottom:1px solid var(--line2);page-break-after:always}
+  .pad{padding:44px 56px}
+  .kicker{display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+  .kicker .ln{flex:1;height:1px;background:var(--line2)}
+  .kicker .r{color:var(--muted)}
+  h1{font-size:48px;font-weight:700;letter-spacing:-.03em;color:var(--ink);line-height:1.0}
+  h2{font-size:32px;font-weight:700;letter-spacing:-.02em;color:var(--ink);line-height:1.15}
+  .sub{font-size:16px;color:var(--muted);margin-top:10px;font-family:var(--mono)}
+  .stats{display:flex;margin:28px 0 26px;border-top:1px solid var(--rule);border-bottom:1px solid var(--line)}
+  .stat{flex:1;padding:17px 0;border-right:1px solid var(--line)}
+  .stat:last-child{border:none}
+  .stat .v{font-size:40px;font-weight:700;color:var(--ink);letter-spacing:-.03em;line-height:1}
+  .stat .v.g{color:var(--green)}
+  .stat .v.a{color:var(--accent)}
+  .stat .k{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);margin-top:9px}
+  .cols{display:grid;grid-template-columns:1.3fr 1fr;gap:46px;align-items:start}
+  .cols-even{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  .h{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+  ol{list-style:none;counter-reset:s}
+  li{position:relative;padding:12px 0 12px 32px;border-top:1px solid var(--line);font-size:16px;color:var(--ink);font-weight:500}
+  li:first-child{border-top:none}
+  li::before{counter-increment:s;content:counter(s,decimal-leading-zero);position:absolute;left:0;top:13px;
+    font-family:var(--mono);font-size:11.5px;color:var(--accent);font-weight:400}
+  li .detail{display:block;font-size:13.5px;font-weight:400;color:var(--muted);margin-top:3px}
+  .dec{padding-top:8px}
+  .dec .lbl{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+  .dec .big{font-size:26px;font-weight:600;color:var(--ink);letter-spacing:-.02em;margin-top:12px;line-height:1.22}
+  .dec .big em{color:var(--accent);font-style:italic}
+  .dec p{font-size:14.5px;color:var(--muted);margin-top:14px;line-height:1.66}
+
+  .stack-table{width:100%;border-collapse:collapse;margin-top:12px}
+  .stack-table th{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);
+    text-align:left;padding:10px 0;border-bottom:2px solid var(--rule);font-weight:500}
+  .stack-table td{padding:11px 0;border-bottom:1px solid var(--line);font-size:14.5px;color:var(--ink);font-weight:500}
+  .stack-table td:first-child{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500;width:120px}
+  .stack-table td:last-child{color:var(--muted);font-weight:400;font-size:13.5px}
+
+  .route-list{list-style:none;counter-reset:unset;margin-top:8px}
+  .route-list li{padding:9px 0 9px 0;font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:400}
+  .route-list li::before{display:none}
+  .route-list li .path{color:var(--accent)}
+  .route-list li .desc{font-family:var(--sans);color:var(--muted);font-size:13px;margin-left:12px}
+
+  .done-tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:.06em;color:var(--green);border:1px solid var(--line2);
+    padding:3px 10px;margin-left:8px}
+  .done-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+
+  .page-num{position:absolute;bottom:20px;right:56px;font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.06em}
+
+  svg text{font-family:var(--hand)}
+  .diagram-wrap{margin-top:20px;display:flex;justify-content:center}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<div class="slide">
+  <div class="pad">
+    <div class="kicker"><span>Guitar Hub</span><span class="ln"></span><span class="r">Foundation · Complete</span></div>
+    <h1>Foundation Sprint</h1>
+    <div class="sub">Full-stack build from zero to deploy-ready · 2026-06-13 &rarr; 06-20</div>
+    <div class="stats">
+      <div class="stat"><div class="v g">9</div><div class="k">tickets shipped</div></div>
+      <div class="stat"><div class="v">100%</div><div class="k">criteria passed</div></div>
+      <div class="stat"><div class="v">5</div><div class="k">pages built</div></div>
+      <div class="stat"><div class="v a">0</div><div class="k">blockers</div></div>
+    </div>
+    <div class="cols">
+      <div>
+        <div class="h">What shipped</div>
+        <ol>
+          <li>Tooling, schema, and Drizzle ORM client</li>
+          <li>Layout shell with "worn leather" design system</li>
+          <li>All five App Router pages with edge runtime</li>
+          <li>CRUD server actions (create, edit, delete)</li>
+          <li>Cloudflare Pages + D1 deployment wiring</li>
+          <li>Seed script with 21 songs across 8 artists</li>
+        </ol>
+      </div>
+      <div class="dec">
+        <div class="lbl">Key decision &mdash; ADR-0002</div>
+        <div class="big">Next.js + D1 on <em>Cloudflare</em></div>
+        <p>Edge SQLite, zero monthly cost, one platform for hosting and database. Type-safe from schema to UI via Drizzle.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">01 / 04</div>
+</div>
+
+<!-- SLIDE 2: Tech Stack + Architecture -->
+<div class="slide">
+  <div class="pad">
+    <div class="kicker"><span>Guitar Hub</span><span class="ln"></span><span class="r">Architecture</span></div>
+    <h2>Stack and Data Model</h2>
+    <div class="sub">Two tables, five pages, three components deep</div>
+    <div class="cols-even" style="margin-top:28px">
+      <div>
+        <div class="h">Tech Stack</div>
+        <table class="stack-table">
+          <thead><tr><th>Layer</th><th>Choice</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Framework</td><td>Next.js 16</td><td>App Router, server actions</td></tr>
+            <tr><td>Database</td><td>Cloudflare D1</td><td>Edge SQLite, free tier</td></tr>
+            <tr><td>ORM</td><td>Drizzle</td><td>Type-safe, no codegen</td></tr>
+            <tr><td>Styling</td><td>Tailwind 4</td><td>Custom aesthetic</td></tr>
+            <tr><td>Hosting</td><td>CF Pages</td><td>Free, same platform as D1</td></tr>
+            <tr><td>Tooling</td><td>Biome + Vitest</td><td>Fast lint, test in one</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="h">Architecture</div>
+        <div class="diagram-wrap">
+          <svg width="380" height="340" viewBox="0 0 380 340">
+            <defs>
+              <filter id="rough"><feTurbulence type="turbulence" baseFrequency="0.013" numOctaves="2" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3"/></filter>
+              <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6" fill="none" stroke="#16130f" stroke-width="1.2"/></marker>
+              <marker id="arr-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <path d="M0,0 L8,3 L0,6" fill="none" stroke="#b0512f" stroke-width="1.2"/></marker>
+            </defs>
+            <g filter="url(#rough)">
+              <rect x="120" y="10" width="140" height="42" fill="none" stroke="#16130f" stroke-width="1.4"/>
+              <rect x="120" y="90" width="140" height="42" fill="none" stroke="#16130f" stroke-width="1.4"/>
+              <rect x="20" y="180" width="150" height="42" fill="none" stroke="#16130f" stroke-width="1.4"/>
+              <rect x="210" y="180" width="150" height="42" fill="none" stroke="#16130f" stroke-width="1.4"/>
+              <rect x="120" y="270" width="140" height="42" fill="none" stroke="#b0512f" stroke-width="1.6"/>
+              <line x1="190" y1="52" x2="190" y2="90" stroke="#16130f" stroke-width="1.2" marker-end="url(#arr)"/>
+              <line x1="160" y1="132" x2="95" y2="180" stroke="#16130f" stroke-width="1.2" marker-end="url(#arr)"/>
+              <line x1="220" y1="132" x2="285" y2="180" stroke="#16130f" stroke-width="1.2" marker-end="url(#arr)"/>
+              <line x1="285" y1="222" x2="225" y2="270" stroke="#b0512f" stroke-width="1.2" marker-end="url(#arr-a)"/>
+              <line x1="95" y1="222" x2="155" y2="270" stroke="#b0512f" stroke-width="1.2" marker-end="url(#arr-a)"/>
+            </g>
+            <text x="190" y="36" text-anchor="middle" font-size="14" fill="#16130f">Browser</text>
+            <text x="190" y="116" text-anchor="middle" font-size="14" fill="#16130f">CF Pages (Edge)</text>
+            <text x="95" y="206" text-anchor="middle" font-size="14" fill="#16130f">Server Components</text>
+            <text x="285" y="206" text-anchor="middle" font-size="14" fill="#16130f">Server Actions</text>
+            <text x="190" y="296" text-anchor="middle" font-size="15" font-weight="700" fill="#b0512f">D1 (SQLite)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">02 / 04</div>
+</div>
+
+<!-- SLIDE 3: Ticket-by-ticket -->
+<div class="slide">
+  <div class="pad">
+    <div class="kicker"><span>Guitar Hub</span><span class="ln"></span><span class="r">Ticket Log</span></div>
+    <h2>All Nine Tickets</h2>
+    <div class="sub">Ordered by dependency, shipped in two sessions</div>
+    <div style="margin-top:20px">
+      <ol>
+        <li>Tooling and Dependencies <span class="done-tag">done</span>
+          <span class="detail">Biome, Vitest, Drizzle, wrangler, nanoid &mdash; project scaffolding from zero</span></li>
+        <li>Database Schema and Drizzle Client <span class="done-tag">done</span>
+          <span class="detail">Two tables (artists, songs), migration SQL, type-safe D1 client factory</span></li>
+        <li>App Layout and Design System Shell <span class="done-tag">done</span>
+          <span class="detail">Sticky header, breadcrumbs, CapoBadge, SongListItem, FAB &mdash; "worn leather" aesthetic</span></li>
+        <li>Home Page: Song-Ordered A-Z Index <span class="done-tag">done</span>
+          <span class="detail">Server-rendered alphabetical song index with client-side search filtering</span></li>
+        <li>Artist Page and Song Page <span class="done-tag">done</span>
+          <span class="detail">Dynamic routes for artist song lists and full tab display with capo badges</span></li>
+        <li>Add Song Form and Server Action <span class="done-tag">done</span>
+          <span class="detail">SongForm component, createSong action, artist autocomplete, live tab preview</span></li>
+        <li>Edit Song Form and Delete Action <span class="done-tag">done</span>
+          <span class="detail">Pre-populated edit form, delete modal, artist upsert on rename, orphan cleanup</span></li>
+        <li>Cloudflare Pages Deployment <span class="done-tag">done</span>
+          <span class="detail">D1 binding via getRequestContext, pages:build/dev scripts, wrangler.toml config</span></li>
+        <li>Remove SPA Prototype <span class="done-tag">done</span>
+          <span class="detail">Deleted localStorage store, migrated 21 seed songs to Drizzle seed script</span></li>
+      </ol>
+    </div>
+  </div>
+  <div class="page-num">03 / 04</div>
+</div>
+
+<!-- SLIDE 4: Routes + What's Next -->
+<div class="slide">
+  <div class="pad">
+    <div class="kicker"><span>Guitar Hub</span><span class="ln"></span><span class="r">Routes &amp; Next Steps</span></div>
+    <h2>Live Routes and What Comes Next</h2>
+    <div class="sub">Five pages, all edge-rendered, zero Node.js runtime</div>
+    <div class="cols" style="margin-top:24px">
+      <div>
+        <div class="h">App Routes</div>
+        <ul class="route-list">
+          <li style="border-top:none"><span class="path">/</span><span class="desc">Home &mdash; all songs A&ndash;Z with search</span></li>
+          <li><span class="path">/artists/[slug]</span><span class="desc">Artist page &mdash; songs by one artist</span></li>
+          <li><span class="path">/artists/[slug]/[song]</span><span class="desc">Song page &mdash; full tab, capo, notes</span></li>
+          <li><span class="path">/add</span><span class="desc">Add song form with live preview</span></li>
+          <li><span class="path">/edit/[id]</span><span class="desc">Edit song, delete with confirmation</span></li>
+        </ul>
+        <div class="h" style="margin-top:24px">Seed Data</div>
+        <ul class="route-list">
+          <li style="border-top:none;font-family:var(--sans);font-size:14.5px;color:var(--body)"><strong style="color:var(--ink)">8</strong> artists &middot; <strong style="color:var(--ink)">21</strong> songs &middot; <strong style="color:var(--ink)">4</strong> tab templates</li>
+          <li style="font-family:var(--sans);font-size:13.5px;color:var(--muted)">Run <code style="font-family:var(--mono);font-size:12px;background:var(--accent-tint);padding:2px 6px;border-radius:3px;color:#9a4226">pnpm seed</code> to populate local D1</li>
+        </ul>
+      </div>
+      <div class="dec">
+        <div class="lbl">What comes next</div>
+        <div class="big">Deploy, then <em>AI integration</em></div>
+        <p>The foundation backlog is empty. Next steps: provision D1 with <code style="font-family:var(--mono);font-size:12px;background:var(--accent-tint);padding:2px 5px;border-radius:3px;color:#9a4226">wrangler d1 create</code>, run the migration, and deploy. Server actions already provide the write interface for future AI-generated tabs.</p>
+      </div>
+    </div>
+  </div>
+  <div class="page-num">04 / 04</div>
+</div>
+
+</body>
+</html>
