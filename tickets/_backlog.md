@@ -16,7 +16,10 @@ _Tickets ready to be picked up in the next cycle._
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| | | | |
+| [001 — Go Live: Provision D1, Migrate, Seed, Deploy](deployment/001-go-live.md) | deployment | P0 | S |
+| [001 — Web App Manifest and App Icons](pwa/001-web-app-manifest-and-icons.md) | pwa | P1 | S |
+| [002 — Service Worker and Offline Caching](pwa/002-service-worker-and-offline-caching.md) | pwa | P1 | M |
+| [003 — Offline Fallback Page](pwa/003-offline-fallback-page.md) | pwa | P1 | XS |
 
 ## Backlog
 
