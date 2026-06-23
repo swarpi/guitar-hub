@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bevan, JetBrains_Mono, Spectral } from "next/font/google";
+import { OfflineBanner } from "../components/OfflineBanner";
+import { ServiceWorkerRegistration } from "../components/ServiceWorkerRegistration";
 import "./globals.css";
 
 const spectral = Spectral({
@@ -47,7 +49,9 @@ export default function RootLayout({
 			<body className="min-h-screen bg-canvas font-serif text-ink">
 				<div className="flex min-h-screen w-full items-start justify-center bg-canvas">
 					<div className="relative min-h-screen w-full max-w-[720px] bg-page shadow-[0_0_0_1px_rgba(51,39,28,0.05),0_24px_70px_rgba(40,28,16,0.12)]">
+						<OfflineBanner />
 						<div className="animate-[ghFade_.28s_ease_both]">{children}</div>
+						<ServiceWorkerRegistration />
 					</div>
 				</div>
 			</body>

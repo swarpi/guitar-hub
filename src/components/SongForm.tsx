@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 import { DeleteModal } from "./DeleteModal";
 
@@ -44,6 +44,7 @@ export function SongForm({
 	cancelHref,
 	deleteAction,
 }: SongFormProps): React.ReactElement {
+	const [isOffline, setIsOffline] = useState(false);
 	const [title, setTitle] = useState(initialValues?.title ?? "");
 	const [artist, setArtist] = useState(initialValues?.artist ?? "");
 	const [capo, setCapo] = useState(initialValues?.capo?.toString() ?? "");
@@ -51,12 +52,32 @@ export function SongForm({
 	const [notes, setNotes] = useState(initialValues?.notes ?? "");
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+	useEffect(() => {
+		setIsOffline(!navigator.onLine);
+		const goOffline = () => setIsOffline(true);
+		const goOnline = () => setIsOffline(false);
+		window.addEventListener("offline", goOffline);
+		window.addEventListener("online", goOnline);
+		return () => {
+			window.removeEventListener("offline", goOffline);
+			window.removeEventListener("online", goOnline);
+		};
+	}, []);
+
 	const [state, formAction, isPending] = useActionState(
 		async (_prev: { error: string } | undefined, formData: FormData) => {
 			return await action(formData);
 		},
 		undefined,
 	);
+
+	if (isOffline) {
+		return (
+			<p className="py-10 text-center font-serif text-[15px] text-ink-soft">
+				You need to be online to add or edit songs
+			</p>
+		);
+	}
 
 	return (
 		<>
