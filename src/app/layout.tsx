@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bevan, JetBrains_Mono, Spectral } from "next/font/google";
 import "./globals.css";
 
@@ -24,6 +24,14 @@ const bevan = Bevan({
 export const metadata: Metadata = {
 	title: "Guitar Hub",
 	description: "A personal fingerstyle guitar tablature collection",
+	manifest: "/manifest.json",
+	icons: {
+		apple: "/icons/icon-192x192.png",
+	},
+};
+
+export const viewport: Viewport = {
+	themeColor: "#1f3a2e",
 };
 
 export default function RootLayout({
