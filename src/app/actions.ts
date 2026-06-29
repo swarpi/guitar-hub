@@ -21,13 +21,12 @@ export async function createSongLogic(
 ): Promise<{ error: string } | { artistSlug: string; songSlug: string }> {
 	const title = (formData.get("title") as string | null)?.trim() ?? "";
 	const artist = (formData.get("artist") as string | null)?.trim() ?? "";
-	const tabContent =
-		(formData.get("tabContent") as string | null)?.trim() ?? "";
+	const content = (formData.get("content") as string | null)?.trim() ?? "";
 	const capoRaw = (formData.get("capo") as string | null)?.trim() ?? "";
 	const notes = (formData.get("notes") as string | null)?.trim() || null;
 
-	if (!title || !artist || !tabContent) {
-		return { error: "Title, artist, and tab content are required." };
+	if (!title || !artist || !content) {
+		return { error: "Title, artist, and content are required." };
 	}
 
 	let capo: number | null = null;
@@ -89,7 +88,7 @@ export async function createSongLogic(
 			artistId: artistRow.id,
 			title,
 			slug: songSlug,
-			tabContent,
+			content,
 			capo,
 			notes,
 			createdAt: now,
@@ -127,13 +126,12 @@ export async function updateSongLogic(
 ): Promise<{ error: string } | { artistSlug: string; songSlug: string }> {
 	const title = (formData.get("title") as string | null)?.trim() ?? "";
 	const artist = (formData.get("artist") as string | null)?.trim() ?? "";
-	const tabContent =
-		(formData.get("tabContent") as string | null)?.trim() ?? "";
+	const content = (formData.get("content") as string | null)?.trim() ?? "";
 	const capoRaw = (formData.get("capo") as string | null)?.trim() ?? "";
 	const notes = (formData.get("notes") as string | null)?.trim() || null;
 
-	if (!title || !artist || !tabContent) {
-		return { error: "Title, artist, and tab content are required." };
+	if (!title || !artist || !content) {
+		return { error: "Title, artist, and content are required." };
 	}
 
 	let capo: number | null = null;
@@ -216,7 +214,7 @@ export async function updateSongLogic(
 		.set({
 			title,
 			slug: newSongSlug,
-			tabContent,
+			content,
 			capo,
 			notes,
 			artistId: newArtistId,

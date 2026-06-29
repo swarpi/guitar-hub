@@ -34,7 +34,8 @@ export async function getSongById(db: Db, songId: string) {
 			id: songs.id,
 			title: songs.title,
 			slug: songs.slug,
-			tabContent: songs.tabContent,
+			instrument: songs.instrument,
+			content: songs.content,
 			capo: songs.capo,
 			notes: songs.notes,
 			artistId: artists.id,
@@ -57,7 +58,7 @@ export async function getSongBySlugs(
 		.select({
 			id: songs.id,
 			title: songs.title,
-			tabContent: songs.tabContent,
+			content: songs.content,
 			capo: songs.capo,
 			notes: songs.notes,
 			artistName: artists.name,

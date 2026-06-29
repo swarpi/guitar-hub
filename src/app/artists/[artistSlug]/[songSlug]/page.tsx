@@ -56,7 +56,7 @@ export default async function SongPage({ params }: SongPageProps) {
 				)}
 
 				<pre className="mb-6 overflow-x-auto whitespace-pre rounded-lg border border-line bg-paper p-5 font-mono text-[13px] leading-[1.7] text-tab-text shadow-[0_1px_3px_rgba(40,28,16,0.06)]">
-					{song.tabContent}
+					{song.content}
 				</pre>
 
 				{song.notes && song.notes.trim() !== "" && (

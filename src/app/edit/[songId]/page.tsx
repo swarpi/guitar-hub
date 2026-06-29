@@ -69,7 +69,7 @@ export default async function EditPage({ params }: EditPageProps) {
 						title: song.title,
 						artist: song.artistName,
 						capo: song.capo,
-						tabContent: song.tabContent,
+						content: song.content,
 						notes: song.notes,
 					}}
 					songId={songId}

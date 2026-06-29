@@ -19,9 +19,10 @@ export const songs = sqliteTable(
 		artistId: text("artist_id")
 			.notNull()
 			.references(() => artists.id),
+		instrument: text("instrument").notNull().default("guitar"),
 		title: text("title").notNull(),
 		slug: text("slug").notNull(),
-		tabContent: text("tab_content").notNull(),
+		content: text("content").notNull(),
 		capo: integer("capo"),
 		notes: text("notes"),
 		createdAt: text("created_at")
@@ -32,6 +33,10 @@ export const songs = sqliteTable(
 			.$defaultFn(() => new Date().toISOString()),
 	},
 	(table) => [
-		unique("songs_artist_slug_unique").on(table.artistId, table.slug),
+		unique("songs_artist_slug_instrument_unique").on(
+			table.artistId,
+			table.slug,
+			table.instrument,
+		),
 	],
 );

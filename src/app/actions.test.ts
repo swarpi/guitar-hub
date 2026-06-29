@@ -42,16 +42,17 @@ const MIGRATION_STATEMENTS = [
 	`CREATE TABLE \`songs\` (
 		\`id\` text PRIMARY KEY NOT NULL,
 		\`artist_id\` text NOT NULL,
+		\`instrument\` text NOT NULL DEFAULT 'guitar',
 		\`title\` text NOT NULL,
 		\`slug\` text NOT NULL,
-		\`tab_content\` text NOT NULL,
+		\`content\` text NOT NULL,
 		\`capo\` integer,
 		\`notes\` text,
 		\`created_at\` text NOT NULL,
 		\`updated_at\` text NOT NULL,
 		FOREIGN KEY (\`artist_id\`) REFERENCES \`artists\`(\`id\`) ON UPDATE no action ON DELETE no action
 	)`,
-	"CREATE UNIQUE INDEX `songs_artist_slug_unique` ON `songs` (`artist_id`,`slug`)",
+	"CREATE UNIQUE INDEX `songs_artist_slug_instrument_unique` ON `songs` (`artist_id`,`slug`,`instrument`)",
 ];
 
 function createTestDb(): Db {
@@ -82,7 +83,7 @@ describe("createSongLogic", () => {
 		const fd = makeFormData({
 			title: "Dust in the Wind",
 			artist: "Sungha Jung",
-			tabContent: "e|---0---",
+			content: "e|---0---",
 			capo: "2",
 			notes: "Standard tuning",
 		});
@@ -107,7 +108,7 @@ describe("createSongLogic", () => {
 		expect(songRows).toHaveLength(1);
 		expect(songRows[0].title).toBe("Dust in the Wind");
 		expect(songRows[0].slug).toBe("dust-in-the-wind");
-		expect(songRows[0].tabContent).toBe("e|---0---");
+		expect(songRows[0].content).toBe("e|---0---");
 		expect(songRows[0].capo).toBe(2);
 		expect(songRows[0].notes).toBe("Standard tuning");
 		expect(songRows[0].createdAt).toBeTruthy();
@@ -118,7 +119,7 @@ describe("createSongLogic", () => {
 		const fd = makeFormData({
 			title: "Amber",
 			artist: "Sungha Jung",
-			tabContent: "e|---0---",
+			content: "e|---0---",
 		});
 
 		await createSongLogic(db, fd);
@@ -127,7 +128,7 @@ describe("createSongLogic", () => {
 		const fd2 = makeFormData({
 			title: "Amber",
 			artist: "Sungha Jung",
-			tabContent: "e|---1---",
+			content: "e|---1---",
 		});
 
 		const result = await createSongLogic(db, fd2);
@@ -140,18 +141,18 @@ describe("createSongLogic", () => {
 	it("returns error when required fields are missing", async () => {
 		const noTitle = await createSongLogic(
 			db,
-			makeFormData({ artist: "X", tabContent: "tab" }),
+			makeFormData({ artist: "X", content: "tab" }),
 		);
 		expect(noTitle).toEqual({
-			error: "Title, artist, and tab content are required.",
+			error: "Title, artist, and content are required.",
 		});
 
 		const noArtist = await createSongLogic(
 			db,
-			makeFormData({ title: "X", tabContent: "tab" }),
+			makeFormData({ title: "X", content: "tab" }),
 		);
 		expect(noArtist).toEqual({
-			error: "Title, artist, and tab content are required.",
+			error: "Title, artist, and content are required.",
 		});
 
 		const noTab = await createSongLogic(
@@ -159,7 +160,7 @@ describe("createSongLogic", () => {
 			makeFormData({ title: "X", artist: "Y" }),
 		);
 		expect(noTab).toEqual({
-			error: "Title, artist, and tab content are required.",
+			error: "Title, artist, and content are required.",
 		});
 	});
 
@@ -167,7 +168,7 @@ describe("createSongLogic", () => {
 		const fd = makeFormData({
 			title: "Song",
 			artist: "Artist",
-			tabContent: "tab",
+			content: "tab",
 			capo: "15",
 		});
 
@@ -180,14 +181,14 @@ describe("createSongLogic", () => {
 		const fd1 = makeFormData({
 			title: "Song One",
 			artist: "Sungha Jung",
-			tabContent: "tab1",
+			content: "tab1",
 		});
 		await createSongLogic(db, fd1);
 
 		const fd2 = makeFormData({
 			title: "Song Two",
 			artist: "Sungha Jung",
-			tabContent: "tab2",
+			content: "tab2",
 		});
 		await createSongLogic(db, fd2);
 
@@ -209,7 +210,7 @@ describe("createSongLogic", () => {
 			makeFormData({
 				title: "Song A",
 				artist: "Foo Bar",
-				tabContent: "tab",
+				content: "tab",
 			}),
 		);
 
@@ -218,7 +219,7 @@ describe("createSongLogic", () => {
 			makeFormData({
 				title: "Song B",
 				artist: "Foo--Bar",
-				tabContent: "tab",
+				content: "tab",
 			}),
 		);
 
@@ -229,12 +230,12 @@ describe("createSongLogic", () => {
 
 async function seedSong(
 	db: Db,
-	fields: { title: string; artist: string; tabContent?: string },
+	fields: { title: string; artist: string; content?: string },
 ) {
 	const fd = makeFormData({
 		title: fields.title,
 		artist: fields.artist,
-		tabContent: fields.tabContent ?? "e|---0---",
+		content: fields.content ?? "e|---0---",
 	});
 	const result = await createSongLogic(db, fd);
 	if ("error" in result) throw new Error(result.error);
@@ -266,7 +267,7 @@ describe("updateSongLogic", () => {
 		const fd = makeFormData({
 			title: "Gravity",
 			artist: "Sungha Jung",
-			tabContent: "e|---1---",
+			content: "e|---1---",
 		});
 
 		const result = await updateSongLogic(db, song.id, fd);
@@ -282,7 +283,7 @@ describe("updateSongLogic", () => {
 		expect(songRows).toHaveLength(1);
 		expect(songRows[0].title).toBe("Gravity");
 		expect(songRows[0].slug).toBe("gravity");
-		expect(songRows[0].tabContent).toBe("e|---1---");
+		expect(songRows[0].content).toBe("e|---1---");
 	});
 
 	it("artist rename upserts new artist and cleans orphaned artist", async () => {
@@ -294,7 +295,7 @@ describe("updateSongLogic", () => {
 		const fd = makeFormData({
 			title: "Amber",
 			artist: "Tommy Emmanuel",
-			tabContent: "e|---0---",
+			content: "e|---0---",
 		});
 
 		const result = await updateSongLogic(db, song.id, fd);
@@ -321,7 +322,7 @@ describe("updateSongLogic", () => {
 		const fd = makeFormData({
 			title: "Gravity",
 			artist: "Tommy Emmanuel",
-			tabContent: "e|---0---",
+			content: "e|---0---",
 		});
 
 		await updateSongLogic(db, song2.id, fd);
@@ -345,10 +346,10 @@ describe("updateSongLogic", () => {
 		const result = await updateSongLogic(
 			db,
 			song.id,
-			makeFormData({ artist: "X", tabContent: "tab" }),
+			makeFormData({ artist: "X", content: "tab" }),
 		);
 		expect(result).toEqual({
-			error: "Title, artist, and tab content are required.",
+			error: "Title, artist, and content are required.",
 		});
 	});
 
@@ -362,7 +363,7 @@ describe("updateSongLogic", () => {
 		const fd = makeFormData({
 			title: "Amber",
 			artist: "Sungha Jung",
-			tabContent: "e|---0---",
+			content: "e|---0---",
 		});
 
 		const result = await updateSongLogic(db, song2.id, fd);

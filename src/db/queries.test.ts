@@ -69,7 +69,7 @@ describe("getSongBySlugs", () => {
 		const song = {
 			id: "s1",
 			title: "Dust in the Wind",
-			tabContent: "e|---0---",
+			content: "e|---0---",
 			capo: 2,
 			notes: "Standard tuning",
 			artistName: "Sungha Jung",

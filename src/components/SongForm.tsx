@@ -9,7 +9,7 @@ interface SongFormInitialValues {
 	readonly title: string;
 	readonly artist: string;
 	readonly capo: number | null;
-	readonly tabContent: string;
+	readonly content: string;
 	readonly notes: string | null;
 }
 
@@ -47,7 +47,7 @@ export function SongForm({
 	const [title, setTitle] = useState(initialValues?.title ?? "");
 	const [artist, setArtist] = useState(initialValues?.artist ?? "");
 	const [capo, setCapo] = useState(initialValues?.capo?.toString() ?? "");
-	const [tabContent, setTabContent] = useState(initialValues?.tabContent ?? "");
+	const [content, setContent] = useState(initialValues?.content ?? "");
 	const [notes, setNotes] = useState(initialValues?.notes ?? "");
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -123,20 +123,20 @@ export function SongForm({
 					</label>
 					<textarea
 						id="tab-input"
-						name="tabContent"
-						value={tabContent}
-						onChange={(e) => setTabContent(e.target.value)}
+						name="content"
+						value={content}
+						onChange={(e) => setContent(e.target.value)}
 						placeholder="Paste your tab here..."
 						className={`${INPUT_CLASS} min-h-[210px] overflow-x-auto whitespace-pre font-mono text-[13px] leading-[1.7]`}
 						required
 					/>
 				</div>
 
-				{tabContent.trim() && (
+				{content.trim() && (
 					<div>
 						<div className={LABEL_CLASS}>Preview</div>
 						<pre className="overflow-x-auto whitespace-pre rounded-lg border border-line bg-paper p-5 font-mono text-[13px] leading-[1.7] text-tab-text shadow-[0_1px_3px_rgba(40,28,16,0.06)]">
-							{tabContent}
+							{content}
 						</pre>
 					</div>
 				)}
