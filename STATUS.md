@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-02 10:40 UTC
+> Last updated: 2026-07-02 11:07 UTC
 
 ## Current Phase
 
@@ -23,10 +23,11 @@ _What is currently being worked on, the relevant tickets, and the expected next 
 
 <!-- AUTO:START -->
 **Branch:** `worktree-multi-instrument-001`  
-**Last commit:** 2026-07-02 10:40 UTC
+**Last commit:** 2026-07-02 11:07 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `883e408` | 2026-07-02 | Add instrument-aware queries, actions, and form support |
 | `cb84190` | 2026-06-29 | Add instrument column, rename tabContent to content, update unique index |
 | `3c381d7` | 2026-06-20 | Initial commit: complete foundation (tickets 001–009) |
 <!-- AUTO:END -->
@@ -37,18 +38,20 @@ _What is currently being worked on, the relevant tickets, and the expected next 
 **Files changed (last 5 commits):**
 
 ```
- migrations/0001_multi-instrument.sql             |  7 ++++++
- src/app/actions.test.ts                          | 51 +++++++++++++++++++-------------------
- src/app/actions.ts                               | 18 ++++++--------
- src/app/artists/[artistSlug]/[songSlug]/page.tsx |  2 +-
+ STATUS.md                                        | 22 ++++++++++---
+ migrations/0001_multi-instrument.sql             |  7 ++++
+ src/app/actions.test.ts                          | 58 ++++++++++++++++++----------------
+ src/app/actions.ts                               | 65 +++++++++++++++++++++++++++-----------
+ src/app/artists/[artistSlug]/[songSlug]/page.tsx |  6 ++--
+ src/app/artists/[artistSlug]/page.tsx            |  3 +-
  src/app/edit/[songId]/page.tsx                   |  2 +-
- src/components/SongForm.tsx                      | 14 +++++------
- src/db/queries.test.ts                           |  2 +-
- src/db/queries.ts                                |  5 ++--
- src/db/schema.test.ts                            |  8 +++---
- src/db/schema.ts                                 |  9 +++++--
+ src/components/SongForm.tsx                      | 19 +++++++----
+ src/db/queries.test.ts                           | 20 +++++++++---
+ src/db/queries.ts                                | 55 ++++++++++++++++++++++++++++----
+ src/db/schema.test.ts                            |  8 +++--
+ src/db/schema.ts                                 |  9 ++++--
  src/db/seed.ts                                   |  2 +-
- 11 files changed, 67 insertions(+), 53 deletions(-)
+ 13 files changed, 197 insertions(+), 79 deletions(-)
 ```
 <!-- AUTO:FILES:END -->
 

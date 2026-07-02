@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { getSongsByInstrument } from "@/db/queries";
 import * as schema from "@/db/schema";
 import { artists, songs } from "@/db/schema";
 
@@ -203,6 +204,111 @@ describe("createSongLogic", () => {
 			.from(songs);
 		expect(songRows).toHaveLength(2);
 		expect(songRows[0].artistId).toBe(songRows[1].artistId);
+	});
+
+	it("creates a song with instrument piano", async () => {
+		const fd = makeFormData({
+			title: "River Flows in You",
+			artist: "Yiruma",
+			content: "X:1\nT:River Flows in You",
+			instrument: "piano",
+		});
+
+		const result = await createSongLogic(db, fd);
+
+		expect(result).toEqual({
+			instrument: "piano",
+			artistSlug: "yiruma",
+			songSlug: "river-flows-in-you",
+		});
+
+		const songRows = await (db as unknown as ReturnType<typeof drizzle>)
+			.select()
+			.from(songs);
+		expect(songRows).toHaveLength(1);
+		expect(songRows[0].instrument).toBe("piano");
+	});
+
+	it("returns error for invalid instrument", async () => {
+		const fd = makeFormData({
+			title: "Song",
+			artist: "Artist",
+			content: "tab",
+			instrument: "drums",
+		});
+
+		const result = await createSongLogic(db, fd);
+
+		expect(result).toEqual({ error: "Instrument must be guitar or piano." });
+	});
+
+	it("allows same artist and title under different instruments", async () => {
+		const guitarResult = await createSongLogic(
+			db,
+			makeFormData({
+				title: "River Flows in You",
+				artist: "Yiruma",
+				content: "e|---0---",
+				instrument: "guitar",
+			}),
+		);
+		expect(guitarResult).toEqual({
+			instrument: "guitar",
+			artistSlug: "yiruma",
+			songSlug: "river-flows-in-you",
+		});
+
+		const pianoResult = await createSongLogic(
+			db,
+			makeFormData({
+				title: "River Flows in You",
+				artist: "Yiruma",
+				content: "X:1\nT:River Flows in You",
+				instrument: "piano",
+			}),
+		);
+		expect(pianoResult).toEqual({
+			instrument: "piano",
+			artistSlug: "yiruma",
+			songSlug: "river-flows-in-you",
+		});
+
+		const songRows = await (db as unknown as ReturnType<typeof drizzle>)
+			.select()
+			.from(songs);
+		expect(songRows).toHaveLength(2);
+		expect(songRows[0].artistId).toBe(songRows[1].artistId);
+		expect(songRows[0].slug).toBe(songRows[1].slug);
+		expect(songRows.map((s) => s.instrument).sort()).toEqual([
+			"guitar",
+			"piano",
+		]);
+	});
+
+	it("returns error for duplicate song under the same instrument", async () => {
+		await createSongLogic(
+			db,
+			makeFormData({
+				title: "River Flows in You",
+				artist: "Yiruma",
+				content: "X:1",
+				instrument: "piano",
+			}),
+		);
+
+		const result = await createSongLogic(
+			db,
+			makeFormData({
+				title: "River Flows in You",
+				artist: "Yiruma",
+				content: "X:2",
+				instrument: "piano",
+			}),
+		);
+
+		expect(result).toEqual({
+			error: "A song with this title already exists for this artist.",
+		});
 	});
 
 	it("returns error when artist name collides on slug with existing artist", async () => {
@@ -428,5 +534,56 @@ describe("deleteSongLogic", () => {
 			.from(artists);
 		expect(artistRows).toHaveLength(1);
 		expect(artistRows[0].name).toBe("Sungha Jung");
+	});
+});
+
+describe("getSongsByInstrument", () => {
+	let db: Db;
+
+	beforeEach(() => {
+		counter = 0;
+		db = createTestDb();
+	});
+
+	it("returns only songs for the given instrument, ordered by title", async () => {
+		await createSongLogic(
+			db,
+			makeFormData({
+				title: "Gravity",
+				artist: "Sungha Jung",
+				content: "e|---0---",
+			}),
+		);
+		await createSongLogic(
+			db,
+			makeFormData({
+				title: "Amber",
+				artist: "Sungha Jung",
+				content: "e|---1---",
+			}),
+		);
+		await createSongLogic(
+			db,
+			makeFormData({
+				title: "River Flows in You",
+				artist: "Yiruma",
+				content: "X:1",
+				instrument: "piano",
+			}),
+		);
+
+		const guitarSongs = await getSongsByInstrument(db, "guitar");
+		expect(guitarSongs.map((s) => s.title)).toEqual(["Amber", "Gravity"]);
+		expect(guitarSongs[0].artistName).toBe("Sungha Jung");
+		expect(guitarSongs[0].artistSlug).toBe("sungha-jung");
+
+		const pianoSongs = await getSongsByInstrument(db, "piano");
+		expect(pianoSongs.map((s) => s.title)).toEqual(["River Flows in You"]);
+		expect(pianoSongs[0].artistName).toBe("Yiruma");
+	});
+
+	it("returns an empty array when no songs exist for the instrument", async () => {
+		const rows = await getSongsByInstrument(db, "piano");
+		expect(rows).toEqual([]);
 	});
 });
