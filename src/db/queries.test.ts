@@ -52,14 +52,14 @@ describe("getSongsByArtistId", () => {
 		];
 		const db = mockDbList(songs);
 
-		const result = await getSongsByArtistId(db, "abc123");
+		const result = await getSongsByArtistId(db, "abc123", "guitar");
 		expect(result).toEqual(songs);
 	});
 
 	it("returns empty array when artist has no songs", async () => {
 		const db = mockDbList([]);
 
-		const result = await getSongsByArtistId(db, "abc123");
+		const result = await getSongsByArtistId(db, "abc123", "guitar");
 		expect(result).toEqual([]);
 	});
 });
@@ -77,14 +77,24 @@ describe("getSongBySlugs", () => {
 		};
 		const db = mockDb([song]);
 
-		const result = await getSongBySlugs(db, "sungha-jung", "dust-in-the-wind");
+		const result = await getSongBySlugs(
+			db,
+			"sungha-jung",
+			"dust-in-the-wind",
+			"guitar",
+		);
 		expect(result).toEqual(song);
 	});
 
 	it("returns null when not found", async () => {
 		const db = mockDb([]);
 
-		const result = await getSongBySlugs(db, "sungha-jung", "nonexistent");
+		const result = await getSongBySlugs(
+			db,
+			"sungha-jung",
+			"nonexistent",
+			"guitar",
+		);
 		expect(result).toBeNull();
 	});
 });

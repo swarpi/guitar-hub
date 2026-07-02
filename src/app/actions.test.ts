@@ -91,6 +91,7 @@ describe("createSongLogic", () => {
 		const result = await createSongLogic(db, fd);
 
 		expect(result).toEqual({
+			instrument: "guitar",
 			artistSlug: "sungha-jung",
 			songSlug: "dust-in-the-wind",
 		});
@@ -273,6 +274,7 @@ describe("updateSongLogic", () => {
 		const result = await updateSongLogic(db, song.id, fd);
 
 		expect(result).toEqual({
+			instrument: "guitar",
 			artistSlug: "sungha-jung",
 			songSlug: "gravity",
 		});
@@ -301,6 +303,7 @@ describe("updateSongLogic", () => {
 		const result = await updateSongLogic(db, song.id, fd);
 
 		expect(result).toEqual({
+			instrument: "guitar",
 			artistSlug: "tommy-emmanuel",
 			songSlug: "amber",
 		});
@@ -390,7 +393,7 @@ describe("deleteSongLogic", () => {
 
 		const result = await deleteSongLogic(db, song.id);
 
-		expect(result).toEqual({ success: true });
+		expect(result).toEqual({ success: true, instrument: "guitar" });
 
 		const songRows = await (db as unknown as ReturnType<typeof drizzle>)
 			.select()
@@ -412,7 +415,7 @@ describe("deleteSongLogic", () => {
 
 		const result = await deleteSongLogic(db, song2.id);
 
-		expect(result).toEqual({ success: true });
+		expect(result).toEqual({ success: true, instrument: "guitar" });
 
 		const songRows = await (db as unknown as ReturnType<typeof drizzle>)
 			.select()

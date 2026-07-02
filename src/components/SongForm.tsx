@@ -19,6 +19,7 @@ interface SongFormProps {
 		formData: FormData,
 	) => Promise<{ error: string } | undefined>;
 	readonly initialValues?: SongFormInitialValues;
+	readonly instrument?: string;
 	readonly songId?: string;
 	readonly songTitle?: string;
 	readonly artistName?: string;
@@ -38,6 +39,7 @@ export function SongForm({
 	artistNames,
 	action,
 	initialValues,
+	instrument,
 	songId,
 	songTitle,
 	artistName,
@@ -62,6 +64,9 @@ export function SongForm({
 		<>
 			<form action={formAction} className="space-y-5">
 				{songId && <input type="hidden" name="songId" value={songId} />}
+				{instrument && (
+					<input type="hidden" name="instrument" value={instrument} />
+				)}
 				<div>
 					<label htmlFor="title-input" className={LABEL_CLASS}>
 						Song Title

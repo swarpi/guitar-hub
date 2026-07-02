@@ -20,7 +20,7 @@ export async function generateMetadata({
 }: SongPageProps): Promise<Metadata> {
 	const { artistSlug, songSlug } = await params;
 	const db = getDb(getRequestContext().env);
-	const song = await getSongBySlugs(db, artistSlug, songSlug);
+	const song = await getSongBySlugs(db, artistSlug, songSlug, "guitar");
 	if (!song) return {};
 	return { title: `${song.title} — Guitar Hub` };
 }
@@ -28,7 +28,7 @@ export async function generateMetadata({
 export default async function SongPage({ params }: SongPageProps) {
 	const { artistSlug, songSlug } = await params;
 	const db = getDb(getRequestContext().env);
-	const song = await getSongBySlugs(db, artistSlug, songSlug);
+	const song = await getSongBySlugs(db, artistSlug, songSlug, "guitar");
 	if (!song) notFound();
 
 	return (

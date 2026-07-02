@@ -30,7 +30,8 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 	const artist = await getArtistBySlug(db, artistSlug);
 	if (!artist) notFound();
 
-	const songs = await getSongsByArtistId(db, artist.id);
+	// Temporary default until ticket 004 replaces this route with /guitar/...
+	const songs = await getSongsByArtistId(db, artist.id, "guitar");
 
 	return (
 		<>

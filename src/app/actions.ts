@@ -15,18 +15,35 @@ import { slugify } from "@/lib/slugify";
 
 type Db = DrizzleD1Database<typeof schema>;
 
+const INSTRUMENTS = ["guitar", "piano"] as const;
+type Instrument = (typeof INSTRUMENTS)[number];
+
+function isInstrument(value: string): value is Instrument {
+	return (INSTRUMENTS as readonly string[]).includes(value);
+}
+
 export async function createSongLogic(
 	db: Db,
 	formData: FormData,
-): Promise<{ error: string } | { artistSlug: string; songSlug: string }> {
+): Promise<
+	| { error: string }
+	| { instrument: string; artistSlug: string; songSlug: string }
+> {
 	const title = (formData.get("title") as string | null)?.trim() ?? "";
 	const artist = (formData.get("artist") as string | null)?.trim() ?? "";
 	const content = (formData.get("content") as string | null)?.trim() ?? "";
 	const capoRaw = (formData.get("capo") as string | null)?.trim() ?? "";
 	const notes = (formData.get("notes") as string | null)?.trim() || null;
+	const instrumentRaw =
+		(formData.get("instrument") as string | null)?.trim() ?? "";
 
 	if (!title || !artist || !content) {
 		return { error: "Title, artist, and content are required." };
+	}
+
+	const instrument = instrumentRaw === "" ? "guitar" : instrumentRaw;
+	if (!isInstrument(instrument)) {
+		return { error: "Instrument must be guitar or piano." };
 	}
 
 	let capo: number | null = null;
@@ -73,7 +90,13 @@ export async function createSongLogic(
 	const existing = await db
 		.select({ id: songs.id })
 		.from(songs)
-		.where(and(eq(songs.artistId, artistRow.id), eq(songs.slug, songSlug)))
+		.where(
+			and(
+				eq(songs.artistId, artistRow.id),
+				eq(songs.slug, songSlug),
+				eq(songs.instrument, instrument),
+			),
+		)
 		.limit(1);
 
 	if (existing.length > 0) {
@@ -86,6 +109,7 @@ export async function createSongLogic(
 		await db.insert(songs).values({
 			id: generateId(),
 			artistId: artistRow.id,
+			instrument,
 			title,
 			slug: songSlug,
 			content,
@@ -103,7 +127,7 @@ export async function createSongLogic(
 		throw err;
 	}
 
-	return { artistSlug, songSlug };
+	return { instrument, artistSlug, songSlug };
 }
 
 export async function createSong(
@@ -123,7 +147,10 @@ export async function updateSongLogic(
 	db: Db,
 	songId: string,
 	formData: FormData,
-): Promise<{ error: string } | { artistSlug: string; songSlug: string }> {
+): Promise<
+	| { error: string }
+	| { instrument: string; artistSlug: string; songSlug: string }
+> {
 	const title = (formData.get("title") as string | null)?.trim() ?? "";
 	const artist = (formData.get("artist") as string | null)?.trim() ?? "";
 	const content = (formData.get("content") as string | null)?.trim() ?? "";
@@ -155,6 +182,9 @@ export async function updateSongLogic(
 	if (!currentSong) {
 		return { error: "Song not found." };
 	}
+
+	// Instrument is fixed at creation (ADR-0005) — the form cannot change it.
+	const instrument = currentSong.instrument;
 
 	let newArtistId = currentSong.artistId;
 
@@ -196,6 +226,7 @@ export async function updateSongLogic(
 				and(
 					eq(songs.artistId, newArtistId),
 					eq(songs.slug, newSongSlug),
+					eq(songs.instrument, instrument),
 					ne(songs.id, songId),
 				),
 			)
@@ -238,7 +269,7 @@ export async function updateSongLogic(
 			);
 	}
 
-	return { artistSlug: newArtistSlug, songSlug: newSongSlug };
+	return { instrument, artistSlug: newArtistSlug, songSlug: newSongSlug };
 }
 
 export async function updateSong(
@@ -262,13 +293,13 @@ export async function updateSong(
 export async function deleteSongLogic(
 	db: Db,
 	songId: string,
-): Promise<{ error: string } | { success: true }> {
+): Promise<{ error: string } | { success: true; instrument: string }> {
 	const currentSong = await getSongById(db, songId);
 	if (!currentSong) {
 		return { error: "Song not found." };
 	}
 
-	const { artistId } = currentSong;
+	const { artistId, instrument } = currentSong;
 
 	await db.delete(songs).where(eq(songs.id, songId));
 
@@ -286,7 +317,7 @@ export async function deleteSongLogic(
 			),
 		);
 
-	return { success: true };
+	return { success: true, instrument };
 }
 
 export async function deleteSong(
