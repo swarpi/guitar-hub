@@ -105,22 +105,24 @@ export function SongForm({
 					</datalist>
 				</div>
 
-				<div>
-					<label htmlFor="capo-input" className={LABEL_CLASS}>
-						Capo
-					</label>
-					<input
-						id="capo-input"
-						name="capo"
-						type="number"
-						value={capo}
-						onChange={(e) => setCapo(e.target.value)}
-						min={0}
-						max={12}
-						placeholder="0"
-						className={`${INPUT_CLASS} max-w-[170px]`}
-					/>
-				</div>
+				{instrument !== "piano" && (
+					<div>
+						<label htmlFor="capo-input" className={LABEL_CLASS}>
+							Capo
+						</label>
+						<input
+							id="capo-input"
+							name="capo"
+							type="number"
+							value={capo}
+							onChange={(e) => setCapo(e.target.value)}
+							min={0}
+							max={12}
+							placeholder="0"
+							className={`${INPUT_CLASS} max-w-[170px]`}
+						/>
+					</div>
+				)}
 
 				<div>
 					<label htmlFor="tab-input" className={LABEL_CLASS}>

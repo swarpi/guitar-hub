@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-02 21:22 UTC
+> Last updated: 2026-07-02 21:24 UTC
 
 ## Current Phase
 
@@ -9,7 +9,7 @@
 | Decide | |
 | Map | |
 | Decompose | |
-| Execute | |
+| Execute | Active |
 | Review | |
 | Audit | |
 | Learn | |
@@ -17,16 +17,17 @@
 
 ## Active Work
 
-_What is currently being worked on, the relevant tickets, and the expected next step._
+Multi-instrument feature (ADR-0005), executing in this worktree. Ticket 007 (piano route group) is done and verifier-approved: all five `/piano/...` pages exist, the piano CRUD flow works end-to-end, and `SongForm` hides the capo field for piano. Changes are uncommitted in the worktree. Next step: ticket 008 (ABC notation rendering via abcjs) to upgrade the piano song detail `<pre>` block to staff notation.
 
 ## Branch & Commits
 
 <!-- AUTO:START -->
 **Branch:** `worktree-multi-instrument-001`  
-**Last commit:** 2026-07-02 21:22 UTC
+**Last commit:** 2026-07-02 21:24 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `07728fd` | 2026-07-02 | Redirect legacy /artists, /add, /edit routes to /guitar equivalents |
 | `a98958a` | 2026-07-02 | Replace home page with Music Hub instrument-picker landing page |
 | `ed00f5b` | 2026-07-02 | Add guitar route group, instrument-prefixed redirects, remove legacy routes |
 | `5ae355b` | 2026-07-02 | Add instrument validation and getSongsByInstrument test coverage |
@@ -41,25 +42,22 @@ _What is currently being worked on, the relevant tickets, and the expected next 
 **Files changed (last 5 commits):**
 
 ```
- STATUS.md                                                    |  26 ++++--
- migrations/0001_multi-instrument.sql                         |   7 ++
- src/app/actions.test.ts                                      | 312 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------
- src/app/actions.ts                                           |  73 +++++++++++-----
- src/app/{artists => guitar}/[artistSlug]/[songSlug]/page.tsx |  13 +--
+ STATUS.md                                                    |  33 +++++++--
+ next.config.mjs                                              |  27 ++++++-
+ src/app/actions.test.ts                                      | 261 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ src/app/actions.ts                                           |  55 +++++++++++---
+ src/app/{artists => guitar}/[artistSlug]/[songSlug]/page.tsx |  11 +--
  src/app/{artists => guitar}/[artistSlug]/page.tsx            |  12 ++-
- src/app/{ => guitar}/add/page.tsx                            |  17 +++-
- src/app/{ => guitar}/edit/[songId]/page.tsx                  |  15 ++--
- src/app/guitar/page.tsx                                      | 100 +++++++++++++++++++++
- src/app/page.tsx                                             | 149 ++++++++++++++------------------
+ src/app/{ => guitar}/add/page.tsx                            |  17 ++++-
+ src/app/{ => guitar}/edit/[songId]/page.tsx                  |  13 ++--
+ src/app/guitar/page.tsx                                      | 100 +++++++++++++++++++++++++
+ src/app/page.tsx                                             | 149 ++++++++++++++++----------------------
  src/components/FAB.tsx                                       |   8 +-
  src/components/Header.tsx                                    |   6 --
- src/components/SongForm.tsx                                  |  19 ++--
- src/db/queries.test.ts                                       |  56 ++++++++++--
- src/db/queries.ts                                            |  55 ++++++++++--
- src/db/schema.test.ts                                        |   8 +-
- src/db/schema.ts                                             |   9 +-
- src/db/seed.ts                                               |   2 +-
- 18 files changed, 689 insertions(+), 198 deletions(-)
+ src/components/SongForm.tsx                                  |   5 ++
+ src/db/queries.test.ts                                       |  54 ++++++++++++--
+ src/db/queries.ts                                            |  50 ++++++++++++-
+ 15 files changed, 655 insertions(+), 146 deletions(-)
 ```
 <!-- AUTO:FILES:END -->
 
@@ -67,7 +65,9 @@ _What is currently being worked on, the relevant tickets, and the expected next 
 
 | Ticket | Feature | Status |
 |--------|---------|--------|
-| | | |
+| multi-instrument/008 — ABC notation rendering | multi-instrument | Up Next |
+| multi-instrument/009 — App rename | multi-instrument | Todo |
+| multi-instrument/010 — Service worker / PWA updates | multi-instrument | Todo |
 
 ## Risks & Blockers
 
@@ -77,4 +77,4 @@ _What is currently being worked on, the relevant tickets, and the expected next 
 
 | Date | Summary |
 |------|---------|
-| | |
+| 2026-07-02 | Ticket 007 done: piano route group (/piano list, add, edit, artist, song detail), capo hidden for piano in SongForm, verifier approved |

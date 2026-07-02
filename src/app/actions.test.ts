@@ -351,12 +351,18 @@ describe("createSongLogic", () => {
 
 async function seedSong(
 	db: Db,
-	fields: { title: string; artist: string; content?: string },
+	fields: {
+		title: string;
+		artist: string;
+		content?: string;
+		instrument?: string;
+	},
 ) {
 	const fd = makeFormData({
 		title: fields.title,
 		artist: fields.artist,
 		content: fields.content ?? "e|---0---",
+		...(fields.instrument ? { instrument: fields.instrument } : {}),
 	});
 	const result = await createSongLogic(db, fd);
 	if ("error" in result) throw new Error(result.error);
@@ -623,6 +629,20 @@ describe("action wrappers", () => {
 
 		expect(revalidatePath).toHaveBeenCalledWith("/guitar");
 		expect(redirect).toHaveBeenCalledWith("/guitar");
+	});
+
+	it("deleteSong revalidates and redirects to /piano for piano songs", async () => {
+		const song = await seedSong(db, {
+			title: "River Flows in You",
+			artist: "Yiruma",
+			content: "X:1",
+			instrument: "piano",
+		});
+
+		await deleteSong(makeFormData({ songId: song.id }));
+
+		expect(revalidatePath).toHaveBeenCalledWith("/piano");
+		expect(redirect).toHaveBeenCalledWith("/piano");
 	});
 });
 
