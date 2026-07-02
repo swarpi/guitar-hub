@@ -8,7 +8,7 @@ _Tickets actively being worked on this cycle._
 
 | Ticket | Feature | Priority | Status | Assignee |
 |--------|---------|----------|--------|----------|
-| | | | | |
+| [003 — Offline Fallback Page](pwa/003-offline-fallback-page.md) | pwa | P1 | In Review | |
 
 ## Up Next
 
@@ -16,17 +16,28 @@ _Tickets ready to be picked up in the next cycle._
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| [001 — Web App Manifest and App Icons](pwa/001-web-app-manifest-and-icons.md) | pwa | P1 | S |
-| [002 — Service Worker and Offline Caching](pwa/002-service-worker-and-offline-caching.md) | pwa | P1 | M |
-| [003 — Offline Fallback Page](pwa/003-offline-fallback-page.md) | pwa | P1 | XS |
+| [007 — Piano Route Group](multi-instrument/007-piano-route-group.md) | multi-instrument | P1 | M |
+| [008 — ABC Notation Rendering](multi-instrument/008-abc-notation-rendering.md) | multi-instrument | P1 | M |
+| [009 — App Rename](multi-instrument/009-app-rename.md) | multi-instrument | P1 | S |
+| [010 — Service Worker and PWA Updates](multi-instrument/010-service-worker-pwa-updates.md) | multi-instrument | P2 | XS |
 
 ## Backlog
 
-_Tickets that are planned but not yet scheduled._
+_Tickets that are planned but not yet scheduled. ai-import tickets should be picked up after multi-instrument lands (ADR-0005 renames `tabContent` → `content`; ImportForm adapts at that point)._
+
+_sheet-ingest (ADR-0007) tickets 001 and 002 are explicitly blocked on the same dependency: the multi-instrument work (tickets 001–004) lives on the unmerged branch `worktree-multi-instrument-001` (worktree at `.claude/worktrees/multi-instrument-001`). Do not start sheet-ingest 001/002 until that branch merges to `master`. Tickets 003–008 layer on top of 001/002 and inherit the same block transitively. ADR-0006 Phase 3 (in-app image import) is descoped per ADR-0007 §7 — no ai-import image tickets exist to remove; this is noted here so no one adds them later._
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| | | | |
+| [003 — Duplicate Warning Banner](ai-import/003-duplicate-warning-banner.md) | ai-import | P1 | S |
+| [001 — Schema Migration: Metadata Columns](sheet-ingest/001-schema-migration-metadata-columns.md) | sheet-ingest | P1 | S |
+| [002 — MCP Server Scaffold](sheet-ingest/002-mcp-server-scaffold.md) | sheet-ingest | P1 | M |
+| [003 — validate_notation: ABC via abcjs](sheet-ingest/003-validate-notation-abc.md) | sheet-ingest | P1 | M |
+| [004 — validate_notation: MusicXML via Verovio](sheet-ingest/004-validate-notation-musicxml.md) | sheet-ingest | P2 | S |
+| [005 — Screenshot Ingestion Prototype](sheet-ingest/005-screenshot-ingestion-prototype.md) | sheet-ingest | P2 | M |
+| [006 — Local Media Tooling + Audio-to-MIDI Pipeline](sheet-ingest/006-local-media-tooling-audio-pipeline.md) | sheet-ingest | P2 | M |
+| [007 — Falling-Notes Frame-to-MIDI Pipeline (Spike)](sheet-ingest/007-falling-notes-frame-to-midi.md) | sheet-ingest | P3 | M |
+| [008 — sheet-ingest Skill](sheet-ingest/008-sheet-ingest-skill.md) | sheet-ingest | P2 | S |
 
 ## Done
 
@@ -34,6 +45,18 @@ _Completed tickets. Move here when done, newest first._
 
 | Ticket | Feature | Completed |
 |--------|---------|-----------|
+| [006 — URL Redirects](multi-instrument/006-url-redirects.md) | multi-instrument | 2026-07-02 |
+| [005 — ImportForm URL Input Mode](ai-import/005-import-form-url-input.md) | ai-import | 2026-07-02 |
+| [005 — Landing Page](multi-instrument/005-landing-page.md) | multi-instrument | 2026-07-02 |
+| [004 — Proxy URL Fetching](ai-import/004-proxy-url-fetching.md) | ai-import | 2026-07-02 |
+| [004 — Guitar Route Group](multi-instrument/004-guitar-route-group.md) | multi-instrument | 2026-07-02 |
+| [003 — Test Suite Updates](multi-instrument/003-test-suite-updates.md) | multi-instrument | 2026-07-02 |
+| [002 — ImportForm Component](ai-import/002-import-form-component.md) | ai-import | 2026-07-02 |
+| [002 — Query and Action Layer](multi-instrument/002-query-action-layer.md) | multi-instrument | 2026-07-02 |
+| [001 — Add Page Mode Toggle](ai-import/001-add-page-mode-toggle.md) | ai-import | 2026-06-29 |
+| [001 — Schema Migration](multi-instrument/001-schema-migration.md) | multi-instrument | 2026-06-29 |
+| [002 — Service Worker and Offline Caching](pwa/002-service-worker-and-offline-caching.md) | pwa | 2026-06-24 |
+| [001 — Web App Manifest and App Icons](pwa/001-web-app-manifest-and-icons.md) | pwa | 2026-06-24 |
 | [001 — Go Live: Provision D1, Migrate, Seed, Deploy](deployment/001-go-live.md) | deployment | 2026-06-24 |
 | [009 — Remove SPA Prototype and Migrate Seed Data](foundation/009-remove-spa-prototype.md) | foundation | 2026-06-20 |
 | [008 — Cloudflare Pages Deployment and D1 Wiring](foundation/008-cloudflare-deployment.md) | foundation | 2026-06-20 |
