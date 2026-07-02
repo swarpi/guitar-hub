@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { getArtistBySlug, getSongBySlugs, getSongsByArtistId } from "./queries";
+import {
+	getArtistBySlug,
+	getSongBySlugs,
+	getSongCountsByInstrument,
+	getSongsByArtistId,
+} from "./queries";
 
 function mockDb(rows: Record<string, unknown>[]) {
 	const chain = {
@@ -96,5 +101,34 @@ describe("getSongBySlugs", () => {
 			"guitar",
 		);
 		expect(result).toBeNull();
+	});
+});
+
+function mockDbGroupBy(rows: Record<string, unknown>[]) {
+	const chain = {
+		select: vi.fn().mockReturnThis(),
+		from: vi.fn().mockReturnThis(),
+		groupBy: vi.fn().mockResolvedValue(rows),
+	};
+	chain.select.mockReturnValue(chain);
+	return chain as unknown as Parameters<typeof getSongCountsByInstrument>[0];
+}
+
+describe("getSongCountsByInstrument", () => {
+	it("maps grouped rows to guitar and piano counts", async () => {
+		const db = mockDbGroupBy([
+			{ instrument: "guitar", total: 21 },
+			{ instrument: "piano", total: 3 },
+		]);
+
+		const result = await getSongCountsByInstrument(db);
+		expect(result).toEqual({ guitar: 21, piano: 3 });
+	});
+
+	it("defaults missing instruments to zero and ignores unknown values", async () => {
+		const db = mockDbGroupBy([{ instrument: "drums", total: 5 }]);
+
+		const result = await getSongCountsByInstrument(db);
+		expect(result).toEqual({ guitar: 0, piano: 0 });
 	});
 });
