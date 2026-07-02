@@ -5,7 +5,7 @@ import { useActionState, useEffect, useState } from "react";
 
 import { DeleteModal } from "./DeleteModal";
 
-interface SongFormInitialValues {
+export interface SongFormInitialValues {
 	readonly title: string;
 	readonly artist: string;
 	readonly capo: number | null;

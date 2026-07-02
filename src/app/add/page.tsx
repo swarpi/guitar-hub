@@ -2,9 +2,9 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { asc } from "drizzle-orm";
 import type { Metadata } from "next";
 
+import { AddPageClient } from "@/components/AddPageClient";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Header } from "@/components/Header";
-import { SongForm } from "@/components/SongForm";
 import { getDb } from "@/db/client";
 import { artists } from "@/db/schema";
 
@@ -36,7 +36,7 @@ export default async function AddPage() {
 				<h1 className="mb-6 font-serif text-[28px] font-medium leading-tight text-ink">
 					Add a Song
 				</h1>
-				<SongForm artistNames={artistNames} action={createSong} />
+				<AddPageClient artistNames={artistNames} action={createSong} />
 			</main>
 		</>
 	);
