@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AbcNotation } from "@/components/AbcNotation";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Header } from "@/components/Header";
 import { getDb } from "@/db/client";
@@ -49,9 +50,7 @@ export default async function PianoSongPage({ params }: SongPageProps) {
 					{song.artistName}
 				</div>
 
-				<pre className="mb-6 overflow-x-auto whitespace-pre rounded-lg border border-line bg-paper p-5 font-mono text-[13px] leading-[1.7] text-tab-text shadow-[0_1px_3px_rgba(40,28,16,0.06)]">
-					{song.content}
-				</pre>
+				<AbcNotation content={song.content} />
 
 				{song.notes && song.notes.trim() !== "" && (
 					<div className="mb-6">
