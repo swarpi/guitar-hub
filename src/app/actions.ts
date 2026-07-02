@@ -140,7 +140,7 @@ export async function createSong(
 		return result;
 	}
 
-	redirect(`/artists/${result.artistSlug}/${result.songSlug}`);
+	redirect(`/${result.instrument}/${result.artistSlug}/${result.songSlug}`);
 }
 
 export async function updateSongLogic(
@@ -287,7 +287,7 @@ export async function updateSong(
 		return result;
 	}
 
-	redirect(`/artists/${result.artistSlug}/${result.songSlug}`);
+	redirect(`/${result.instrument}/${result.artistSlug}/${result.songSlug}`);
 }
 
 export async function deleteSongLogic(
@@ -335,6 +335,6 @@ export async function deleteSong(
 		return result;
 	}
 
-	revalidatePath("/");
-	redirect("/");
+	revalidatePath(`/${result.instrument}`);
+	redirect(`/${result.instrument}`);
 }

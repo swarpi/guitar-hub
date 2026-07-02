@@ -24,13 +24,12 @@ export async function generateMetadata({
 	return { title: `${artist.name} — Guitar Hub` };
 }
 
-export default async function ArtistPage({ params }: ArtistPageProps) {
+export default async function GuitarArtistPage({ params }: ArtistPageProps) {
 	const { artistSlug } = await params;
 	const db = getDb(getRequestContext().env);
 	const artist = await getArtistBySlug(db, artistSlug);
 	if (!artist) notFound();
 
-	// Temporary default until ticket 004 replaces this route with /guitar/...
 	const songs = await getSongsByArtistId(db, artist.id, "guitar");
 
 	return (
@@ -38,7 +37,11 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 			<Header />
 			<main className="relative z-[1] px-[clamp(20px,4vw,34px)] pb-20 pt-[clamp(22px,4.5vw,38px)]">
 				<Breadcrumb
-					items={[{ label: "Home", href: "/" }, { label: artist.name }]}
+					items={[
+						{ label: "Home", href: "/" },
+						{ label: "Guitar", href: "/guitar" },
+						{ label: artist.name },
+					]}
 				/>
 				<h1 className="mb-1 font-serif text-[28px] font-medium leading-tight text-ink">
 					{artist.name}
@@ -54,7 +57,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 								key={song.id}
 								title={song.title}
 								capo={song.capo ?? undefined}
-								href={`/artists/${artistSlug}/${song.slug}`}
+								href={`/guitar/${artistSlug}/${song.slug}`}
 							/>
 						))}
 					</div>

@@ -8,7 +8,7 @@ import { SongForm } from "@/components/SongForm";
 import { getDb } from "@/db/client";
 import { artists } from "@/db/schema";
 
-import { createSong } from "../actions";
+import { createSong } from "../../actions";
 
 export const runtime = "edge";
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 	title: "Add a Song — Guitar Hub",
 };
 
-export default async function AddPage() {
+export default async function AddGuitarSongPage() {
 	const db = getDb(getRequestContext().env);
 
 	const allArtists = await db
@@ -31,12 +31,21 @@ export default async function AddPage() {
 			<Header />
 			<main className="relative z-[1] px-[clamp(20px,4vw,34px)] pb-20 pt-[clamp(22px,4.5vw,38px)]">
 				<Breadcrumb
-					items={[{ label: "Home", href: "/" }, { label: "Add a Song" }]}
+					items={[
+						{ label: "Home", href: "/" },
+						{ label: "Guitar", href: "/guitar" },
+						{ label: "Add a Song" },
+					]}
 				/>
 				<h1 className="mb-6 font-serif text-[28px] font-medium leading-tight text-ink">
 					Add a Song
 				</h1>
-				<SongForm artistNames={artistNames} action={createSong} />
+				<SongForm
+					artistNames={artistNames}
+					action={createSong}
+					instrument="guitar"
+					cancelHref="/guitar"
+				/>
 			</main>
 		</>
 	);

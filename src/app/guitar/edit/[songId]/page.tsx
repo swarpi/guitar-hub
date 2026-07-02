@@ -10,7 +10,7 @@ import { getDb } from "@/db/client";
 import { getSongById } from "@/db/queries";
 import { artists } from "@/db/schema";
 
-import { deleteSong, updateSong } from "../../actions";
+import { deleteSong, updateSong } from "../../../actions";
 
 export const runtime = "edge";
 
@@ -28,7 +28,7 @@ export async function generateMetadata({
 	return { title: `Edit ${song.title} — Guitar Hub` };
 }
 
-export default async function EditPage({ params }: EditPageProps) {
+export default async function EditGuitarSongPage({ params }: EditPageProps) {
 	const { songId } = await params;
 	const db = getDb(getRequestContext().env);
 
@@ -37,7 +37,7 @@ export default async function EditPage({ params }: EditPageProps) {
 		db.select({ name: artists.name }).from(artists).orderBy(asc(artists.name)),
 	]);
 
-	if (!song) notFound();
+	if (song?.instrument !== "guitar") notFound();
 
 	const artistNames = allArtists.map((a) => a.name);
 
@@ -48,13 +48,14 @@ export default async function EditPage({ params }: EditPageProps) {
 				<Breadcrumb
 					items={[
 						{ label: "Home", href: "/" },
+						{ label: "Guitar", href: "/guitar" },
 						{
 							label: song.artistName,
-							href: `/artists/${song.artistSlug}`,
+							href: `/guitar/${song.artistSlug}`,
 						},
 						{
 							label: song.title,
-							href: `/artists/${song.artistSlug}/${song.slug}`,
+							href: `/guitar/${song.artistSlug}/${song.slug}`,
 						},
 						{ label: "Edit" },
 					]}
@@ -75,7 +76,7 @@ export default async function EditPage({ params }: EditPageProps) {
 					songId={songId}
 					songTitle={song.title}
 					artistName={song.artistName}
-					cancelHref={`/artists/${song.artistSlug}/${song.slug}`}
+					cancelHref={`/guitar/${song.artistSlug}/${song.slug}`}
 					deleteAction={deleteSong}
 				/>
 			</main>

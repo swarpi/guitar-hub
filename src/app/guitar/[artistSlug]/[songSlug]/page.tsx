@@ -25,7 +25,7 @@ export async function generateMetadata({
 	return { title: `${song.title} — Guitar Hub` };
 }
 
-export default async function SongPage({ params }: SongPageProps) {
+export default async function GuitarSongPage({ params }: SongPageProps) {
 	const { artistSlug, songSlug } = await params;
 	const db = getDb(getRequestContext().env);
 	const song = await getSongBySlugs(db, artistSlug, songSlug, "guitar");
@@ -38,7 +38,8 @@ export default async function SongPage({ params }: SongPageProps) {
 				<Breadcrumb
 					items={[
 						{ label: "Home", href: "/" },
-						{ label: song.artistName, href: `/artists/${song.artistSlug}` },
+						{ label: "Guitar", href: "/guitar" },
+						{ label: song.artistName, href: `/guitar/${song.artistSlug}` },
 						{ label: song.title },
 					]}
 				/>
@@ -71,7 +72,7 @@ export default async function SongPage({ params }: SongPageProps) {
 				)}
 
 				<Link
-					href={`/edit/${song.id}`}
+					href={`/guitar/edit/${song.id}`}
 					className="inline-flex items-center rounded-lg border border-line bg-transparent px-5 py-[11px] font-mono text-[11px] font-semibold uppercase tracking-widest text-ink-soft transition-colors hover:border-ink-soft/30 hover:bg-accent/[.04]"
 				>
 					Edit

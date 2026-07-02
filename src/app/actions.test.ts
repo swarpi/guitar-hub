@@ -1,5 +1,7 @@
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getSongsByInstrument } from "@/db/queries";
@@ -7,7 +9,7 @@ import * as schema from "@/db/schema";
 import { artists, songs } from "@/db/schema";
 
 vi.mock("@cloudflare/next-on-pages", () => ({
-	getRequestContext: vi.fn(),
+	getRequestContext: vi.fn(() => ({ env: {} })),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -18,12 +20,24 @@ vi.mock("next/cache", () => ({
 	revalidatePath: vi.fn(),
 }));
 
+vi.mock("@/db/client", () => ({
+	getDb: vi.fn(() => currentDb),
+}));
+
 // eslint-disable-next-line -- must be after mocks
-const { createSongLogic, updateSongLogic, deleteSongLogic } = await import(
-	"./actions"
-);
+const {
+	createSongLogic,
+	updateSongLogic,
+	deleteSongLogic,
+	createSong,
+	updateSong,
+	deleteSong,
+} = await import("./actions");
 
 type Db = Parameters<typeof createSongLogic>[0];
+
+// Handed to the mocked getDb so wrapper tests run against the in-memory db.
+let currentDb: Db;
 
 let counter = 0;
 vi.mock("@/lib/nanoid", () => ({
@@ -534,6 +548,81 @@ describe("deleteSongLogic", () => {
 			.from(artists);
 		expect(artistRows).toHaveLength(1);
 		expect(artistRows[0].name).toBe("Sungha Jung");
+	});
+});
+
+describe("action wrappers", () => {
+	let db: Db;
+
+	beforeEach(() => {
+		counter = 0;
+		db = createTestDb();
+		currentDb = db;
+		vi.clearAllMocks();
+	});
+
+	it("createSong redirects to the instrument-prefixed song path", async () => {
+		await createSong(
+			makeFormData({
+				title: "Amber",
+				artist: "Sungha Jung",
+				content: "e|---0---",
+			}),
+		);
+
+		expect(redirect).toHaveBeenCalledWith("/guitar/sungha-jung/amber");
+	});
+
+	it("createSong redirects to /piano/... for piano songs", async () => {
+		await createSong(
+			makeFormData({
+				title: "River Flows in You",
+				artist: "Yiruma",
+				content: "X:1",
+				instrument: "piano",
+			}),
+		);
+
+		expect(redirect).toHaveBeenCalledWith("/piano/yiruma/river-flows-in-you");
+	});
+
+	it("createSong returns the error without redirecting", async () => {
+		const result = await createSong(makeFormData({ title: "X", artist: "Y" }));
+
+		expect(result).toEqual({
+			error: "Title, artist, and content are required.",
+		});
+		expect(redirect).not.toHaveBeenCalled();
+	});
+
+	it("updateSong redirects to the instrument-prefixed song path", async () => {
+		const song = await seedSong(db, {
+			title: "Amber",
+			artist: "Sungha Jung",
+		});
+
+		await updateSong(
+			makeFormData({
+				songId: song.id,
+				title: "Gravity",
+				artist: "Sungha Jung",
+				content: "e|---1---",
+			}),
+		);
+
+		expect(redirect).toHaveBeenCalledWith("/guitar/sungha-jung/gravity");
+	});
+
+	it("deleteSong revalidates and redirects to the instrument section", async () => {
+		const song = await seedSong(db, {
+			title: "Amber",
+			artist: "Sungha Jung",
+		});
+
+		await deleteSong(makeFormData({ songId: song.id }));
+
+		expect(revalidatePath).toHaveBeenCalledWith("/guitar");
+		expect(redirect).toHaveBeenCalledWith("/guitar");
 	});
 });
 

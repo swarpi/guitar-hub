@@ -13,12 +13,6 @@ export function Header(): React.ReactElement {
 						<span className="font-light italic text-[#a7bdab]">Hub</span>
 					</span>
 				</Link>
-				<Link
-					href="/add"
-					className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-white/[.28] bg-white/[.08] px-[15px] py-[9px] font-mono text-[11.5px] font-semibold uppercase tracking-widest text-[#e8ecde] transition-colors hover:border-white/[.55] hover:bg-white/[.16]"
-				>
-					＋ Add
-				</Link>
 			</div>
 			<div className="px-[clamp(16px,4vw,28px)] pb-4 pt-3">
 				<Suspense>
