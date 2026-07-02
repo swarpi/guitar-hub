@@ -1,7 +1,7 @@
 # Ticket: Offline Fallback Page
 
 **Feature:** pwa
-**Status:** Todo
+**Status:** In Review
 **Priority:** P1
 **Estimate:** XS
 **Related:** ADR-0004
@@ -18,16 +18,16 @@ When the user navigates to an un-cached page while offline, they see a Guitar Hu
 
 ## Acceptance Criteria
 
-- [ ] `public/offline.html` exists as a standalone, self-contained HTML file (no external stylesheet, font, or script dependencies)
-- [ ] The page's visual design matches the app: ivory background (`#faf9f3`), a forest green (`#1f3a2e`) header bar with the text "Guitar Hub", Spectral-style serif body font declared inline via `font-family: Georgia, serif` (Google Fonts cannot be loaded offline), centered single-column layout
-- [ ] The page body displays a clear message: the user is offline and the requested page has not been cached yet
-- [ ] A "Go Back" button calls `window.history.back()` — returns the user to the previous (likely cached) page
-- [ ] A "Try Again" button calls `window.location.reload()` — re-attempts the navigation when connectivity returns
-- [ ] The service worker from ticket 002 is updated to precache `/offline.html` on install
-- [ ] The service worker's catch handler is extended with `setCatchHandler` (or equivalent) to serve `/offline.html` when a navigation request fails and no cache entry exists
-- [ ] Navigating offline to a URL not in the page cache shows `offline.html` — verified in Chrome DevTools with Network set to "Offline"
-- [ ] `pnpm build` passes
-- [ ] `pnpm lint` passes
+- [x] `public/offline.html` exists as a standalone, self-contained HTML file (no external stylesheet, font, or script dependencies)
+- [x] The page's visual design matches the app: ivory background (`#faf9f3`), a forest green (`#1f3a2e`) header bar with the text "Guitar Hub", Spectral-style serif body font declared inline via `font-family: Georgia, serif` (Google Fonts cannot be loaded offline), centered single-column layout
+- [x] The page body displays a clear message: the user is offline and the requested page has not been cached yet
+- [x] A "Go Back" button calls `window.history.back()` — returns the user to the previous (likely cached) page
+- [x] A "Try Again" button calls `window.location.reload()` — re-attempts the navigation when connectivity returns
+- [x] The service worker from ticket 002 is updated to precache `/offline.html` on install
+- [x] The service worker's catch handler is extended with `setCatchHandler` (or equivalent) to serve `/offline.html` when a navigation request fails and no cache entry exists
+- [ ] Navigating offline to a URL not in the page cache shows `offline.html` — verified in Chrome DevTools with Network set to "Offline" — **pending manual confirmation** (no browser available in the implementing/verifying environment; wiring verified by code review against Workbox's documented `setCatchHandler` semantics and the ticket's own Notes pattern, applied verbatim)
+- [x] `pnpm build` passes
+- [x] `pnpm lint` passes
 - [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
@@ -56,11 +56,10 @@ When the user navigates to an un-cached page while offline, they see a Guitar Hu
 
 ## Implementation Plan
 
-_To be filled in before starting work._
-
-1. Step 1
-2. Step 2
-3. Step 3
+1. Create `public/offline.html` as a fully self-contained page (inline `<style>` only, `Georgia, serif`, design-system hex colors `#faf9f3` / `#1f3a2e` / `#33271c`) with the offline message, a "Go Back" button (`window.history.back()`), and a "Try Again" button (`window.location.reload()`).
+2. Update `public/sw.js`: add an `offline-v1` cache to `VALID_CACHES`, precache `/offline.html` in an `install` listener, and register `workbox.routing.setCatchHandler` to serve `/offline.html` for failed `document` navigations (matching the pattern in this ticket's Notes verbatim), returning `Response.error()` for non-document requests.
+3. Run `pnpm build` and `pnpm lint`.
+4. Manual DevTools offline-navigation check (Network → Offline, navigate to an uncached URL) — requires a real Chrome session; flagged for the user to confirm since the implementing session has no browser access.
 
 ## Post-Implementation
 

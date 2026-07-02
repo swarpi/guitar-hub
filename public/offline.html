@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline — Guitar Hub</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #faf9f3;
+      color: #33271c;
+      font-family: Georgia, serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      background: #1f3a2e;
+      padding: 1rem 1.5rem;
+      text-align: center;
+    }
+    header h1 {
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+    main {
+      width: 100%;
+      max-width: 720px;
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #1f3a2e;
+    }
+    p {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #5f6b5c;
+      margin-bottom: 2rem;
+    }
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    button {
+      font-family: Georgia, serif;
+      font-size: 1rem;
+      padding: 0.625rem 1.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    button:hover { opacity: 0.85; }
+    .btn-back {
+      background: #1f3a2e;
+      color: #fff;
+      border: none;
+    }
+    .btn-retry {
+      background: transparent;
+      color: #1f3a2e;
+      border: 1.5px solid #1f3a2e;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Guitar Hub</h1>
+  </header>
+  <main>
+    <h2>You're offline</h2>
+    <p>The page you're looking for hasn't been cached yet. Connect to the internet and try again, or go back to a page you've already visited.</p>
+    <div class="actions">
+      <button class="btn-back" onclick="window.history.back()">Go Back</button>
+      <button class="btn-retry" onclick="window.location.reload()">Try Again</button>
+    </div>
+  </main>
+</body>
+</html>

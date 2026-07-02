@@ -5,7 +5,14 @@ importScripts(
 const CACHE_VERSION = "v1";
 const PAGES_CACHE = `pages-${CACHE_VERSION}`;
 const ASSETS_CACHE = `assets-${CACHE_VERSION}`;
-const VALID_CACHES = [PAGES_CACHE, ASSETS_CACHE];
+const OFFLINE_CACHE = `offline-${CACHE_VERSION}`;
+const VALID_CACHES = [PAGES_CACHE, ASSETS_CACHE, OFFLINE_CACHE];
+
+self.addEventListener("install", (event) => {
+	event.waitUntil(
+		caches.open(OFFLINE_CACHE).then((cache) => cache.add("/offline.html")),
+	);
+});
 
 workbox.routing.registerRoute(
 	({ request }) => request.mode === "navigate",
@@ -46,4 +53,11 @@ self.addEventListener("activate", (event) => {
 			),
 		),
 	);
+});
+
+workbox.routing.setCatchHandler(async ({ event }) => {
+	if (event.request.destination === "document") {
+		return caches.match("/offline.html");
+	}
+	return Response.error();
 });
