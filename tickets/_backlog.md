@@ -6,8 +6,12 @@ Track and prioritize work across features. Move tickets between sections as they
 
 _Tickets actively being worked on this cycle._
 
+_route-consolidation (ADR-0008) is P0: production is degraded — the deployed worker exceeds the Workers free-plan 3 MiB gzipped bundle cap, and the `tab_content → content` D1 rename has been temporarily reverted so the old worker keeps serving. Ticket 002 depends on ticket 001 and its production steps are operator-run; see 002's Notes for the required sequencing (verify bundle size → re-apply rename → deploy → smoke test)._
+
 | Ticket | Feature | Priority | Status | Assignee |
 |--------|---------|----------|--------|----------|
+| [001 — Consolidate Instrument Route Group](route-consolidation/001-consolidate-instrument-route-group.md) | route-consolidation | P0 | Todo | |
+| [002 — Deploy Verification and Rollout](route-consolidation/002-deploy-verification-and-rollout.md) | route-consolidation | P0 | Todo | |
 | [003 — Offline Fallback Page](pwa/003-offline-fallback-page.md) | pwa | P1 | In Review | |
 
 ## Up Next

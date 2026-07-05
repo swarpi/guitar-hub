@@ -5,9 +5,11 @@ import type { Metadata } from "next";
 import { AddPageClient } from "@/components/AddPageClient";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Header } from "@/components/Header";
+import { SongForm } from "@/components/SongForm";
 import { getDb } from "@/db/client";
 import { getAllSongsFlat } from "@/db/queries";
 import { artists } from "@/db/schema";
+import { assertInstrument, INSTRUMENT_LABELS } from "@/lib/instruments";
 
 import { createSong } from "../../actions";
 
@@ -17,12 +19,20 @@ export const metadata: Metadata = {
 	title: "Add a Song",
 };
 
-export default async function AddGuitarSongPage() {
+interface AddSongPageProps {
+	readonly params: Promise<{ instrument: string }>;
+}
+
+export default async function AddSongPage({ params }: AddSongPageProps) {
+	const { instrument: rawInstrument } = await params;
+	const instrument = assertInstrument(rawInstrument);
 	const db = getDb(getRequestContext().env);
 
+	// The AI import (and its duplicate check) is guitar-only; the flat song
+	// list is not queried for piano.
 	const [allArtists, existingSongs] = await Promise.all([
 		db.select({ name: artists.name }).from(artists).orderBy(asc(artists.name)),
-		getAllSongsFlat(db, "guitar"),
+		instrument === "guitar" ? getAllSongsFlat(db, "guitar") : null,
 	]);
 
 	const artistNames = allArtists.map((a) => a.name);
@@ -34,20 +44,29 @@ export default async function AddGuitarSongPage() {
 				<Breadcrumb
 					items={[
 						{ label: "Home", href: "/" },
-						{ label: "Guitar", href: "/guitar" },
+						{ label: INSTRUMENT_LABELS[instrument], href: `/${instrument}` },
 						{ label: "Add a Song" },
 					]}
 				/>
 				<h1 className="mb-6 font-serif text-[28px] font-medium leading-tight text-ink">
 					Add a Song
 				</h1>
-				<AddPageClient
-					artistNames={artistNames}
-					existingSongs={existingSongs}
-					action={createSong}
-					instrument="guitar"
-					cancelHref="/guitar"
-				/>
+				{instrument === "guitar" && existingSongs ? (
+					<AddPageClient
+						artistNames={artistNames}
+						existingSongs={existingSongs}
+						action={createSong}
+						instrument="guitar"
+						cancelHref="/guitar"
+					/>
+				) : (
+					<SongForm
+						artistNames={artistNames}
+						action={createSong}
+						instrument={instrument}
+						cancelHref={`/${instrument}`}
+					/>
+				)}
 			</main>
 		</>
 	);

@@ -6,19 +6,30 @@ import { Header } from "@/components/Header";
 import { SongListItem } from "@/components/SongListItem";
 import { getDb } from "@/db/client";
 import { getSongsByInstrument } from "@/db/queries";
+import {
+	assertInstrument,
+	INSTRUMENT_LABELS,
+	type Instrument,
+} from "@/lib/instruments";
 import { groupSongsByLetter } from "@/lib/songs";
 
 export const runtime = "edge";
 
-interface PianoPageProps {
+interface SongListPageProps {
+	readonly params: Promise<{ instrument: string }>;
 	readonly searchParams: Promise<{ q?: string }>;
 }
 
-export default async function PianoPage({ searchParams }: PianoPageProps) {
+export default async function SongListPage({
+	params,
+	searchParams,
+}: SongListPageProps) {
+	const { instrument: rawInstrument } = await params;
+	const instrument = assertInstrument(rawInstrument);
 	const { q } = await searchParams;
 	const db = getDb(getRequestContext().env);
 
-	const allSongs = await getSongsByInstrument(db, "piano");
+	const allSongs = await getSongsByInstrument(db, instrument);
 
 	const songCount = allSongs.length;
 	const artistCount = new Set(allSongs.map((s) => s.artistSlug)).size;
@@ -39,14 +50,14 @@ export default async function PianoPage({ searchParams }: PianoPageProps) {
 			<Header />
 			<main className="relative z-[1] px-[clamp(20px,4vw,34px)] pb-20 pt-[clamp(22px,4.5vw,38px)]">
 				<div className="mb-[7px] mt-0.5 font-mono text-[11px] font-semibold uppercase tracking-[.22em] text-ink-soft">
-					The Songbook &middot; Piano
+					The Songbook &middot; {INSTRUMENT_LABELS[instrument]}
 				</div>
 				<div className="mb-2.5 font-serif text-[15px] italic text-ink-soft">
 					{songCount} {songCount === 1 ? "song" : "songs"} &middot;{" "}
 					{artistCount} {artistCount === 1 ? "artist" : "artists"}
 				</div>
 
-				{songCount === 0 && !query && <EmptyState />}
+				{songCount === 0 && !query && <EmptyState instrument={instrument} />}
 
 				{songCount > 0 && query && sections.length === 0 && (
 					<p className="px-1.5 py-11 font-serif text-base italic text-ink-soft">
@@ -66,7 +77,12 @@ export default async function PianoPage({ searchParams }: PianoPageProps) {
 										key={`${song.artistSlug}/${song.slug}`}
 										title={song.title}
 										artist={song.artistName}
-										href={`/piano/${song.artistSlug}/${song.slug}`}
+										capo={
+											instrument === "guitar"
+												? (song.capo ?? undefined)
+												: undefined
+										}
+										href={`/${instrument}/${song.artistSlug}/${song.slug}`}
 									/>
 								))}
 							</div>
@@ -74,22 +90,28 @@ export default async function PianoPage({ searchParams }: PianoPageProps) {
 					</div>
 				)}
 			</main>
-			<FAB href="/piano/add" />
+			<FAB href={`/${instrument}/add`} />
 		</>
 	);
 }
 
-function EmptyState(): React.ReactElement {
+function EmptyState({
+	instrument,
+}: {
+	readonly instrument: Instrument;
+}): React.ReactElement {
 	return (
 		<div className="px-5 py-[60px] text-center text-ink-soft">
 			<h2 className="mb-[9px] font-serif text-[23px] font-medium text-ink">
 				Your songbook is empty
 			</h2>
 			<p className="mb-6 font-serif text-[15.5px] italic">
-				Add your first piece to begin the collection.
+				{instrument === "guitar"
+					? "Add your first tab to begin the collection."
+					: "Add your first piece to begin the collection."}
 			</p>
 			<Link
-				href="/piano/add"
+				href={`/${instrument}/add`}
 				className="inline-flex rounded-lg border border-black/[.15] bg-leather px-6 py-[13px] font-mono text-xs font-semibold uppercase tracking-widest text-[#f1e7d4] shadow-[0_1px_2px_rgba(40,28,16,0.18)]"
 			>
 				＋ Add a Song

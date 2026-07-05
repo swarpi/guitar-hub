@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-05 18:24 UTC
+> Last updated: 2026-07-05 21:34 UTC
 
 ## Current Phase
 
@@ -22,11 +22,13 @@ Multi-instrument feature (ADR-0005) complete: all ten tickets done and verifier-
 ## Branch & Commits
 
 <!-- AUTO:START -->
-**Branch:** `master`  
-**Last commit:** 2026-07-05 18:24 UTC
+**Branch:** `route-consolidation`  
+**Last commit:** 2026-07-05 21:34 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `c24ab46` | 2026-07-05 | Correct wrangler.toml D1 database name and deployment instructions |
+| `6ceca24` | 2026-07-05 | Add abcjs/ABC notation learning |
 | `89b934b` | 2026-07-05 | Merge multi-instrument feature into master |
 | `26efbb9` | 2026-07-05 | Sync ticket statuses and backlog: multi-instrument 007-010 verified done |
 | `0744d59` | 2026-07-05 | Add duplicate warning banner to AI import review step (ai-import ticket 003) |
@@ -35,8 +37,6 @@ Multi-instrument feature (ADR-0005) complete: all ten tickets done and verifier-
 | `6c20e2c` | 2026-07-05 | Merge branch 'master' into worktree-multi-instrument-001 |
 | `0b4eea9` | 2026-07-05 | Update STATUS.md: ticket 009 done, ticket 010 blocked on master integration |
 | `7400d13` | 2026-07-05 | Rename app Guitar Hub to Music Hub via layout title template (ticket 009) |
-| `b7a862c` | 2026-07-03 | Render piano songs as staff notation via code-split abcjs (ticket 008) |
-| `4f3e7bf` | 2026-07-03 | Add piano route group: full /piano CRUD flow (ticket 007) |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -45,26 +45,26 @@ Multi-instrument feature (ADR-0005) complete: all ten tickets done and verifier-
 **Files changed (last 5 commits):**
 
 ```
- STATUS.md                                                      |  67 +++++++-----
- architecture/decisions/0005-multi-instrument-support.md        | 261 +++++++++++++++++++++++++++++++++++++++++++++
- architecture/decisions/0007-mcp-sheet-ingestion-pipeline.md    | 214 +++++++++++++++++++++++++++++++++++++
- migrations/0001_multi-instrument.sql                           |   7 ++
- next.config.mjs                                                |  27 ++++-
- package.json                                                   |   3 +-
- pnpm-lock.yaml                                                 |   8 ++
- public/manifest.json                                           |   4 +-
- public/offline.html                                            |  88 ++++++++++++++++
- public/sw.js                                                   |  18 +++-
- src/app/actions.test.ts                                        | 369 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
- src/app/actions.ts                                             |  73 +++++++++----
- src/app/{artists => guitar}/[artistSlug]/[songSlug]/page.tsx   |  15 +--
- src/app/{artists => guitar}/[artistSlug]/page.tsx              |  14 ++-
- src/app/guitar/add/page.tsx                                    |  54 ++++++++++
- src/app/{ => guitar}/edit/[songId]/page.tsx                    |  17 +--
- src/app/guitar/page.tsx                                        | 100 ++++++++++++++++++
- src/app/layout.tsx                                             |   7 +-
- src/app/page.tsx                                               | 149 +++++++++++---------------
- src/app/piano/[artistSlug]/[songSlug]/page.tsx                 |  75 +++++++++++++
+ STATUS.md                                                    |  94 ++++++++---------
+ learnings/abcjs-abc-notation.md                              |  41 ++++++++
+ migrations/0001_multi-instrument.sql                         |   7 ++
+ next.config.mjs                                              |  27 ++++-
+ package.json                                                 |   3 +-
+ pnpm-lock.yaml                                               |   8 ++
+ public/manifest.json                                         |   4 +-
+ public/offline.html                                          |   4 +-
+ public/sw.js                                                 |   2 +-
+ src/app/actions.test.ts                                      | 369 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ src/app/actions.ts                                           |  73 +++++++++----
+ src/app/{artists => guitar}/[artistSlug]/[songSlug]/page.tsx |  15 +--
+ src/app/{artists => guitar}/[artistSlug]/page.tsx            |  14 ++-
+ src/app/guitar/add/page.tsx                                  |  54 ++++++++++
+ src/app/{ => guitar}/edit/[songId]/page.tsx                  |  17 +--
+ src/app/guitar/page.tsx                                      | 100 ++++++++++++++++++
+ src/app/layout.tsx                                           |   7 +-
+ src/app/page.tsx                                             | 149 ++++++++++++---------------
+ src/app/piano/[artistSlug]/[songSlug]/page.tsx               |  75 ++++++++++++++
+ src/app/piano/[artistSlug]/page.tsx                          |  66 ++++++++++++
 ```
 <!-- AUTO:FILES:END -->
 

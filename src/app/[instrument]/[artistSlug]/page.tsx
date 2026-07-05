@@ -7,11 +7,12 @@ import { Header } from "@/components/Header";
 import { SongListItem } from "@/components/SongListItem";
 import { getDb } from "@/db/client";
 import { getArtistBySlug, getSongsByArtistId } from "@/db/queries";
+import { assertInstrument, INSTRUMENT_LABELS } from "@/lib/instruments";
 
 export const runtime = "edge";
 
 interface ArtistPageProps {
-	readonly params: Promise<{ artistSlug: string }>;
+	readonly params: Promise<{ instrument: string; artistSlug: string }>;
 }
 
 export async function generateMetadata({
@@ -24,13 +25,19 @@ export async function generateMetadata({
 	return { title: artist.name };
 }
 
-export default async function GuitarArtistPage({ params }: ArtistPageProps) {
-	const { artistSlug } = await params;
+export default async function ArtistPage({ params }: ArtistPageProps) {
+	const { instrument: rawInstrument, artistSlug } = await params;
+	const instrument = assertInstrument(rawInstrument);
 	const db = getDb(getRequestContext().env);
 	const artist = await getArtistBySlug(db, artistSlug);
 	if (!artist) notFound();
 
-	const songs = await getSongsByArtistId(db, artist.id, "guitar");
+	const songs = await getSongsByArtistId(db, artist.id, instrument);
+
+	// Pre-existing behavioral difference, preserved (see ticket
+	// route-consolidation/001): piano 404s when the artist has no songs for
+	// the instrument; guitar renders the "0 songs" state.
+	if (instrument === "piano" && songs.length === 0) notFound();
 
 	return (
 		<>
@@ -39,7 +46,7 @@ export default async function GuitarArtistPage({ params }: ArtistPageProps) {
 				<Breadcrumb
 					items={[
 						{ label: "Home", href: "/" },
-						{ label: "Guitar", href: "/guitar" },
+						{ label: INSTRUMENT_LABELS[instrument], href: `/${instrument}` },
 						{ label: artist.name },
 					]}
 				/>
@@ -56,8 +63,10 @@ export default async function GuitarArtistPage({ params }: ArtistPageProps) {
 							<SongListItem
 								key={song.id}
 								title={song.title}
-								capo={song.capo ?? undefined}
-								href={`/guitar/${artistSlug}/${song.slug}`}
+								capo={
+									instrument === "guitar" ? (song.capo ?? undefined) : undefined
+								}
+								href={`/${instrument}/${artistSlug}/${song.slug}`}
 							/>
 						))}
 					</div>

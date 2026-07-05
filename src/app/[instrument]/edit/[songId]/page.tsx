@@ -9,13 +9,14 @@ import { SongForm } from "@/components/SongForm";
 import { getDb } from "@/db/client";
 import { getSongById } from "@/db/queries";
 import { artists } from "@/db/schema";
+import { assertInstrument, INSTRUMENT_LABELS } from "@/lib/instruments";
 
 import { deleteSong, updateSong } from "../../../actions";
 
 export const runtime = "edge";
 
 interface EditPageProps {
-	readonly params: Promise<{ songId: string }>;
+	readonly params: Promise<{ instrument: string; songId: string }>;
 }
 
 export async function generateMetadata({
@@ -28,8 +29,9 @@ export async function generateMetadata({
 	return { title: `Edit ${song.title}` };
 }
 
-export default async function EditPianoSongPage({ params }: EditPageProps) {
-	const { songId } = await params;
+export default async function EditSongPage({ params }: EditPageProps) {
+	const { instrument: rawInstrument, songId } = await params;
+	const instrument = assertInstrument(rawInstrument);
 	const db = getDb(getRequestContext().env);
 
 	const [song, allArtists] = await Promise.all([
@@ -37,7 +39,7 @@ export default async function EditPianoSongPage({ params }: EditPageProps) {
 		db.select({ name: artists.name }).from(artists).orderBy(asc(artists.name)),
 	]);
 
-	if (song?.instrument !== "piano") notFound();
+	if (song?.instrument !== instrument) notFound();
 
 	const artistNames = allArtists.map((a) => a.name);
 
@@ -48,14 +50,14 @@ export default async function EditPianoSongPage({ params }: EditPageProps) {
 				<Breadcrumb
 					items={[
 						{ label: "Home", href: "/" },
-						{ label: "Piano", href: "/piano" },
+						{ label: INSTRUMENT_LABELS[instrument], href: `/${instrument}` },
 						{
 							label: song.artistName,
-							href: `/piano/${song.artistSlug}`,
+							href: `/${instrument}/${song.artistSlug}`,
 						},
 						{
 							label: song.title,
-							href: `/piano/${song.artistSlug}/${song.slug}`,
+							href: `/${instrument}/${song.artistSlug}/${song.slug}`,
 						},
 						{ label: "Edit" },
 					]}
@@ -73,11 +75,11 @@ export default async function EditPianoSongPage({ params }: EditPageProps) {
 						content: song.content,
 						notes: song.notes,
 					}}
-					instrument="piano"
+					instrument={instrument}
 					songId={songId}
 					songTitle={song.title}
 					artistName={song.artistName}
-					cancelHref={`/piano/${song.artistSlug}/${song.slug}`}
+					cancelHref={`/${instrument}/${song.artistSlug}/${song.slug}`}
 					deleteAction={deleteSong}
 				/>
 			</main>
