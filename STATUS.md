@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-05 17:25 UTC
+> Last updated: 2026-07-05 17:28 UTC
 
 ## Current Phase
 
@@ -17,16 +17,17 @@
 
 ## Active Work
 
-Multi-instrument feature (ADR-0005), executing in this worktree. Tickets 007 (`4f3e7bf`), 008 (`b7a862c`), and 009 (app rename to Music Hub, `7400d13`) are done and verifier-approved. Ticket 010 (service worker cache bump) is blocked: it targets `public/sw.js`, which only exists on `master` — this branch was cut before the PWA commits (`6d1e7cd`, `cfb57ca`). Next step: integrate the branch with master (merge master in, or merge the branch back), then finish 010 plus the two deferred 009 criteria (manifest.json, offline.html renames).
+Multi-instrument feature (ADR-0005) complete: all ten tickets done and verifier-approved. Master was merged into this branch (`6c20e2c`), the AI import was re-homed onto `/guitar/add`, the Music Hub rename was finished (manifest, offline page), and the service worker cache was bumped to v2 with programmatically verified v1 eviction (`3371bce`). Branch is ready to land on master. Remaining before production deploy: run migration `0001_multi-instrument.sql` against the remote D1, then `pnpm pages:build` + `wrangler pages deploy`.
 
 ## Branch & Commits
 
 <!-- AUTO:START -->
 **Branch:** `worktree-multi-instrument-001`  
-**Last commit:** 2026-07-05 17:25 UTC
+**Last commit:** 2026-07-05 17:28 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `3371bce` | 2026-07-05 | Reconcile AI import with multi-instrument routes; finish Music Hub rename |
 | `6c20e2c` | 2026-07-05 | Merge branch 'master' into worktree-multi-instrument-001 |
 | `0b4eea9` | 2026-07-05 | Update STATUS.md: ticket 009 done, ticket 010 blocked on master integration |
 | `7400d13` | 2026-07-05 | Rename app Guitar Hub to Music Hub via layout title template (ticket 009) |
@@ -36,7 +37,6 @@ Multi-instrument feature (ADR-0005), executing in this worktree. Tickets 007 (`4
 | `cfb57ca` | 2026-07-02 | Add branded offline fallback page served by the service worker |
 | `4d1d5ef` | 2026-07-02 | Add AI tab import: paste and URL extraction via local AI proxy (ADR-0006) |
 | `c6251ba` | 2026-07-02 | Exclude Claude Code agent worktrees from vitest, biome, and git |
-| `07728fd` | 2026-07-02 | Redirect legacy /artists, /add, /edit routes to /guitar equivalents |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -48,7 +48,7 @@ Multi-instrument feature (ADR-0005), executing in this worktree. Tickets 007 (`4
  .claude/settings.json                                          |  33 ++++++
  .gitignore                                                     |   3 +
  CLAUDE.md                                                      |  34 +++++-
- STATUS.md                                                      |  59 +++++-----
+ STATUS.md                                                      |  65 ++++++-----
  architecture/decisions/0004-deployment-and-next-phase.md       | 130 +++++++++++++++++++++
  architecture/decisions/0005-multi-instrument-support.md        | 261 ++++++++++++++++++++++++++++++++++++++++++
  architecture/decisions/0006-ai-tab-import.md                   | 268 +++++++++++++++++++++++++++++++++++++++++++
@@ -72,11 +72,11 @@ Multi-instrument feature (ADR-0005), executing in this worktree. Tickets 007 (`4
 
 | Ticket | Feature | Status |
 |--------|---------|--------|
-| multi-instrument/010 — Service worker / PWA updates | multi-instrument | Blocked (needs master integration) |
+| _None — multi-instrument feature complete_ | | |
 
 ## Risks & Blockers
 
-- **Branch topology gap:** `public/manifest.json`, `public/offline.html`, and `public/sw.js` exist only on `master` (PWA commits `6d1e7cd`, `cfb57ca` landed after this branch was cut). Two ticket-009 rename criteria are deferred and all of ticket 010 is blocked until this branch integrates with master. The 009 ticket file documents the exact post-merge remediation.
+- **Production D1 schema lag:** the deployed database (id `84c8f3de…`) still has the pre-instrument schema. Migration `0001_multi-instrument.sql` must run against remote D1 before (or with) the next deploy, or the live site breaks on the new queries.
 
 ## Session Log
 
@@ -85,3 +85,4 @@ Multi-instrument feature (ADR-0005), executing in this worktree. Tickets 007 (`4
 | 2026-07-02 | Ticket 007 done: piano route group (/piano list, add, edit, artist, song detail), capo hidden for piano in SongForm, verifier approved |
 | 2026-07-03 | Ticket 008 done: abcjs staff notation on piano song detail, code-split via client dynamic() wrapper, bundle isolation + browser render verified, verifier approved |
 | 2026-07-05 | Ticket 009 done: Music Hub rename via layout title template, 8 page titles simplified, header/wrangler/package renamed; manifest+offline.html deferred (master-only files); ticket 010 flagged blocked pending master integration |
+| 2026-07-05 | Merged master into branch (PWA, AI import, deploy config); re-homed AddPageClient onto /guitar/add; fixed tabContent→content wire mapping; finished 009 deferrals; ticket 010 done with programmatic SW v1-eviction proof; feature complete, verifier approved |
