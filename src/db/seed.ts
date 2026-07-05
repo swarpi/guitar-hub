@@ -47,7 +47,7 @@ for (const song of SEED_SONGS) {
 			artistId,
 			title: song.title,
 			slug: slugify(song.title),
-			tabContent: song.tab,
+			content: song.tab,
 			capo: song.capo,
 			notes: song.notes,
 			createdAt: now,

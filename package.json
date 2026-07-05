@@ -1,5 +1,5 @@
 {
-	"name": "guitar-hub",
+	"name": "music-hub",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
@@ -17,6 +17,7 @@
 		"dev:all": "tsx scripts/ai-proxy.ts & pnpm dev"
 	},
 	"dependencies": {
+		"abcjs": "^6.6.3",
 		"drizzle-orm": "^0.45.2",
 		"nanoid": "^5.1.11",
 		"next": "16.2.9",

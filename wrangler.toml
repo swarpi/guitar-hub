@@ -1,16 +1,16 @@
 # ---- Deployment ----
 # 1. Create the D1 database:
-#      wrangler d1 create guitar-hub
+#      wrangler d1 create guitar-hub-db
 # 2. Replace database_id below with the ID from step 1.
 # 3. Run the initial migration:
-#      wrangler d1 execute guitar-hub --file=migrations/0000_initial.sql
+#      wrangler d1 execute guitar-hub-db --file=migrations/0000_initial.sql
 # 4. Build for Cloudflare:
 #      pnpm pages:build
 # 5. Deploy:
 #      wrangler pages deploy .vercel/output/static
 # ---------------------
 
-name = "guitar-hub"
+name = "music-hub"
 pages_build_output_dir = ".vercel/output/static"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]

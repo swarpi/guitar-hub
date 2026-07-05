@@ -1,112 +1,89 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
-import { asc, eq } from "drizzle-orm";
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import { FAB } from "@/components/FAB";
-import { Header } from "@/components/Header";
-import { SongListItem } from "@/components/SongListItem";
 import { getDb } from "@/db/client";
-import { artists, songs } from "@/db/schema";
-import { groupSongsByLetter } from "@/lib/songs";
+import { getSongCountsByInstrument } from "@/db/queries";
 
 export const runtime = "edge";
 
-interface HomePageProps {
-	readonly searchParams: Promise<{ q?: string }>;
-}
+export const metadata: Metadata = {
+	title: "Music Hub",
+};
 
-export default async function HomePage({ searchParams }: HomePageProps) {
-	const { q } = await searchParams;
-	const env = getRequestContext().env;
-	const db = getDb(env);
-
-	const allSongs = await db
-		.select({
-			title: songs.title,
-			songSlug: songs.slug,
-			capo: songs.capo,
-			artistName: artists.name,
-			artistSlug: artists.slug,
-		})
-		.from(songs)
-		.leftJoin(artists, eq(songs.artistId, artists.id))
-		.orderBy(asc(songs.title));
-
-	const songCount = allSongs.length;
-	const artistCount = new Set(allSongs.map((s) => s.artistSlug)).size;
-
-	const query = q?.trim().toLowerCase() ?? "";
-	const filtered = query
-		? allSongs.filter(
-				(s) =>
-					s.title.toLowerCase().includes(query) ||
-					(s.artistName?.toLowerCase().includes(query) ?? false),
-			)
-		: allSongs;
-
-	const sections = groupSongsByLetter(filtered);
+export default async function LandingPage() {
+	const db = getDb(getRequestContext().env);
+	const counts = await getSongCountsByInstrument(db);
 
 	return (
 		<>
-			<Header />
+			<header className="sticky top-0 z-20 border-b border-black/30 bg-header shadow-[0_6px_16px_rgba(15,30,22,0.18)]">
+				<div className="px-[clamp(16px,4vw,28px)] py-4">
+					<span className="whitespace-nowrap font-serif text-[clamp(21px,5vw,26px)] tracking-tight text-cream">
+						<span className="font-semibold">Music</span>{" "}
+						<span className="font-light italic text-[#a7bdab]">Hub</span>
+					</span>
+				</div>
+			</header>
 			<main className="relative z-[1] px-[clamp(20px,4vw,34px)] pb-20 pt-[clamp(22px,4.5vw,38px)]">
 				<div className="mb-[7px] mt-0.5 font-mono text-[11px] font-semibold uppercase tracking-[.22em] text-ink-soft">
 					The Songbook
 				</div>
-				<div className="mb-2.5 font-serif text-[15px] italic text-ink-soft">
-					{songCount} {songCount === 1 ? "song" : "songs"} &middot;{" "}
-					{artistCount} {artistCount === 1 ? "artist" : "artists"}
+				<p className="mb-8 font-serif text-[15px] italic text-ink-soft">
+					Pick an instrument to browse its collection.
+				</p>
+
+				<div className="grid gap-5 sm:grid-cols-2">
+					<InstrumentCard
+						name="Guitar"
+						href="/guitar"
+						count={counts.guitar}
+						description="Fingerstyle tablature"
+					/>
+					<InstrumentCard
+						name="Piano"
+						href="/piano"
+						count={counts.piano}
+						description="Sheets in ABC notation"
+					/>
 				</div>
-
-				{songCount === 0 && !query && <EmptyState />}
-
-				{songCount > 0 && query && sections.length === 0 && (
-					<p className="px-1.5 py-11 font-serif text-base italic text-ink-soft">
-						No songs match &ldquo;{q}&rdquo;
-					</p>
-				)}
-
-				{sections.length > 0 && (
-					<div className="border-t border-line">
-						{sections.map((section) => (
-							<div key={section.letter}>
-								<div className="px-1.5 pb-1.5 pt-6 font-mono text-[11px] font-semibold uppercase tracking-[.3em] text-accent opacity-85">
-									{section.letter}
-								</div>
-								{section.songs.map((song) => (
-									<SongListItem
-										key={`${song.artistSlug}/${song.songSlug}`}
-										title={song.title}
-										artist={song.artistName ?? undefined}
-										capo={song.capo ?? undefined}
-										href={`/artists/${song.artistSlug}/${song.songSlug}`}
-									/>
-								))}
-							</div>
-						))}
-					</div>
-				)}
 			</main>
-			<FAB />
 		</>
 	);
 }
 
-function EmptyState(): React.ReactElement {
+interface InstrumentCardProps {
+	readonly name: string;
+	readonly href: string;
+	readonly count: number;
+	readonly description: string;
+}
+
+function InstrumentCard({
+	name,
+	href,
+	count,
+	description,
+}: InstrumentCardProps): React.ReactElement {
 	return (
-		<div className="px-5 py-[60px] text-center text-ink-soft">
-			<h2 className="mb-[9px] font-serif text-[23px] font-medium text-ink">
-				Your songbook is empty
+		<Link
+			href={href}
+			className="group block rounded-lg border border-line bg-paper p-6 shadow-[0_1px_3px_rgba(40,28,16,0.06)] transition-all hover:-translate-y-px hover:border-accent/40 hover:shadow-[0_4px_12px_rgba(40,28,16,0.10)]"
+		>
+			<h2 className="mb-1 font-serif text-[23px] font-medium text-ink">
+				{name}
 			</h2>
-			<p className="mb-6 font-serif text-[15.5px] italic">
-				Add your first tab to begin the collection.
+			<p className="mb-4 font-serif text-[14px] italic text-ink-soft">
+				{description}
 			</p>
-			<Link
-				href="/add"
-				className="inline-flex rounded-lg border border-black/[.15] bg-leather px-6 py-[13px] font-mono text-xs font-semibold uppercase tracking-widest text-[#f1e7d4] shadow-[0_1px_2px_rgba(40,28,16,0.18)]"
-			>
-				＋ Add a Song
-			</Link>
-		</div>
+			<div className="flex items-baseline justify-between">
+				<span className="font-serif text-[15px] italic text-ink-soft">
+					{count} {count === 1 ? "song" : "songs"}
+				</span>
+				<span className="font-mono text-[10px] font-semibold uppercase tracking-[.22em] text-accent transition-transform group-hover:translate-x-0.5">
+					Browse →
+				</span>
+			</div>
+		</Link>
 	);
 }

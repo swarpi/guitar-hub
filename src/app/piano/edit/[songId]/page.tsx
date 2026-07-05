@@ -10,7 +10,7 @@ import { getDb } from "@/db/client";
 import { getSongById } from "@/db/queries";
 import { artists } from "@/db/schema";
 
-import { deleteSong, updateSong } from "../../actions";
+import { deleteSong, updateSong } from "../../../actions";
 
 export const runtime = "edge";
 
@@ -25,10 +25,10 @@ export async function generateMetadata({
 	const db = getDb(getRequestContext().env);
 	const song = await getSongById(db, songId);
 	if (!song) return {};
-	return { title: `Edit ${song.title} — Guitar Hub` };
+	return { title: `Edit ${song.title}` };
 }
 
-export default async function EditPage({ params }: EditPageProps) {
+export default async function EditPianoSongPage({ params }: EditPageProps) {
 	const { songId } = await params;
 	const db = getDb(getRequestContext().env);
 
@@ -37,7 +37,7 @@ export default async function EditPage({ params }: EditPageProps) {
 		db.select({ name: artists.name }).from(artists).orderBy(asc(artists.name)),
 	]);
 
-	if (!song) notFound();
+	if (song?.instrument !== "piano") notFound();
 
 	const artistNames = allArtists.map((a) => a.name);
 
@@ -48,13 +48,14 @@ export default async function EditPage({ params }: EditPageProps) {
 				<Breadcrumb
 					items={[
 						{ label: "Home", href: "/" },
+						{ label: "Piano", href: "/piano" },
 						{
 							label: song.artistName,
-							href: `/artists/${song.artistSlug}`,
+							href: `/piano/${song.artistSlug}`,
 						},
 						{
 							label: song.title,
-							href: `/artists/${song.artistSlug}/${song.slug}`,
+							href: `/piano/${song.artistSlug}/${song.slug}`,
 						},
 						{ label: "Edit" },
 					]}
@@ -69,13 +70,14 @@ export default async function EditPage({ params }: EditPageProps) {
 						title: song.title,
 						artist: song.artistName,
 						capo: song.capo,
-						tabContent: song.tabContent,
+						content: song.content,
 						notes: song.notes,
 					}}
+					instrument="piano"
 					songId={songId}
 					songTitle={song.title}
 					artistName={song.artistName}
-					cancelHref={`/artists/${song.artistSlug}/${song.slug}`}
+					cancelHref={`/piano/${song.artistSlug}/${song.slug}`}
 					deleteAction={deleteSong}
 				/>
 			</main>

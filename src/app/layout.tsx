@@ -24,8 +24,11 @@ const bevan = Bevan({
 });
 
 export const metadata: Metadata = {
-	title: "Guitar Hub",
-	description: "A personal fingerstyle guitar tablature collection",
+	title: {
+		default: "Music Hub",
+		template: "%s — Music Hub",
+	},
+	description: "A personal music sheet and tablature collection",
 	manifest: "/manifest.json",
 	icons: {
 		apple: "/icons/icon-192x192.png",

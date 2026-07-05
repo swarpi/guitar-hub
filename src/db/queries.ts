@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 
 import type * as schema from "./schema";
@@ -15,7 +15,11 @@ export async function getArtistBySlug(db: Db, slug: string) {
 	return rows[0] ?? null;
 }
 
-export async function getSongsByArtistId(db: Db, artistId: string) {
+export async function getSongsByArtistId(
+	db: Db,
+	artistId: string,
+	instrument: string,
+) {
 	return db
 		.select({
 			id: songs.id,
@@ -24,7 +28,7 @@ export async function getSongsByArtistId(db: Db, artistId: string) {
 			capo: songs.capo,
 		})
 		.from(songs)
-		.where(eq(songs.artistId, artistId))
+		.where(and(eq(songs.artistId, artistId), eq(songs.instrument, instrument)))
 		.orderBy(asc(songs.title));
 }
 
@@ -34,7 +38,8 @@ export async function getSongById(db: Db, songId: string) {
 			id: songs.id,
 			title: songs.title,
 			slug: songs.slug,
-			tabContent: songs.tabContent,
+			instrument: songs.instrument,
+			content: songs.content,
 			capo: songs.capo,
 			notes: songs.notes,
 			artistId: artists.id,
@@ -48,11 +53,12 @@ export async function getSongById(db: Db, songId: string) {
 	return rows[0] ?? null;
 }
 
-export async function getAllSongsFlat(db: Db) {
+export async function getAllSongsFlat(db: Db, instrument: string) {
 	return db
 		.select({ title: songs.title, artistName: artists.name })
 		.from(songs)
 		.innerJoin(artists, eq(songs.artistId, artists.id))
+		.where(eq(songs.instrument, instrument))
 		.orderBy(asc(songs.title));
 }
 
@@ -60,12 +66,13 @@ export async function getSongBySlugs(
 	db: Db,
 	artistSlug: string,
 	songSlug: string,
+	instrument: string,
 ) {
 	const rows = await db
 		.select({
 			id: songs.id,
 			title: songs.title,
-			tabContent: songs.tabContent,
+			content: songs.content,
 			capo: songs.capo,
 			notes: songs.notes,
 			artistName: artists.name,
@@ -73,7 +80,44 @@ export async function getSongBySlugs(
 		})
 		.from(songs)
 		.innerJoin(artists, eq(songs.artistId, artists.id))
-		.where(and(eq(artists.slug, artistSlug), eq(songs.slug, songSlug)))
+		.where(
+			and(
+				eq(artists.slug, artistSlug),
+				eq(songs.slug, songSlug),
+				eq(songs.instrument, instrument),
+			),
+		)
 		.limit(1);
 	return rows[0] ?? null;
+}
+
+export async function getSongsByInstrument(db: Db, instrument: string) {
+	return db
+		.select({
+			id: songs.id,
+			title: songs.title,
+			slug: songs.slug,
+			capo: songs.capo,
+			artistName: artists.name,
+			artistSlug: artists.slug,
+		})
+		.from(songs)
+		.innerJoin(artists, eq(songs.artistId, artists.id))
+		.where(eq(songs.instrument, instrument))
+		.orderBy(asc(songs.title));
+}
+
+export async function getSongCountsByInstrument(db: Db) {
+	const rows = await db
+		.select({ instrument: songs.instrument, total: count() })
+		.from(songs)
+		.groupBy(songs.instrument);
+
+	const counts = { guitar: 0, piano: 0 };
+	for (const row of rows) {
+		if (row.instrument === "guitar" || row.instrument === "piano") {
+			counts[row.instrument] = row.total;
+		}
+	}
+	return counts;
 }

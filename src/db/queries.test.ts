@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { getArtistBySlug, getSongBySlugs, getSongsByArtistId } from "./queries";
+import {
+	getArtistBySlug,
+	getSongBySlugs,
+	getSongCountsByInstrument,
+	getSongsByArtistId,
+} from "./queries";
 
 function mockDb(rows: Record<string, unknown>[]) {
 	const chain = {
@@ -52,14 +57,14 @@ describe("getSongsByArtistId", () => {
 		];
 		const db = mockDbList(songs);
 
-		const result = await getSongsByArtistId(db, "abc123");
+		const result = await getSongsByArtistId(db, "abc123", "guitar");
 		expect(result).toEqual(songs);
 	});
 
 	it("returns empty array when artist has no songs", async () => {
 		const db = mockDbList([]);
 
-		const result = await getSongsByArtistId(db, "abc123");
+		const result = await getSongsByArtistId(db, "abc123", "guitar");
 		expect(result).toEqual([]);
 	});
 });
@@ -69,7 +74,7 @@ describe("getSongBySlugs", () => {
 		const song = {
 			id: "s1",
 			title: "Dust in the Wind",
-			tabContent: "e|---0---",
+			content: "e|---0---",
 			capo: 2,
 			notes: "Standard tuning",
 			artistName: "Sungha Jung",
@@ -77,14 +82,53 @@ describe("getSongBySlugs", () => {
 		};
 		const db = mockDb([song]);
 
-		const result = await getSongBySlugs(db, "sungha-jung", "dust-in-the-wind");
+		const result = await getSongBySlugs(
+			db,
+			"sungha-jung",
+			"dust-in-the-wind",
+			"guitar",
+		);
 		expect(result).toEqual(song);
 	});
 
 	it("returns null when not found", async () => {
 		const db = mockDb([]);
 
-		const result = await getSongBySlugs(db, "sungha-jung", "nonexistent");
+		const result = await getSongBySlugs(
+			db,
+			"sungha-jung",
+			"nonexistent",
+			"guitar",
+		);
 		expect(result).toBeNull();
+	});
+});
+
+function mockDbGroupBy(rows: Record<string, unknown>[]) {
+	const chain = {
+		select: vi.fn().mockReturnThis(),
+		from: vi.fn().mockReturnThis(),
+		groupBy: vi.fn().mockResolvedValue(rows),
+	};
+	chain.select.mockReturnValue(chain);
+	return chain as unknown as Parameters<typeof getSongCountsByInstrument>[0];
+}
+
+describe("getSongCountsByInstrument", () => {
+	it("maps grouped rows to guitar and piano counts", async () => {
+		const db = mockDbGroupBy([
+			{ instrument: "guitar", total: 21 },
+			{ instrument: "piano", total: 3 },
+		]);
+
+		const result = await getSongCountsByInstrument(db);
+		expect(result).toEqual({ guitar: 21, piano: 3 });
+	});
+
+	it("defaults missing instruments to zero and ignores unknown values", async () => {
+		const db = mockDbGroupBy([{ instrument: "drums", total: 5 }]);
+
+		const result = await getSongCountsByInstrument(db);
+		expect(result).toEqual({ guitar: 0, piano: 0 });
 	});
 });

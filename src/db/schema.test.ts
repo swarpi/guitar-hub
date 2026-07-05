@@ -22,9 +22,10 @@ describe("songs table", () => {
 			expect.arrayContaining([
 				"id",
 				"artistId",
+				"instrument",
 				"title",
 				"slug",
-				"tabContent",
+				"content",
 				"capo",
 				"notes",
 				"createdAt",
@@ -43,14 +44,15 @@ describe("songs table", () => {
 		expect(ref.foreignColumns.map((c) => c.name)).toEqual(["id"]);
 	});
 
-	it("has unique constraint on artist_id and slug", () => {
+	it("has unique constraint on artist_id, slug, and instrument", () => {
 		const config = getTableConfig(songs);
 		const compositeUnique = config.uniqueConstraints.find(
-			(uc) => uc.columns.length === 2,
+			(uc) => uc.columns.length === 3,
 		);
 		expect(compositeUnique).toBeDefined();
 		const colNames = compositeUnique?.columns.map((c) => c.name);
 		expect(colNames).toContain("artist_id");
 		expect(colNames).toContain("slug");
+		expect(colNames).toContain("instrument");
 	});
 });

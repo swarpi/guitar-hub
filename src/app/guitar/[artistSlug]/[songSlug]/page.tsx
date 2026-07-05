@@ -20,15 +20,15 @@ export async function generateMetadata({
 }: SongPageProps): Promise<Metadata> {
 	const { artistSlug, songSlug } = await params;
 	const db = getDb(getRequestContext().env);
-	const song = await getSongBySlugs(db, artistSlug, songSlug);
+	const song = await getSongBySlugs(db, artistSlug, songSlug, "guitar");
 	if (!song) return {};
-	return { title: `${song.title} — Guitar Hub` };
+	return { title: song.title };
 }
 
-export default async function SongPage({ params }: SongPageProps) {
+export default async function GuitarSongPage({ params }: SongPageProps) {
 	const { artistSlug, songSlug } = await params;
 	const db = getDb(getRequestContext().env);
-	const song = await getSongBySlugs(db, artistSlug, songSlug);
+	const song = await getSongBySlugs(db, artistSlug, songSlug, "guitar");
 	if (!song) notFound();
 
 	return (
@@ -38,7 +38,8 @@ export default async function SongPage({ params }: SongPageProps) {
 				<Breadcrumb
 					items={[
 						{ label: "Home", href: "/" },
-						{ label: song.artistName, href: `/artists/${song.artistSlug}` },
+						{ label: "Guitar", href: "/guitar" },
+						{ label: song.artistName, href: `/guitar/${song.artistSlug}` },
 						{ label: song.title },
 					]}
 				/>
@@ -56,7 +57,7 @@ export default async function SongPage({ params }: SongPageProps) {
 				)}
 
 				<pre className="mb-6 overflow-x-auto whitespace-pre rounded-lg border border-line bg-paper p-5 font-mono text-[13px] leading-[1.7] text-tab-text shadow-[0_1px_3px_rgba(40,28,16,0.06)]">
-					{song.tabContent}
+					{song.content}
 				</pre>
 
 				{song.notes && song.notes.trim() !== "" && (
@@ -71,7 +72,7 @@ export default async function SongPage({ params }: SongPageProps) {
 				)}
 
 				<Link
-					href={`/edit/${song.id}`}
+					href={`/guitar/edit/${song.id}`}
 					className="inline-flex items-center rounded-lg border border-line bg-transparent px-5 py-[11px] font-mono text-[11px] font-semibold uppercase tracking-widest text-ink-soft transition-colors hover:border-ink-soft/30 hover:bg-accent/[.04]"
 				>
 					Edit

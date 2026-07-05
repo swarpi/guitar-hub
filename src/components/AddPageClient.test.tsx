@@ -18,7 +18,7 @@ const sampleFields: SongFormInitialValues = {
 	title: "Dust in the Wind",
 	artist: "Kansas",
 	capo: 0,
-	tabContent: "Am  C  G\nI close my eyes...",
+	content: "Am  C  G\nI close my eyes...",
 	notes: null,
 };
 
@@ -38,7 +38,7 @@ vi.mock("./ImportForm", () => ({
 						title: "Dust in the Wind",
 						artist: "Kansas",
 						capo: 0,
-						tabContent: "Am  C  G\nI close my eyes...",
+						content: "Am  C  G\nI close my eyes...",
 						notes: null,
 					})
 				}

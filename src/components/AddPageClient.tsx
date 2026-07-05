@@ -19,6 +19,8 @@ interface AddPageClientProps {
 	readonly action: (
 		formData: FormData,
 	) => Promise<{ error: string } | undefined>;
+	readonly instrument?: string;
+	readonly cancelHref?: string;
 }
 
 const TOGGLE_BASE =
@@ -47,6 +49,8 @@ export function AddPageClient({
 	artistNames,
 	existingSongs,
 	action,
+	instrument,
+	cancelHref,
 }: AddPageClientProps): React.ReactElement {
 	const [mode, setMode] = useState<Mode>("manual");
 	const [extractedFields, setExtractedFields] =
@@ -90,7 +94,12 @@ export function AddPageClient({
 			</div>
 
 			{mode === "manual" && (
-				<SongForm artistNames={artistNames} action={action} />
+				<SongForm
+					artistNames={artistNames}
+					action={action}
+					instrument={instrument}
+					cancelHref={cancelHref}
+				/>
 			)}
 
 			{mode === "import" && !showReview && (
@@ -123,6 +132,8 @@ export function AddPageClient({
 						artistNames={artistNames}
 						action={action}
 						initialValues={extractedFields}
+						instrument={instrument}
+						cancelHref={cancelHref}
 					/>
 				</>
 			)}
