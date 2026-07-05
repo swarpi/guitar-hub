@@ -1,7 +1,7 @@
 # Ticket: Piano Route Group — Create /piano/... Pages
 
 **Feature:** multi-instrument
-**Status:** Todo
+**Status:** Done
 **Priority:** P1
 **Estimate:** M
 **Related:** ADR-0005
@@ -21,18 +21,18 @@ All five piano pages exist under `src/app/piano/` and the full piano CRUD flow w
 
 ## Acceptance Criteria
 
-- [ ] `src/app/piano/page.tsx` renders the piano song list scoped to `instrument = 'piano'` using `getSongsByInstrument(db, 'piano')`; layout mirrors the guitar list page (A-Z grouping by artist, song count, search input)
-- [ ] `src/app/piano/add/page.tsx` renders `SongForm` with a hidden `<input type="hidden" name="instrument" value="piano" />` and breadcrumb `Home → Piano → Add a Song`; on submit calls `createSong`
-- [ ] `src/app/piano/edit/[songId]/page.tsx` renders `SongForm` pre-filled with the song's existing data; breadcrumb links are piano-prefixed (`Home → Piano → [Artist] → [Song] → Edit`); `cancelHref` points to `/piano/[artistSlug]/[songSlug]`
-- [ ] `src/app/piano/[artistSlug]/page.tsx` renders the artist's piano songs using `getSongsByArtistId(db, artistId, 'piano')`; returns 404 if the artist has no piano songs
-- [ ] `src/app/piano/[artistSlug]/[songSlug]/page.tsx` renders the song detail; `content` is displayed in a `<pre>` block (identical to guitar for now); Edit link points to `/piano/edit/[songId]`; uses `getSongBySlugs(db, artistSlug, songSlug, 'piano')`, returns 404 if not found
-- [ ] All five piano pages export `export const runtime = "edge"`
-- [ ] The `deleteSong` action's `revalidatePath` call is updated from `/guitar` to `/${instrument}` so deleting a piano song revalidates `/piano` (requires reading `instrument` from the deleted song's record)
-- [ ] The FAB on piano pages has `href="/piano/add"`
-- [ ] `pnpm build` passes with no TypeScript errors
-- [ ] `pnpm test` passes
-- [ ] `pnpm lint` passes
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `src/app/piano/page.tsx` renders the piano song list scoped to `instrument = 'piano'` using `getSongsByInstrument(db, 'piano')`; layout mirrors the guitar list page (A-Z grouping by artist, song count, search input)
+- [x] `src/app/piano/add/page.tsx` renders `SongForm` with a hidden `<input type="hidden" name="instrument" value="piano" />` and breadcrumb `Home → Piano → Add a Song`; on submit calls `createSong`
+- [x] `src/app/piano/edit/[songId]/page.tsx` renders `SongForm` pre-filled with the song's existing data; breadcrumb links are piano-prefixed (`Home → Piano → [Artist] → [Song] → Edit`); `cancelHref` points to `/piano/[artistSlug]/[songSlug]`
+- [x] `src/app/piano/[artistSlug]/page.tsx` renders the artist's piano songs using `getSongsByArtistId(db, artistId, 'piano')`; returns 404 if the artist has no piano songs
+- [x] `src/app/piano/[artistSlug]/[songSlug]/page.tsx` renders the song detail; `content` is displayed in a `<pre>` block (identical to guitar for now); Edit link points to `/piano/edit/[songId]`; uses `getSongBySlugs(db, artistSlug, songSlug, 'piano')`, returns 404 if not found
+- [x] All five piano pages export `export const runtime = "edge"`
+- [x] The `deleteSong` action's `revalidatePath` call is updated from `/guitar` to `/${instrument}` so deleting a piano song revalidates `/piano` (requires reading `instrument` from the deleted song's record)
+- [x] The FAB on piano pages has `href="/piano/add"`
+- [x] `pnpm build` passes with no TypeScript errors
+- [x] `pnpm test` passes
+- [x] `pnpm lint` passes
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
@@ -50,11 +50,14 @@ All five piano pages exist under `src/app/piano/` and the full piano CRUD flow w
 
 ## Implementation Plan
 
-_To be filled in before starting work._
-
-1. Step 1
-2. Step 2
-3. Step 3
+1. Hide the capo field in `SongForm` when `instrument === "piano"` (ticket 002 did not add this conditional)
+2. Create `src/app/piano/page.tsx` — song list scoped to `getSongsByInstrument(db, "piano")`, mirroring the guitar list (A–Z grouping, counts, search, FAB → `/piano/add`), no capo badges
+3. Create `src/app/piano/add/page.tsx` — `SongForm` with `instrument="piano"` (hidden field), breadcrumb `Home → Piano → Add a Song`, `cancelHref="/piano"`
+4. Create `src/app/piano/edit/[songId]/page.tsx` — pre-filled `SongForm`, 404 unless `song.instrument === "piano"`, piano-prefixed breadcrumbs, `cancelHref` → `/piano/[artistSlug]/[songSlug]`
+5. Create `src/app/piano/[artistSlug]/page.tsx` — artist's piano songs via `getSongsByArtistId(db, artist.id, "piano")`, 404 when the artist has no piano songs
+6. Create `src/app/piano/[artistSlug]/[songSlug]/page.tsx` — song detail with `content` in a `<pre>` block, Edit link → `/piano/edit/[songId]`, 404 via `getSongBySlugs(..., "piano")`
+7. `deleteSong` already calls `revalidatePath(\`/\${result.instrument}\`)` (done in an earlier ticket) — add a test asserting `/piano` for piano songs
+8. Tests: `SongForm` capo-field visibility (hidden for piano, shown for guitar), `deleteSong` piano revalidation; run `pnpm test`, `pnpm lint`, `pnpm build`
 
 ## Post-Implementation
 

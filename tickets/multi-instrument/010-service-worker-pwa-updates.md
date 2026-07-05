@@ -1,7 +1,7 @@
 # Ticket: Service Worker and PWA Updates — Cache Bust and Manifest Sync
 
 **Feature:** multi-instrument
-**Status:** Todo
+**Status:** Done
 **Priority:** P2
 **Estimate:** XS
 **Related:** ADR-0005
@@ -25,12 +25,12 @@ Bump `CACHE_VERSION` in `public/sw.js` from `"v1"` to `"v2"` so all stale caches
 
 ## Acceptance Criteria
 
-- [ ] `public/sw.js`: `CACHE_VERSION` changed from `"v1"` to `"v2"`
-- [ ] The three derived cache names update automatically: `pages-v2`, `assets-v2`, `offline-v2`
-- [ ] The `VALID_CACHES` array includes the three new names (`pages-v2`, `assets-v2`, `offline-v2`); old v1 caches are deleted on activation because they are not in `VALID_CACHES`
-- [ ] Manually verify in Chrome DevTools (Application → Cache Storage) that after a hard reload the v1 caches are absent and v2 caches are present (document this as a manual check — no automated test needed)
-- [ ] `pnpm lint` passes on `public/sw.js`
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `public/sw.js`: `CACHE_VERSION` changed from `"v1"` to `"v2"` — confirmed in commit `3371bce`, `public/sw.js:5`
+- [x] The three derived cache names update automatically: `pages-v2`, `assets-v2`, `offline-v2` — confirmed via template literals at `public/sw.js:6-8` and via runtime observation (see manual check below)
+- [x] The `VALID_CACHES` array includes the three new names (`pages-v2`, `assets-v2`, `offline-v2`); old v1 caches are deleted on activation because they are not in `VALID_CACHES` — confirmed at `public/sw.js:9` and `public/sw.js:46-56` (activate handler filters `keys` against `VALID_CACHES` and deletes the rest)
+- [x] Manually verify in Chrome DevTools (Application → Cache Storage) that after a hard reload the v1 caches are absent and v2 caches are present (document this as a manual check — no automated test needed) — done programmatically, see "Manual Verification" below
+- [x] `pnpm lint` passes on `public/sw.js` — re-verified by ticket-verifier: `biome check .` → "Checked 54 files in 189ms. No fixes applied."
+- [x] **`/ticket-verifier` invoked and approved** — all criteria satisfied on the merged branch (`worktree-multi-instrument-001` @ `3371bce`).
 
 ## Out of Scope
 
@@ -58,3 +58,36 @@ _To be filled in before starting work._
 ## Post-Implementation
 
 > The last acceptance criterion (`/ticket-verifier` invoked and approved) is a hard gate. When implementation is complete and all other checks pass, invoke `/ticket-verifier` with this ticket. The ticket-verifier — not you — checks that box. A ticket is not Done until the ticket-verifier approves it.
+
+## Verification (ticket-verifier, 2026-07-05)
+
+This ticket was blocked until `master` merged into `worktree-multi-instrument-001`, since `public/sw.js` did not exist on the branch before that. Master merged in commit `6c20e2c`; the `CACHE_VERSION` bump and related reconciliation landed in commit `3371bce`.
+
+**Static review of `public/sw.js`:**
+- `CACHE_VERSION = "v2"` (line 5)
+- `PAGES_CACHE`, `ASSETS_CACHE`, `OFFLINE_CACHE` are all template literals derived from `CACHE_VERSION` (lines 6-8) → automatically resolve to `pages-v2`, `assets-v2`, `offline-v2`
+- `VALID_CACHES` is `[PAGES_CACHE, ASSETS_CACHE, OFFLINE_CACHE]` (line 9)
+- `activate` handler (lines 46-56) deletes any cache key not present in `VALID_CACHES` — this is the eviction mechanism for stale v1 caches
+- Routing logic (NetworkFirst for navigation, CacheFirst for scripts/styles/fonts/images) is unchanged, consistent with the ticket's "no logic changes" scope
+
+**Manual verification (Chrome DevTools criterion), performed programmatically:**
+Rather than eyeballing DevTools, drove real Chrome (not a mocked browser) via `playwright-core` against the local dev server. The script pre-seeded stale `pages-v1`, `assets-v1`, `offline-v1` caches through the Cache API *before* the service worker registered, then waited for SW activation and polled `caches.keys()`.
+
+Observed output:
+```
+caches after seeding: [ 'assets-v1', 'offline-v1', 'pages-v1' ]
+caches after SW activation: [ 'offline-v2' ]
+v1 caches remaining: NONE (evicted)
+offline-v2 precached: YES
+offline.html in cache says Music Hub: true
+```
+
+This confirms: all three v1 caches were evicted by the activate handler's `VALID_CACHES` filter, `offline-v2` was created and precached with `/offline.html` during the `install` handler, and the cached body reflects the post-009-merge "Music Hub" rename. This is a stronger check than a manual DevTools inspection because it exercises the actual eviction code path against a live SW lifecycle rather than a point-in-time snapshot.
+
+**Re-run checks on `worktree-multi-instrument-001` @ `3371bce`:**
+- `pnpm lint`: clean (`biome check .` — 54 files, no fixes applied)
+- `pnpm test`: 106/106 passed, 12 test files
+- `pnpm build`: compiles successfully, TypeScript check passes, all 11 routes (`/`, `/guitar`, `/guitar/[artistSlug]`, `/guitar/[artistSlug]/[songSlug]`, `/guitar/add`, `/guitar/edit/[songId]`, `/piano`, `/piano/[artistSlug]`, `/piano/[artistSlug]/[songSlug]`, `/piano/add`, `/piano/edit/[songId]`) generated
+- `grep -rin "guitar hub" src/ public/ package.json wrangler.toml`: no matches
+
+All acceptance criteria satisfied. No issues found.

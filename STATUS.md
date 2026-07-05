@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-02 21:26 UTC
+> Last updated: 2026-07-05 17:58 UTC
 
 ## Current Phase
 
@@ -27,10 +27,11 @@ Sheet ingestion (ADR-0007, accepted 2026-07-02): local MCP server + Claude Code 
 
 <!-- AUTO:START -->
 **Branch:** `master`  
-**Last commit:** 2026-07-02 21:26 UTC
+**Last commit:** 2026-07-05 17:58 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `69e06dd` | 2026-07-02 | Add planning artifacts: ADR-0005, ADR-0007, tickets, dashboard sync |
 | `cfb57ca` | 2026-07-02 | Add branded offline fallback page served by the service worker |
 | `4d1d5ef` | 2026-07-02 | Add AI tab import: paste and URL extraction via local AI proxy (ADR-0006) |
 | `c6251ba` | 2026-07-02 | Exclude Claude Code agent worktrees from vitest, biome, and git |
@@ -46,26 +47,26 @@ Sheet ingestion (ADR-0007, accepted 2026-07-02): local MCP server + Claude Code 
 **Files changed (last 5 commits):**
 
 ```
- .gitignore                                            |   3 +
- STATUS.md                                             |  22 +-
- architecture/decisions/0006-ai-tab-import.md          | 268 ++++++++++++++++++++++
- package.json                                          |   4 +-
- public/icons/icon-192x192.png                         | Bin 0 -> 4132 bytes
- public/icons/icon-512x512.png                         | Bin 0 -> 13007 bytes
- public/icons/icon-source.svg                          |   4 +
- public/manifest.json                                  |  20 ++
- public/offline.html                                   |  88 +++++++
- public/sw.js                                          |  63 +++++
- scripts/ai-proxy.ts                                   | 154 +++++++++++++
- scripts/url-import.test.ts                            | 175 ++++++++++++++
- scripts/url-import.ts                                 |  96 ++++++++
- src/app/add/page.tsx                                  |   4 +-
- src/app/layout.tsx                                    |  14 +-
- src/components/AddPageClient.test.tsx                 | 164 +++++++++++++
- src/components/AddPageClient.tsx                      |  99 ++++++++
- src/components/ImportForm.test.tsx                    | 395 ++++++++++++++++++++++++++++++++
- src/components/ImportForm.tsx                         | 251 ++++++++++++++++++++
- src/components/OfflineBanner.test.tsx                 |  68 ++++++
+ .gitignore                                                     |   3 +
+ STATUS.md                                                      |  75 ++++++++----
+ architecture/decisions/0005-multi-instrument-support.md        | 261 ++++++++++++++++++++++++++++++++++++++++++
+ architecture/decisions/0006-ai-tab-import.md                   | 268 +++++++++++++++++++++++++++++++++++++++++++
+ architecture/decisions/0007-mcp-sheet-ingestion-pipeline.md    | 214 +++++++++++++++++++++++++++++++++++
+ package.json                                                   |   4 +-
+ public/offline.html                                            |  88 +++++++++++++++
+ public/sw.js                                                   |  63 +++++++++++
+ scripts/ai-proxy.ts                                            | 154 +++++++++++++++++++++++++
+ scripts/url-import.test.ts                                     | 175 ++++++++++++++++++++++++++++
+ scripts/url-import.ts                                          |  96 ++++++++++++++++
+ src/app/add/page.tsx                                           |   4 +-
+ src/app/layout.tsx                                             |   4 +
+ src/components/AddPageClient.test.tsx                          | 164 +++++++++++++++++++++++++++
+ src/components/AddPageClient.tsx                               |  99 ++++++++++++++++
+ src/components/ImportForm.test.tsx                             | 395 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/components/ImportForm.tsx                                  | 251 +++++++++++++++++++++++++++++++++++++++++
+ src/components/OfflineBanner.test.tsx                          |  68 +++++++++++
+ src/components/OfflineBanner.tsx                               |  33 ++++++
+ src/components/ServiceWorkerRegistration.tsx                   |  13 +++
 ```
 <!-- AUTO:FILES:END -->
 

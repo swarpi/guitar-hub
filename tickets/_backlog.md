@@ -16,10 +16,6 @@ _Tickets ready to be picked up in the next cycle._
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| [007 — Piano Route Group](multi-instrument/007-piano-route-group.md) | multi-instrument | P1 | M |
-| [008 — ABC Notation Rendering](multi-instrument/008-abc-notation-rendering.md) | multi-instrument | P1 | M |
-| [009 — App Rename](multi-instrument/009-app-rename.md) | multi-instrument | P1 | S |
-| [010 — Service Worker and PWA Updates](multi-instrument/010-service-worker-pwa-updates.md) | multi-instrument | P2 | XS |
 
 ## Backlog
 
@@ -29,7 +25,6 @@ _sheet-ingest (ADR-0007) tickets 001 and 002 are explicitly blocked on the same 
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| [003 — Duplicate Warning Banner](ai-import/003-duplicate-warning-banner.md) | ai-import | P1 | S |
 | [001 — Schema Migration: Metadata Columns](sheet-ingest/001-schema-migration-metadata-columns.md) | sheet-ingest | P1 | S |
 | [002 — MCP Server Scaffold](sheet-ingest/002-mcp-server-scaffold.md) | sheet-ingest | P1 | M |
 | [003 — validate_notation: ABC via abcjs](sheet-ingest/003-validate-notation-abc.md) | sheet-ingest | P1 | M |
@@ -45,6 +40,11 @@ _Completed tickets. Move here when done, newest first._
 
 | Ticket | Feature | Completed |
 |--------|---------|-----------|
+| [010 — Service Worker and PWA Updates](multi-instrument/010-service-worker-pwa-updates.md) | multi-instrument | 2026-07-05 |
+| [009 — App Rename](multi-instrument/009-app-rename.md) | multi-instrument | 2026-07-05 |
+| [003 — Duplicate Warning Banner](ai-import/003-duplicate-warning-banner.md) | ai-import | 2026-07-03 |
+| [008 — ABC Notation Rendering](multi-instrument/008-abc-notation-rendering.md) | multi-instrument | 2026-07-03 |
+| [007 — Piano Route Group](multi-instrument/007-piano-route-group.md) | multi-instrument | 2026-07-02 |
 | [006 — URL Redirects](multi-instrument/006-url-redirects.md) | multi-instrument | 2026-07-02 |
 | [005 — ImportForm URL Input Mode](ai-import/005-import-form-url-input.md) | ai-import | 2026-07-02 |
 | [005 — Landing Page](multi-instrument/005-landing-page.md) | multi-instrument | 2026-07-02 |
