@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-05 17:00 UTC
+> Last updated: 2026-07-05 17:25 UTC
 
 ## Current Phase
 
@@ -23,20 +23,20 @@ Multi-instrument feature (ADR-0005), executing in this worktree. Tickets 007 (`4
 
 <!-- AUTO:START -->
 **Branch:** `worktree-multi-instrument-001`  
-**Last commit:** 2026-07-05 17:00 UTC
+**Last commit:** 2026-07-05 17:25 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `6c20e2c` | 2026-07-05 | Merge branch 'master' into worktree-multi-instrument-001 |
+| `0b4eea9` | 2026-07-05 | Update STATUS.md: ticket 009 done, ticket 010 blocked on master integration |
 | `7400d13` | 2026-07-05 | Rename app Guitar Hub to Music Hub via layout title template (ticket 009) |
 | `b7a862c` | 2026-07-03 | Render piano songs as staff notation via code-split abcjs (ticket 008) |
 | `4f3e7bf` | 2026-07-03 | Add piano route group: full /piano CRUD flow (ticket 007) |
+| `69e06dd` | 2026-07-02 | Add planning artifacts: ADR-0005, ADR-0007, tickets, dashboard sync |
+| `cfb57ca` | 2026-07-02 | Add branded offline fallback page served by the service worker |
+| `4d1d5ef` | 2026-07-02 | Add AI tab import: paste and URL extraction via local AI proxy (ADR-0006) |
+| `c6251ba` | 2026-07-02 | Exclude Claude Code agent worktrees from vitest, biome, and git |
 | `07728fd` | 2026-07-02 | Redirect legacy /artists, /add, /edit routes to /guitar equivalents |
-| `a98958a` | 2026-07-02 | Replace home page with Music Hub instrument-picker landing page |
-| `ed00f5b` | 2026-07-02 | Add guitar route group, instrument-prefixed redirects, remove legacy routes |
-| `5ae355b` | 2026-07-02 | Add instrument validation and getSongsByInstrument test coverage |
-| `883e408` | 2026-07-02 | Add instrument-aware queries, actions, and form support |
-| `cb84190` | 2026-06-29 | Add instrument column, rename tabContent to content, update unique index |
-| `3c381d7` | 2026-06-20 | Initial commit: complete foundation (tickets 001–009) |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -45,26 +45,26 @@ Multi-instrument feature (ADR-0005), executing in this worktree. Tickets 007 (`4
 **Files changed (last 5 commits):**
 
 ```
- STATUS.md                                       |  53 +++++++++++++++++-----------
- next.config.mjs                                 |  27 ++++++++++++++-
- package.json                                    |   3 +-
- pnpm-lock.yaml                                  |   8 +++++
- src/app/actions.test.ts                         |  22 +++++++++++-
- src/app/guitar/[artistSlug]/[songSlug]/page.tsx |   2 +-
- src/app/guitar/[artistSlug]/page.tsx            |   2 +-
- src/app/guitar/add/page.tsx                     |   2 +-
- src/app/guitar/edit/[songId]/page.tsx           |   2 +-
- src/app/layout.tsx                              |   7 ++--
- src/app/page.tsx                                | 149 +++++++++++++++++++++++++++++++++----------------------------------------------
- src/app/piano/[artistSlug]/[songSlug]/page.tsx  |  75 ++++++++++++++++++++++++++++++++++++++++
- src/app/piano/[artistSlug]/page.tsx             |  66 +++++++++++++++++++++++++++++++++++
- src/app/piano/add/page.tsx                      |  52 ++++++++++++++++++++++++++++
- src/app/piano/edit/[songId]/page.tsx            |  86 ++++++++++++++++++++++++++++++++++++++++++++++
- src/app/piano/page.tsx                          |  99 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/components/AbcNotation.tsx                  |  23 +++++++++++++
- src/components/AbcNotationRenderer.test.tsx     |  48 ++++++++++++++++++++++++++
- src/components/AbcNotationRenderer.tsx          |  28 +++++++++++++++
- src/components/Header.tsx                       |   2 +-
+ .claude/settings.json                                          |  33 ++++++
+ .gitignore                                                     |   3 +
+ CLAUDE.md                                                      |  34 +++++-
+ STATUS.md                                                      |  59 +++++-----
+ architecture/decisions/0004-deployment-and-next-phase.md       | 130 +++++++++++++++++++++
+ architecture/decisions/0005-multi-instrument-support.md        | 261 ++++++++++++++++++++++++++++++++++++++++++
+ architecture/decisions/0006-ai-tab-import.md                   | 268 +++++++++++++++++++++++++++++++++++++++++++
+ architecture/decisions/0007-mcp-sheet-ingestion-pipeline.md    | 214 +++++++++++++++++++++++++++++++++++
+ biome.json                                                     |  21 +---
+ package.json                                                   |   7 +-
+ pnpm-lock.yaml                                                 |   8 ++
+ public/icons/icon-192x192.png                                  | Bin 0 -> 4132 bytes
+ public/icons/icon-512x512.png                                  | Bin 0 -> 13007 bytes
+ public/icons/icon-source.svg                                   |   4 +
+ public/manifest.json                                           |  20 ++++
+ public/offline.html                                            |  88 +++++++++++++++
+ public/sw.js                                                   |  63 +++++++++++
+ scripts/ai-proxy.ts                                            | 154 +++++++++++++++++++++++++
+ scripts/generate-seed-sql.ts                                   |  37 ++++++
+ scripts/seed.sql                                               | 135 ++++++++++++++++++++++
 ```
 <!-- AUTO:FILES:END -->
 

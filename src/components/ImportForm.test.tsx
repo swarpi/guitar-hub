@@ -127,7 +127,7 @@ describe("ImportForm", () => {
 				title: "Dust in the Wind",
 				artist: "Kansas",
 				capo: null,
-				tabContent: "Am  C  G\nI close my eyes...",
+				content: "Am  C  G\nI close my eyes...",
 				notes: "Standard tuning",
 			});
 		});
@@ -325,7 +325,7 @@ describe("ImportForm", () => {
 					title: "Dust in the Wind",
 					artist: "Kansas",
 					capo: null,
-					tabContent: "Am  C  G\nI close my eyes...",
+					content: "Am  C  G\nI close my eyes...",
 					notes: "Standard tuning",
 				});
 			});

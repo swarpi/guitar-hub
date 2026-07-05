@@ -145,7 +145,7 @@ export function ImportForm({
 			title: parsed.title ?? "Unknown",
 			artist: parsed.artist ?? "Unknown",
 			capo: parsed.capo ?? null,
-			tabContent: parsed.tabContent,
+			content: parsed.tabContent,
 			notes: parsed.notes ?? null,
 		});
 	}

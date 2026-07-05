@@ -2,7 +2,7 @@ importScripts(
 	"https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-sw.js",
 );
 
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const PAGES_CACHE = `pages-${CACHE_VERSION}`;
 const ASSETS_CACHE = `assets-${CACHE_VERSION}`;
 const OFFLINE_CACHE = `offline-${CACHE_VERSION}`;
