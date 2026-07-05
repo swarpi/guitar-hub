@@ -10,7 +10,6 @@ _route-consolidation (ADR-0008) is P0: production is degraded — the deployed w
 
 | Ticket | Feature | Priority | Status | Assignee |
 |--------|---------|----------|--------|----------|
-| [001 — Consolidate Instrument Route Group](route-consolidation/001-consolidate-instrument-route-group.md) | route-consolidation | P0 | Todo | |
 | [002 — Deploy Verification and Rollout](route-consolidation/002-deploy-verification-and-rollout.md) | route-consolidation | P0 | Todo | |
 | [003 — Offline Fallback Page](pwa/003-offline-fallback-page.md) | pwa | P1 | In Review | |
 
@@ -44,6 +43,7 @@ _Completed tickets. Move here when done, newest first._
 
 | Ticket | Feature | Completed |
 |--------|---------|-----------|
+| [001 — Consolidate Instrument Route Group](route-consolidation/001-consolidate-instrument-route-group.md) | route-consolidation | 2026-07-05 |
 | [010 — Service Worker and PWA Updates](multi-instrument/010-service-worker-pwa-updates.md) | multi-instrument | 2026-07-05 |
 | [009 — App Rename](multi-instrument/009-app-rename.md) | multi-instrument | 2026-07-05 |
 | [003 — Duplicate Warning Banner](ai-import/003-duplicate-warning-banner.md) | ai-import | 2026-07-03 |

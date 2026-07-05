@@ -1,7 +1,7 @@
 # Ticket: Consolidate /guitar and /piano Route Groups into a Dynamic [instrument] Group
 
 **Feature:** route-consolidation
-**Status:** Todo
+**Status:** Done
 **Priority:** P0
 **Estimate:** L
 **Related:** ADR-0008, ADR-0005
@@ -20,21 +20,21 @@ Production is currently degraded (see route-consolidation/002) — this ticket i
 
 ## Acceptance Criteria
 
-- [ ] `src/lib/instruments.ts` created, exporting `INSTRUMENTS = ["guitar", "piano"] as const`, an `Instrument` type, and `assertInstrument(value: string): Instrument` that calls `notFound()` for any value not in `INSTRUMENTS` (per ADR-0008's sketch) — used by all five consolidated pages
-- [ ] `src/app/[instrument]/page.tsx` — validates `params.instrument` via `assertInstrument`; lists songs via `getSongsByInstrument(db, instrument)`; section label reads `"The Songbook · Guitar"` or `"The Songbook · Piano"`; `capo` is passed to `SongListItem` only when `instrument === "guitar"`; FAB `href` is `/${instrument}/add`; empty-state CTA link is `/${instrument}/add` and empty-state copy is preserved per instrument ("Add your first tab to begin the collection." for guitar, "Add your first piece to begin the collection." for piano)
-- [ ] `src/app/[instrument]/add/page.tsx` — validates instrument; guitar branch renders `AddPageClient` with `existingSongs = getAllSongsFlat(db, "guitar")`, `instrument="guitar"`, `cancelHref="/guitar"`; piano branch renders plain `SongForm` with `instrument="piano"`, `cancelHref="/piano"`; both call the `createSong` action; the `getAllSongsFlat` query runs only on the guitar branch (not invoked for piano); breadcrumb reads `Home → {Guitar|Piano} → Add a Song`
-- [ ] `src/app/[instrument]/edit/[songId]/page.tsx` — validates instrument; loads the song via `getSongById`; calls `notFound()` when `song.instrument !== validatedInstrument` (the existing guard, preserved verbatim); breadcrumbs and `cancelHref` are instrument-prefixed; capo field visibility inside `SongForm` is unchanged (already conditional on instrument)
-- [ ] `src/app/[instrument]/[artistSlug]/page.tsx` — validates instrument; `getArtistBySlug` + `getSongsByArtistId(db, artist.id, instrument)`; capo passed to `SongListItem` only for guitar; preserves the pre-existing per-instrument discrepancy exactly as it is today: guitar renders the "N songs" state (including "0 songs") without a 404 when the artist has no guitar songs, while piano calls `notFound()` when the artist has no piano songs — see Notes
-- [ ] `src/app/[instrument]/[artistSlug]/[songSlug]/page.tsx` — validates instrument; `getSongBySlugs(db, artistSlug, songSlug, instrument)`, `notFound()` if absent; renders a `<pre>` block for guitar and `AbcNotation` for piano; capo badge shown only for guitar; Edit link is `/${instrument}/edit/${song.id}`
-- [ ] `generateMetadata` is preserved on the edit and detail pages with unchanged title logic
-- [ ] `src/app/guitar/` and `src/app/piano/` directories are deleted in full
-- [ ] An unknown instrument segment (e.g. `/banjo`, `/xyz`) returns a 404 via the new `[instrument]` route for the list page and at least one nested shape (e.g. `/banjo/add`)
-- [ ] `next.config.mjs` redirects (`/artists/:artistSlug`, `/artists/:artistSlug/:songSlug`, `/add`, `/edit/:songId`) are unchanged and still resolve correctly (static routes continue to win over the dynamic `[instrument]` segment per Next.js routing precedence) — verified by a test or documented manual check
-- [ ] Tests added/updated covering: invalid-instrument 404 (list route and one nested route), guitar-only capo rendering on list/artist/detail, guitar-only `AddPageClient` + `getAllSongsFlat` invocation vs piano's plain `SongForm`, `AbcNotation` (piano) vs `<pre>` (guitar) on the detail page, the edit-page instrument guard for both instruments, and the artist-page 0-songs behavior parity (guitar renders empty list, piano 404s)
-- [ ] `pnpm test` passes
-- [ ] `pnpm lint` passes
-- [ ] `pnpm build` passes with no TypeScript errors
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `src/lib/instruments.ts` created, exporting `INSTRUMENTS = ["guitar", "piano"] as const`, an `Instrument` type, and `assertInstrument(value: string): Instrument` that calls `notFound()` for any value not in `INSTRUMENTS` (per ADR-0008's sketch) — used by all five consolidated pages
+- [x] `src/app/[instrument]/page.tsx` — validates `params.instrument` via `assertInstrument`; lists songs via `getSongsByInstrument(db, instrument)`; section label reads `"The Songbook · Guitar"` or `"The Songbook · Piano"`; `capo` is passed to `SongListItem` only when `instrument === "guitar"`; FAB `href` is `/${instrument}/add`; empty-state CTA link is `/${instrument}/add` and empty-state copy is preserved per instrument ("Add your first tab to begin the collection." for guitar, "Add your first piece to begin the collection." for piano)
+- [x] `src/app/[instrument]/add/page.tsx` — validates instrument; guitar branch renders `AddPageClient` with `existingSongs = getAllSongsFlat(db, "guitar")`, `instrument="guitar"`, `cancelHref="/guitar"`; piano branch renders plain `SongForm` with `instrument="piano"`, `cancelHref="/piano"`; both call the `createSong` action; the `getAllSongsFlat` query runs only on the guitar branch (not invoked for piano); breadcrumb reads `Home → {Guitar|Piano} → Add a Song`
+- [x] `src/app/[instrument]/edit/[songId]/page.tsx` — validates instrument; loads the song via `getSongById`; calls `notFound()` when `song.instrument !== validatedInstrument` (the existing guard, preserved verbatim); breadcrumbs and `cancelHref` are instrument-prefixed; capo field visibility inside `SongForm` is unchanged (already conditional on instrument)
+- [x] `src/app/[instrument]/[artistSlug]/page.tsx` — validates instrument; `getArtistBySlug` + `getSongsByArtistId(db, artist.id, instrument)`; capo passed to `SongListItem` only for guitar; preserves the pre-existing per-instrument discrepancy exactly as it is today: guitar renders the "N songs" state (including "0 songs") without a 404 when the artist has no guitar songs, while piano calls `notFound()` when the artist has no piano songs — see Notes
+- [x] `src/app/[instrument]/[artistSlug]/[songSlug]/page.tsx` — validates instrument; `getSongBySlugs(db, artistSlug, songSlug, instrument)`, `notFound()` if absent; renders a `<pre>` block for guitar and `AbcNotation` for piano; capo badge shown only for guitar; Edit link is `/${instrument}/edit/${song.id}`
+- [x] `generateMetadata` is preserved on the edit and detail pages with unchanged title logic
+- [x] `src/app/guitar/` and `src/app/piano/` directories are deleted in full
+- [x] An unknown instrument segment (e.g. `/banjo`, `/xyz`) returns a 404 via the new `[instrument]` route for the list page and at least one nested shape (e.g. `/banjo/add`)
+- [x] `next.config.mjs` redirects (`/artists/:artistSlug`, `/artists/:artistSlug/:songSlug`, `/add`, `/edit/:songId`) are unchanged and still resolve correctly (static routes continue to win over the dynamic `[instrument]` segment per Next.js routing precedence) — verified by a test or documented manual check
+- [x] Tests added/updated covering: invalid-instrument 404 (list route and one nested route), guitar-only capo rendering on list/artist/detail, guitar-only `AddPageClient` + `getAllSongsFlat` invocation vs piano's plain `SongForm`, `AbcNotation` (piano) vs `<pre>` (guitar) on the detail page, the edit-page instrument guard for both instruments, and the artist-page 0-songs behavior parity (guitar renders empty list, piano 404s)
+- [x] `pnpm test` passes
+- [x] `pnpm lint` passes
+- [x] `pnpm build` passes with no TypeScript errors
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
