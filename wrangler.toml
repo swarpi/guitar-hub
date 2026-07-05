@@ -1,13 +1,14 @@
 # ---- Deployment ----
-# 1. Create the D1 database:
-#      wrangler d1 create guitar-hub-db
-# 2. Replace database_id below with the ID from step 1.
-# 3. Run the initial migration:
-#      wrangler d1 execute guitar-hub-db --file=migrations/0000_initial.sql
-# 4. Build for Cloudflare:
+# The production D1 database is named "guitar-hub" (D1 does not support
+# renaming; the app name changed to Music Hub but the database keeps its
+# original name). The Pages project is also "guitar-hub", so deploys must
+# pass --project-name=guitar-hub explicitly.
+# 1. Run pending migrations against production:
+#      wrangler d1 execute guitar-hub --remote --file=migrations/<file>.sql
+# 2. Build for Cloudflare:
 #      pnpm pages:build
-# 5. Deploy:
-#      wrangler pages deploy .vercel/output/static
+# 3. Deploy:
+#      wrangler pages deploy --project-name=guitar-hub
 # ---------------------
 
 name = "music-hub"
@@ -17,5 +18,5 @@ compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB"
-database_name = "guitar-hub-db"
+database_name = "guitar-hub"
 database_id = "84c8f3de-9356-42d0-8f7f-a3ea2a50361e"
