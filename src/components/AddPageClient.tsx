@@ -8,8 +8,14 @@ import { SongForm } from "./SongForm";
 
 type Mode = "manual" | "import";
 
+export interface ExistingSong {
+	readonly title: string;
+	readonly artistName: string;
+}
+
 interface AddPageClientProps {
 	readonly artistNames: readonly string[];
+	readonly existingSongs: readonly ExistingSong[];
 	readonly action: (
 		formData: FormData,
 	) => Promise<{ error: string } | undefined>;
@@ -22,8 +28,24 @@ const TOGGLE_ACTIVE =
 const TOGGLE_INACTIVE =
 	"border border-line bg-transparent text-ink-soft hover:border-ink-soft/30 hover:bg-accent/[.04]";
 
+export function findDuplicate(
+	extractedFields: SongFormInitialValues,
+	existingSongs: readonly ExistingSong[],
+): ExistingSong | null {
+	const title = extractedFields.title.trim().toLowerCase();
+	const artist = extractedFields.artist.trim().toLowerCase();
+	return (
+		existingSongs.find(
+			(s) =>
+				s.title.trim().toLowerCase() === title &&
+				s.artistName.trim().toLowerCase() === artist,
+		) ?? null
+	);
+}
+
 export function AddPageClient({
 	artistNames,
+	existingSongs,
 	action,
 }: AddPageClientProps): React.ReactElement {
 	const [mode, setMode] = useState<Mode>("manual");
@@ -87,6 +109,16 @@ export function AddPageClient({
 					>
 						&larr; Back to Import
 					</button>
+					{(() => {
+						if (!extractedFields) return null;
+						const dup = findDuplicate(extractedFields, existingSongs);
+						return dup ? (
+							<div className="mb-4 rounded-lg border border-amber-300/60 bg-amber-50/60 px-4 py-3 font-serif text-[14px] text-amber-800">
+								A song called &ldquo;{dup.title}&rdquo; by &ldquo;
+								{dup.artistName}&rdquo; may already exist in your songbook.
+							</div>
+						) : null;
+					})()}
 					<SongForm
 						artistNames={artistNames}
 						action={action}

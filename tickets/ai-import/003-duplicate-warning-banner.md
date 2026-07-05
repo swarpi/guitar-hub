@@ -1,7 +1,7 @@
 # Ticket: Duplicate Warning Banner in Review Step
 
 **Feature:** ai-import
-**Status:** Todo
+**Status:** Done
 **Priority:** P1
 **Estimate:** S
 **Related:** ADR-0006
@@ -18,25 +18,25 @@ Show a non-blocking advisory warning banner during the review step when the extr
 
 ## Acceptance Criteria
 
-- [ ] A new query function `getAllSongsFlat(db)` (or inline query) is added to `src/db/queries.ts` that returns `{ title: string, artistName: string }[]` via a join of `songs` and `artists`
-- [ ] `src/app/add/page.tsx` calls this query and passes the result to `AddPageClient` as a new prop `existingSongs: { title: string; artistName: string }[]`
-- [ ] `AddPageClient` accepts the `existingSongs` prop
-- [ ] In the review step, `AddPageClient` checks for a duplicate by comparing `extractedFields.title` and `extractedFields.artist` against `existingSongs` using case-insensitive string comparison
-- [ ] When a duplicate is found, a warning banner is shown above the `SongForm` with the text: "A song called '[title]' by '[artist]' may already exist in your songbook."
-- [ ] The warning banner is styled using warning-appropriate design system tokens (e.g., amber/orange tones). Look at the existing error text style (`text-delete` in `SongForm.tsx`) and choose a visually distinct warning variant.
-- [ ] The warning banner does not block form submission — the "Save to Songbook" button remains active
-- [ ] When no duplicate is found, no banner renders (the review step looks the same as before)
-- [ ] When `existingSongs` is empty, no banner renders
-- [ ] The manual mode path is unaffected — no banner ever appears when the user is in manual mode
-- [ ] `pnpm build` compiles without errors
-- [ ] `pnpm lint` passes on all changed files
-- [ ] Tests cover:
-  - [ ] Duplicate found (case-insensitive match on both title and artist) → banner rendered with correct text
-  - [ ] Title matches but artist differs → no banner
-  - [ ] Artist matches but title differs → no banner
-  - [ ] Empty `existingSongs` array → no banner
-  - [ ] Manual mode active → no banner
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] A new query function `getAllSongsFlat(db)` (or inline query) is added to `src/db/queries.ts` that returns `{ title: string, artistName: string }[]` via a join of `songs` and `artists`
+- [x] `src/app/add/page.tsx` calls this query and passes the result to `AddPageClient` as a new prop `existingSongs: { title: string; artistName: string }[]`
+- [x] `AddPageClient` accepts the `existingSongs` prop
+- [x] In the review step, `AddPageClient` checks for a duplicate by comparing `extractedFields.title` and `extractedFields.artist` against `existingSongs` using case-insensitive string comparison
+- [x] When a duplicate is found, a warning banner is shown above the `SongForm` with the text: "A song called '[title]' by '[artist]' may already exist in your songbook."
+- [x] The warning banner is styled using warning-appropriate design system tokens (e.g., amber/orange tones). Look at the existing error text style (`text-delete` in `SongForm.tsx`) and choose a visually distinct warning variant.
+- [x] The warning banner does not block form submission — the "Save to Songbook" button remains active
+- [x] When no duplicate is found, no banner renders (the review step looks the same as before)
+- [x] When `existingSongs` is empty, no banner renders
+- [x] The manual mode path is unaffected — no banner ever appears when the user is in manual mode
+- [x] `pnpm build` compiles without errors
+- [x] `pnpm lint` passes on all changed files
+- [x] Tests cover:
+  - [x] Duplicate found (case-insensitive match on both title and artist) → banner rendered with correct text
+  - [x] Title matches but artist differs → no banner
+  - [x] Artist matches but title differs → no banner
+  - [x] Empty `existingSongs` array → no banner
+  - [x] Manual mode active → no banner
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 

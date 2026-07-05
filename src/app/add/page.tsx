@@ -6,6 +6,7 @@ import { AddPageClient } from "@/components/AddPageClient";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Header } from "@/components/Header";
 import { getDb } from "@/db/client";
+import { getAllSongsFlat } from "@/db/queries";
 import { artists } from "@/db/schema";
 
 import { createSong } from "../actions";
@@ -19,10 +20,10 @@ export const metadata: Metadata = {
 export default async function AddPage() {
 	const db = getDb(getRequestContext().env);
 
-	const allArtists = await db
-		.select({ name: artists.name })
-		.from(artists)
-		.orderBy(asc(artists.name));
+	const [allArtists, existingSongs] = await Promise.all([
+		db.select({ name: artists.name }).from(artists).orderBy(asc(artists.name)),
+		getAllSongsFlat(db),
+	]);
 
 	const artistNames = allArtists.map((a) => a.name);
 
@@ -36,7 +37,11 @@ export default async function AddPage() {
 				<h1 className="mb-6 font-serif text-[28px] font-medium leading-tight text-ink">
 					Add a Song
 				</h1>
-				<AddPageClient artistNames={artistNames} action={createSong} />
+				<AddPageClient
+					artistNames={artistNames}
+					existingSongs={existingSongs}
+					action={createSong}
+				/>
 			</main>
 		</>
 	);

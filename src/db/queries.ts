@@ -48,6 +48,14 @@ export async function getSongById(db: Db, songId: string) {
 	return rows[0] ?? null;
 }
 
+export async function getAllSongsFlat(db: Db) {
+	return db
+		.select({ title: songs.title, artistName: artists.name })
+		.from(songs)
+		.innerJoin(artists, eq(songs.artistId, artists.id))
+		.orderBy(asc(songs.title));
+}
+
 export async function getSongBySlugs(
 	db: Db,
 	artistSlug: string,
