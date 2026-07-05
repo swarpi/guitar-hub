@@ -12,7 +12,9 @@
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"pages:dev": "wrangler pages dev",
-		"seed": "tsx src/db/seed.ts"
+		"seed": "tsx src/db/seed.ts",
+		"dev:ai": "tsx scripts/ai-proxy.ts",
+		"dev:all": "tsx scripts/ai-proxy.ts & pnpm dev"
 	},
 	"dependencies": {
 		"abcjs": "^6.6.3",

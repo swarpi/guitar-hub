@@ -1,0 +1,33 @@
+{
+	"hooks": {
+		"PostToolUse": [
+			{
+				"matcher": "Bash",
+				"hooks": [
+					{
+						"type": "command",
+						"if": "Bash(git commit *)",
+						"command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/scripts/update-status.sh",
+						"timeout": 30
+					},
+					{
+						"type": "command",
+						"if": "Bash(git push *)",
+						"command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/scripts/update-status.sh",
+						"timeout": 30
+					}
+				]
+			},
+			{
+				"matcher": "Write|Edit",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "lines=$(wc -l < CLAUDE.md 2>/dev/null) && [ \"${lines:-0}\" -gt 200 ] && echo \"CLAUDE.md is ${lines} lines (limit: 200). Move content to linked files.\" || true",
+						"timeout": 10
+					}
+				]
+			}
+		]
+	}
+}

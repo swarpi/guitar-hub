@@ -1,4 +1,36 @@
-# Project
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Build and Dev Commands
+
+```bash
+pnpm dev              # Next.js dev server (uses setupDevPlatform for local D1)
+pnpm build            # Next.js production build
+pnpm pages:build      # Cloudflare Pages build (runs vercel build + @cloudflare/next-on-pages)
+pnpm pages:dev        # Wrangler local Cloudflare runtime
+pnpm lint             # Biome check (lint + format check)
+pnpm format           # Biome auto-format
+pnpm test             # Vitest run all tests
+pnpm test:watch       # Vitest watch mode
+pnpm seed             # Populate local D1 with 21 seed songs (uses better-sqlite3)
+```
+
+Run a single test file: `pnpm vitest run src/path/to/file.test.ts`
+
+## Architecture
+
+Personal guitar tab collection app. Next.js 16 (App Router) on Cloudflare Pages with D1 (edge SQLite) via Drizzle ORM. Single user, no auth.
+
+**Data flow:** Server components and server actions call `getRequestContext().env` to get the D1 binding, then pass it to `getDb()` which returns a typed Drizzle client. All pages use `export const runtime = "edge"`.
+
+**Two tables:** `artists` (id, name, slug) and `songs` (id, artistId, title, slug, tabContent, capo, notes). Schema in `src/db/schema.ts`, queries in `src/db/queries.ts`, server actions in `src/app/actions.ts`.
+
+**Testing:** Vitest with jsdom. Tests mock `@cloudflare/next-on-pages` and use `better-sqlite3` in-memory databases (see `src/app/actions.test.ts` for the pattern). Production code never imports `better-sqlite3`.
+
+**Cloudflare specifics:** `build` script is just `next build`. The `pages:build` script runs `@cloudflare/next-on-pages` separately — do NOT chain them in one script (causes recursive `vercel build` invocation). The D1 database ID in `wrangler.toml` is a placeholder until provisioned.
+
+## Project
 
 This project uses a hybrid agentic workflow: specialized agents handle process (decisions, planning, review), and Claude Code's plan mode handles execution.
 
