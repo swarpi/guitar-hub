@@ -22,8 +22,11 @@ const bevan = Bevan({
 });
 
 export const metadata: Metadata = {
-	title: "Guitar Hub",
-	description: "A personal fingerstyle guitar tablature collection",
+	title: {
+		default: "Music Hub",
+		template: "%s — Music Hub",
+	},
+	description: "A personal music sheet and tablature collection",
 };
 
 export default function RootLayout({

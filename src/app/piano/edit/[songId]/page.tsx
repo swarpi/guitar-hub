@@ -25,7 +25,7 @@ export async function generateMetadata({
 	const db = getDb(getRequestContext().env);
 	const song = await getSongById(db, songId);
 	if (!song) return {};
-	return { title: `Edit ${song.title} — Guitar Hub` };
+	return { title: `Edit ${song.title}` };
 }
 
 export default async function EditPianoSongPage({ params }: EditPageProps) {

@@ -9,7 +9,7 @@ export function Header(): React.ReactElement {
 			<div className="flex items-center justify-between gap-3.5 px-[clamp(16px,4vw,28px)] pt-4">
 				<Link href="/" className="flex min-w-0 items-baseline gap-3.5">
 					<span className="whitespace-nowrap font-serif text-[clamp(21px,5vw,26px)] tracking-tight text-cream">
-						<span className="font-semibold">Guitar</span>{" "}
+						<span className="font-semibold">Music</span>{" "}
 						<span className="font-light italic text-[#a7bdab]">Hub</span>
 					</span>
 				</Link>

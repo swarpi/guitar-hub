@@ -21,7 +21,7 @@ export async function generateMetadata({
 	const db = getDb(getRequestContext().env);
 	const artist = await getArtistBySlug(db, artistSlug);
 	if (!artist) return {};
-	return { title: `${artist.name} — Guitar Hub` };
+	return { title: artist.name };
 }
 
 export default async function GuitarArtistPage({ params }: ArtistPageProps) {

@@ -22,7 +22,7 @@ export async function generateMetadata({
 	const db = getDb(getRequestContext().env);
 	const song = await getSongBySlugs(db, artistSlug, songSlug, "piano");
 	if (!song) return {};
-	return { title: `${song.title} — Guitar Hub` };
+	return { title: song.title };
 }
 
 export default async function PianoSongPage({ params }: SongPageProps) {

@@ -13,7 +13,7 @@ import { createSong } from "../../actions";
 export const runtime = "edge";
 
 export const metadata: Metadata = {
-	title: "Add a Song — Guitar Hub",
+	title: "Add a Song",
 };
 
 export default async function AddPianoSongPage() {
