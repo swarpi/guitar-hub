@@ -1,0 +1,21 @@
+name: Notify Site of Content Update
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'orchestration.yaml'
+      - 'architecture.yaml'
+      - 'README.md'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger site rebuild
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.SITE_REBUILD_TOKEN }}
+          repository: swarpi/swarpi.github.io
+          event-type: showcase-updated
