@@ -88,6 +88,9 @@ const MIGRATION_STATEMENTS = [
 		\`content\` text NOT NULL,
 		\`capo\` integer,
 		\`notes\` text,
+		\`difficulty\` text,
+		\`key\` text,
+		\`source_url\` text,
 		\`created_at\` text NOT NULL,
 		\`updated_at\` text NOT NULL
 	)`,
@@ -119,6 +122,9 @@ async function seedSong(
 		slug: string;
 		content?: string;
 		capo?: number | null;
+		difficulty?: string | null;
+		key?: string | null;
+		sourceUrl?: string | null;
 	},
 ) {
 	await db.insert(schema.songs).values({
@@ -126,6 +132,9 @@ async function seedSong(
 		content: fields.content ?? "content",
 		capo: fields.capo ?? null,
 		notes: null,
+		difficulty: fields.difficulty ?? null,
+		key: fields.key ?? null,
+		sourceUrl: fields.sourceUrl ?? null,
 		createdAt: NOW,
 		updatedAt: NOW,
 	});
@@ -332,5 +341,53 @@ describe("song detail page", () => {
 				}),
 			}),
 		).rejects.toThrow("NEXT_NOT_FOUND");
+	});
+
+	it("renders difficulty, key, and source link when present", async () => {
+		await seedSong(currentDb, {
+			id: "song-m",
+			artistId: "artist-g",
+			instrument: "guitar",
+			title: "Gravity",
+			slug: "gravity",
+			difficulty: "intermediate",
+			key: "G",
+			sourceUrl: "https://example.com/gravity",
+		});
+
+		render(
+			await SongPage({
+				params: p({
+					instrument: "guitar",
+					artistSlug: "sungha-jung",
+					songSlug: "gravity",
+				}),
+			}),
+		);
+
+		expect(screen.getByText("intermediate")).toBeInTheDocument();
+		expect(screen.getByText("Key: G")).toBeInTheDocument();
+		const source = screen.getByText("https://example.com/gravity");
+		expect(source.closest("a")?.getAttribute("href")).toBe(
+			"https://example.com/gravity",
+		);
+	});
+
+	it("renders no metadata extras when difficulty, key, and source are null", async () => {
+		render(
+			await SongPage({
+				params: p({
+					instrument: "guitar",
+					artistSlug: "sungha-jung",
+					songSlug: "amber",
+				}),
+			}),
+		);
+
+		expect(screen.queryByText(/Key:/)).not.toBeInTheDocument();
+		expect(screen.queryByText("Source")).not.toBeInTheDocument();
+		expect(screen.queryByText("beginner")).not.toBeInTheDocument();
+		expect(screen.queryByText("intermediate")).not.toBeInTheDocument();
+		expect(screen.queryByText("advanced")).not.toBeInTheDocument();
 	});
 });

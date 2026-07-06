@@ -22,6 +22,31 @@ function isInstrument(value: string): value is Instrument {
 	return (INSTRUMENTS as readonly string[]).includes(value);
 }
 
+const DIFFICULTIES = ["beginner", "intermediate", "advanced"] as const;
+
+function parseSheetMetadata(formData: FormData):
+	| { error: string }
+	| {
+			difficulty: string | null;
+			key: string | null;
+			sourceUrl: string | null;
+	  } {
+	const difficulty =
+		(formData.get("difficulty") as string | null)?.trim() || null;
+	const key = (formData.get("key") as string | null)?.trim() || null;
+	const sourceUrl =
+		(formData.get("sourceUrl") as string | null)?.trim() || null;
+
+	if (
+		difficulty !== null &&
+		!(DIFFICULTIES as readonly string[]).includes(difficulty)
+	) {
+		return { error: "Difficulty must be beginner, intermediate, or advanced." };
+	}
+
+	return { difficulty, key, sourceUrl };
+}
+
 export async function createSongLogic(
 	db: Db,
 	formData: FormData,
@@ -44,6 +69,11 @@ export async function createSongLogic(
 	const instrument = instrumentRaw === "" ? "guitar" : instrumentRaw;
 	if (!isInstrument(instrument)) {
 		return { error: "Instrument must be guitar or piano." };
+	}
+
+	const metadata = parseSheetMetadata(formData);
+	if ("error" in metadata) {
+		return metadata;
 	}
 
 	let capo: number | null = null;
@@ -115,6 +145,9 @@ export async function createSongLogic(
 			content,
 			capo,
 			notes,
+			difficulty: metadata.difficulty,
+			key: metadata.key,
+			sourceUrl: metadata.sourceUrl,
 			createdAt: now,
 			updatedAt: now,
 		});
@@ -159,6 +192,11 @@ export async function updateSongLogic(
 
 	if (!title || !artist || !content) {
 		return { error: "Title, artist, and content are required." };
+	}
+
+	const metadata = parseSheetMetadata(formData);
+	if ("error" in metadata) {
+		return metadata;
 	}
 
 	let capo: number | null = null;
@@ -248,6 +286,9 @@ export async function updateSongLogic(
 			content,
 			capo,
 			notes,
+			difficulty: metadata.difficulty,
+			key: metadata.key,
+			sourceUrl: metadata.sourceUrl,
 			artistId: newArtistId,
 			updatedAt: now,
 		})

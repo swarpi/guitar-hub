@@ -11,7 +11,12 @@ export interface SongFormInitialValues {
 	readonly capo: number | null;
 	readonly content: string;
 	readonly notes: string | null;
+	readonly difficulty?: string | null;
+	readonly key?: string | null;
+	readonly sourceUrl?: string | null;
 }
+
+const DIFFICULTY_OPTIONS = ["beginner", "intermediate", "advanced"] as const;
 
 interface SongFormProps {
 	readonly artistNames: readonly string[];
@@ -52,6 +57,9 @@ export function SongForm({
 	const [capo, setCapo] = useState(initialValues?.capo?.toString() ?? "");
 	const [content, setContent] = useState(initialValues?.content ?? "");
 	const [notes, setNotes] = useState(initialValues?.notes ?? "");
+	const [difficulty, setDifficulty] = useState(initialValues?.difficulty ?? "");
+	const [songKey, setSongKey] = useState(initialValues?.key ?? "");
+	const [sourceUrl, setSourceUrl] = useState(initialValues?.sourceUrl ?? "");
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 	useEffect(() => {
@@ -168,6 +176,58 @@ export function SongForm({
 						</pre>
 					</div>
 				)}
+
+				<div className="flex flex-wrap gap-5">
+					<div>
+						<label htmlFor="difficulty-input" className={LABEL_CLASS}>
+							Difficulty
+						</label>
+						<select
+							id="difficulty-input"
+							name="difficulty"
+							value={difficulty}
+							onChange={(e) => setDifficulty(e.target.value)}
+							className={`${INPUT_CLASS} min-w-[170px]`}
+						>
+							<option value="">—</option>
+							{DIFFICULTY_OPTIONS.map((option) => (
+								<option key={option} value={option}>
+									{option}
+								</option>
+							))}
+						</select>
+					</div>
+
+					<div>
+						<label htmlFor="key-input" className={LABEL_CLASS}>
+							Key
+						</label>
+						<input
+							id="key-input"
+							name="key"
+							type="text"
+							value={songKey}
+							onChange={(e) => setSongKey(e.target.value)}
+							placeholder="e.g. G, Am"
+							className={`${INPUT_CLASS} max-w-[170px]`}
+						/>
+					</div>
+				</div>
+
+				<div>
+					<label htmlFor="source-url-input" className={LABEL_CLASS}>
+						Source URL
+					</label>
+					<input
+						id="source-url-input"
+						name="sourceUrl"
+						type="url"
+						value={sourceUrl}
+						onChange={(e) => setSourceUrl(e.target.value)}
+						placeholder="https://..."
+						className={INPUT_CLASS}
+					/>
+				</div>
 
 				<div>
 					<label htmlFor="notes-input" className={LABEL_CLASS}>

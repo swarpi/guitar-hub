@@ -21,11 +21,10 @@ _Tickets ready to be picked up in the next cycle._
 
 _Tickets that are planned but not yet scheduled. ai-import tickets should be picked up after multi-instrument lands (ADR-0005 renames `tabContent` → `content`; ImportForm adapts at that point)._
 
-_sheet-ingest (ADR-0007) tickets 001 and 002 are explicitly blocked on the same dependency: the multi-instrument work (tickets 001–004) lives on the unmerged branch `worktree-multi-instrument-001` (worktree at `.claude/worktrees/multi-instrument-001`). Do not start sheet-ingest 001/002 until that branch merges to `master`. Tickets 003–008 layer on top of 001/002 and inherit the same block transitively. ADR-0006 Phase 3 (in-app image import) is descoped per ADR-0007 §7 — no ai-import image tickets exist to remove; this is noted here so no one adds them later._
+_sheet-ingest (ADR-0007) tickets 002–008 build on ticket 001, which merged to `master` and was verified done. The multi-instrument dependency that previously blocked this feature (branch `worktree-multi-instrument-001`) has also merged to `master`, so no cross-feature block remains. ADR-0006 Phase 3 (in-app image import) is descoped per ADR-0007 §7 — no ai-import image tickets exist to remove; this is noted here so no one adds them later._
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| [001 — Schema Migration: Metadata Columns](sheet-ingest/001-schema-migration-metadata-columns.md) | sheet-ingest | P1 | S |
 | [002 — MCP Server Scaffold](sheet-ingest/002-mcp-server-scaffold.md) | sheet-ingest | P1 | M |
 | [003 — validate_notation: ABC via abcjs](sheet-ingest/003-validate-notation-abc.md) | sheet-ingest | P1 | M |
 | [004 — validate_notation: MusicXML via Verovio](sheet-ingest/004-validate-notation-musicxml.md) | sheet-ingest | P2 | S |
@@ -40,6 +39,7 @@ _Completed tickets. Move here when done, newest first._
 
 | Ticket | Feature | Completed |
 |--------|---------|-----------|
+| [001 — Schema Migration: Metadata Columns](sheet-ingest/001-schema-migration-metadata-columns.md) | sheet-ingest | 2026-07-06 |
 | [002 — Deploy Verification and Rollout](route-consolidation/002-deploy-verification-and-rollout.md) | route-consolidation | 2026-07-05 |
 | [001 — Consolidate Instrument Route Group](route-consolidation/001-consolidate-instrument-route-group.md) | route-consolidation | 2026-07-05 |
 | [010 — Service Worker and PWA Updates](multi-instrument/010-service-worker-pwa-updates.md) | multi-instrument | 2026-07-05 |

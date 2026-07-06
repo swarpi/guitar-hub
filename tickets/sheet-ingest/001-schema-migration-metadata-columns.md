@@ -1,7 +1,7 @@
 # Ticket: Schema Migration — Add difficulty, key, and source_url Columns
 
 **Feature:** sheet-ingest
-**Status:** Open
+**Status:** Done
 **Priority:** P1
 **Estimate:** S
 **Related:** ADR-0007 (Decision §1 "New metadata columns"), ADR-0005 (schema precedent)
@@ -20,16 +20,16 @@ Add nullable `difficulty`, `key`, and `source_url` TEXT columns to `songs`, upda
 
 ## Acceptance Criteria
 
-- [ ] The multi-instrument branch (`worktree-multi-instrument-001`) has merged to `master` before this ticket starts; confirm `src/db/schema.ts` on `master` already has `instrument` and `content` (not `tab_content`) before writing the migration
-- [ ] A new migration file (next number after the multi-instrument migration, e.g. `migrations/0002-sheet-metadata.sql`) adds three nullable columns to `songs`: `difficulty TEXT`, `key TEXT`, `source_url TEXT`
-- [ ] `src/db/schema.ts` `songs` table definition adds `difficulty: text("difficulty")`, `key: text("key")`, `sourceUrl: text("source_url")` — all nullable, no `.notNull()`
-- [ ] `createSongLogic` and `updateSongLogic` in `src/app/actions.ts` accept optional `difficulty`, `key`, and `sourceUrl` fields from `FormData`, trim them, store empty string as `null`, and pass them through to the insert/update
-- [ ] `difficulty`, when provided, is validated against the set `'beginner' | 'intermediate' | 'advanced'`; an invalid value returns `{ error: "Difficulty must be beginner, intermediate, or advanced." }`
-- [ ] `SongForm` gains three optional fields (difficulty select, key text input, source URL text input), positioned near `notes`; existing required fields and behavior are unchanged
-- [ ] Song detail pages render `difficulty`, `key`, and `source_url` when present (e.g., alongside capo/notes), and render nothing extra when they are `null`
-- [ ] Running the new migration SQL against a local SQLite database with existing rows leaves `difficulty`, `key`, and `source_url` as `NULL` on those rows
-- [ ] `pnpm test`, `pnpm lint`, and `pnpm build` pass
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] The multi-instrument branch (`worktree-multi-instrument-001`) has merged to `master` before this ticket starts; confirm `src/db/schema.ts` on `master` already has `instrument` and `content` (not `tab_content`) before writing the migration
+- [x] A new migration file (next number after the multi-instrument migration, e.g. `migrations/0002-sheet-metadata.sql`) adds three nullable columns to `songs`: `difficulty TEXT`, `key TEXT`, `source_url TEXT`
+- [x] `src/db/schema.ts` `songs` table definition adds `difficulty: text("difficulty")`, `key: text("key")`, `sourceUrl: text("source_url")` — all nullable, no `.notNull()`
+- [x] `createSongLogic` and `updateSongLogic` in `src/app/actions.ts` accept optional `difficulty`, `key`, and `sourceUrl` fields from `FormData`, trim them, store empty string as `null`, and pass them through to the insert/update
+- [x] `difficulty`, when provided, is validated against the set `'beginner' | 'intermediate' | 'advanced'`; an invalid value returns `{ error: "Difficulty must be beginner, intermediate, or advanced." }`
+- [x] `SongForm` gains three optional fields (difficulty select, key text input, source URL text input), positioned near `notes`; existing required fields and behavior are unchanged
+- [x] Song detail pages render `difficulty`, `key`, and `source_url` when present (e.g., alongside capo/notes), and render nothing extra when they are `null`
+- [x] Running the new migration SQL against a local SQLite database with existing rows leaves `difficulty`, `key`, and `source_url` as `NULL` on those rows
+- [x] `pnpm test`, `pnpm lint`, and `pnpm build` pass
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 

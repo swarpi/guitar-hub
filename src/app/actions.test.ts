@@ -63,6 +63,9 @@ const MIGRATION_STATEMENTS = [
 		\`content\` text NOT NULL,
 		\`capo\` integer,
 		\`notes\` text,
+		\`difficulty\` text,
+		\`key\` text,
+		\`source_url\` text,
 		\`created_at\` text NOT NULL,
 		\`updated_at\` text NOT NULL,
 		FOREIGN KEY (\`artist_id\`) REFERENCES \`artists\`(\`id\`) ON UPDATE no action ON DELETE no action
@@ -191,6 +194,62 @@ describe("createSongLogic", () => {
 		const result = await createSongLogic(db, fd);
 
 		expect(result).toEqual({ error: "Capo must be between 0 and 12." });
+	});
+
+	it("stores difficulty, key, and sourceUrl when provided", async () => {
+		const fd = makeFormData({
+			title: "Song",
+			artist: "Artist",
+			content: "tab",
+			difficulty: "beginner",
+			key: "G",
+			sourceUrl: "https://example.com/tab",
+		});
+
+		const result = await createSongLogic(db, fd);
+		expect(result).not.toHaveProperty("error");
+
+		const songRows = await (db as unknown as ReturnType<typeof drizzle>)
+			.select()
+			.from(songs);
+		expect(songRows[0].difficulty).toBe("beginner");
+		expect(songRows[0].key).toBe("G");
+		expect(songRows[0].sourceUrl).toBe("https://example.com/tab");
+	});
+
+	it("stores null for omitted or whitespace-only metadata fields", async () => {
+		const fd = makeFormData({
+			title: "Song",
+			artist: "Artist",
+			content: "tab",
+			difficulty: "",
+			key: "   ",
+		});
+
+		const result = await createSongLogic(db, fd);
+		expect(result).not.toHaveProperty("error");
+
+		const songRows = await (db as unknown as ReturnType<typeof drizzle>)
+			.select()
+			.from(songs);
+		expect(songRows[0].difficulty).toBeNull();
+		expect(songRows[0].key).toBeNull();
+		expect(songRows[0].sourceUrl).toBeNull();
+	});
+
+	it("returns error for invalid difficulty", async () => {
+		const fd = makeFormData({
+			title: "Song",
+			artist: "Artist",
+			content: "tab",
+			difficulty: "expert",
+		});
+
+		const result = await createSongLogic(db, fd);
+
+		expect(result).toEqual({
+			error: "Difficulty must be beginner, intermediate, or advanced.",
+		});
 	});
 
 	it("reuses existing artist without duplication", async () => {
@@ -412,6 +471,52 @@ describe("updateSongLogic", () => {
 		expect(songRows[0].title).toBe("Gravity");
 		expect(songRows[0].slug).toBe("gravity");
 		expect(songRows[0].content).toBe("e|---1---");
+	});
+
+	it("updates difficulty, key, and sourceUrl", async () => {
+		const song = await seedSong(db, {
+			title: "Amber",
+			artist: "Sungha Jung",
+		});
+
+		const fd = makeFormData({
+			title: "Amber",
+			artist: "Sungha Jung",
+			content: "e|---0---",
+			difficulty: "advanced",
+			key: "Am",
+			sourceUrl: "https://example.com/amber",
+		});
+
+		const result = await updateSongLogic(db, song.id, fd);
+		expect(result).not.toHaveProperty("error");
+
+		const songRows = await (db as unknown as ReturnType<typeof drizzle>)
+			.select()
+			.from(songs);
+		expect(songRows[0].difficulty).toBe("advanced");
+		expect(songRows[0].key).toBe("Am");
+		expect(songRows[0].sourceUrl).toBe("https://example.com/amber");
+	});
+
+	it("returns error for invalid difficulty on update", async () => {
+		const song = await seedSong(db, {
+			title: "Amber",
+			artist: "Sungha Jung",
+		});
+
+		const fd = makeFormData({
+			title: "Amber",
+			artist: "Sungha Jung",
+			content: "e|---0---",
+			difficulty: "impossible",
+		});
+
+		const result = await updateSongLogic(db, song.id, fd);
+
+		expect(result).toEqual({
+			error: "Difficulty must be beginner, intermediate, or advanced.",
+		});
 	});
 
 	it("artist rename upserts new artist and cleans orphaned artist", async () => {

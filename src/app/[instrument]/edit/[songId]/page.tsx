@@ -74,6 +74,9 @@ export default async function EditSongPage({ params }: EditPageProps) {
 						capo: song.capo,
 						content: song.content,
 						notes: song.notes,
+						difficulty: song.difficulty,
+						key: song.key,
+						sourceUrl: song.sourceUrl,
 					}}
 					instrument={instrument}
 					songId={songId}

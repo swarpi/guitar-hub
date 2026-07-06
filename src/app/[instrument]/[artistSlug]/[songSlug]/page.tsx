@@ -61,11 +61,25 @@ export default async function SongPage({ params }: SongPageProps) {
 					{song.artistName}
 				</div>
 
-				{instrument === "guitar" && song.capo != null && (
-					<div className="mb-4">
-						<CapoBadge capo={song.capo} size="lg" />
+				{(instrument === "guitar" && song.capo != null) ||
+				song.difficulty ||
+				song.key ? (
+					<div className="mb-4 flex flex-wrap items-center gap-2">
+						{instrument === "guitar" && song.capo != null && (
+							<CapoBadge capo={song.capo} size="lg" />
+						)}
+						{song.difficulty && (
+							<span className="rounded-full border border-line bg-paper px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[.22em] text-ink-soft">
+								{song.difficulty}
+							</span>
+						)}
+						{song.key && (
+							<span className="rounded-full border border-line bg-paper px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[.22em] text-ink-soft">
+								Key: {song.key}
+							</span>
+						)}
 					</div>
-				)}
+				) : null}
 
 				{instrument === "guitar" ? (
 					<pre className="mb-6 overflow-x-auto whitespace-pre rounded-lg border border-line bg-paper p-5 font-mono text-[13px] leading-[1.7] text-tab-text shadow-[0_1px_3px_rgba(40,28,16,0.06)]">
@@ -83,6 +97,22 @@ export default async function SongPage({ params }: SongPageProps) {
 						<p className="font-serif text-[15px] italic leading-relaxed text-ink-soft">
 							{song.notes}
 						</p>
+					</div>
+				)}
+
+				{song.sourceUrl && (
+					<div className="mb-6">
+						<div className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[.22em] text-ink-soft">
+							Source
+						</div>
+						<a
+							href={song.sourceUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="break-all font-serif text-[15px] text-accent underline-offset-2 hover:underline"
+						>
+							{song.sourceUrl}
+						</a>
 					</div>
 				)}
 

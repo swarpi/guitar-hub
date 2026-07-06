@@ -25,6 +25,9 @@ export const songs = sqliteTable(
 		content: text("content").notNull(),
 		capo: integer("capo"),
 		notes: text("notes"),
+		difficulty: text("difficulty"),
+		key: text("key"),
+		sourceUrl: text("source_url"),
 		createdAt: text("created_at")
 			.notNull()
 			.$defaultFn(() => new Date().toISOString()),
