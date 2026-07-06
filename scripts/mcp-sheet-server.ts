@@ -1,7 +1,8 @@
 // Local MCP server exposing the Music Hub collection as tools (ADR-0007):
-//   add_sheet    — insert a song via createSongLogic (same path as the web form)
-//   list_sheets  — query existing songs for duplicate detection and context
-//   update_sheet — edit a song's content or metadata via updateSongLogic
+//   add_sheet         — insert a song via createSongLogic (same path as the web form)
+//   list_sheets       — query existing songs for duplicate detection and context
+//   update_sheet      — edit a song's content or metadata via updateSongLogic
+//   validate_notation — render candidate notation headlessly: parse errors or PNG
 //
 // Local-only infrastructure — never deployed. Talks to the local dev SQLite
 // database (the same file `pnpm dev` and `pnpm seed` use) over better-sqlite3.
@@ -35,6 +36,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { z } from "zod";
 
 import * as schema from "../src/db/schema";
+import { validateAbc } from "./lib/validate-abc";
 import {
   addSheet,
   type Db,
@@ -155,6 +157,48 @@ server.registerTool(
     },
   },
   async (input) => toToolResult(await updateSheet(db, input)),
+);
+
+server.registerTool(
+  "validate_notation",
+  {
+    description:
+      "Render candidate notation headlessly before saving it (ADR-0007's " +
+      "validation loop). Returns parse/render errors to fix, or the rendered " +
+      "PNG to compare visually against the source. Currently supports ABC; " +
+      "MusicXML lands in a later ticket.",
+    inputSchema: {
+      // Ticket 004 extends this enum with "musicxml".
+      format: z.enum(["abc"]),
+      content: z.string().describe("The notation source text to validate"),
+    },
+  },
+  async (input) => {
+    const result = validateAbc(input.content);
+    if (!result.ok) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({ valid: false, errors: result.errors }),
+          },
+        ],
+      };
+    }
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: "ABC parsed and rendered successfully. Compare the image against the source before saving.",
+        },
+        {
+          type: "image" as const,
+          data: result.pngBuffer.toString("base64"),
+          mimeType: "image/png",
+        },
+      ],
+    };
+  },
 );
 
 async function main() {

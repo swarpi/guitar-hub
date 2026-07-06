@@ -1,7 +1,7 @@
 # Ticket: validate_notation Tool — Headless ABC Rendering via abcjs
 
 **Feature:** sheet-ingest
-**Status:** Open
+**Status:** Done
 **Priority:** P1
 **Estimate:** M
 **Related:** ADR-0007 (Decision §4 "Validation-Driven Loop")
@@ -19,17 +19,17 @@ Add a `validate_notation` tool to the MCP server (ticket 002) that renders ABC t
 
 ## Acceptance Criteria
 
-- [ ] `abcjs` is available to the MCP server script (already a dependency post multi-instrument merge per ADR-0005; add it as a `devDependency` here if it is not present after that merge)
-- [ ] A new module `scripts/lib/validate-abc.ts` exports a pure function `validateAbc(abcText: string): { ok: true; pngBuffer: Buffer } | { ok: false; errors: string[] }`
-- [ ] `validateAbc` parses the input with `abcjs`'s headless/Node-compatible rendering path (using a DOM shim such as `jsdom` if `abcjs` requires a `document`, consistent with this project's existing `jsdom`-based test setup) and rasterizes the resulting SVG to a PNG buffer
-- [ ] Malformed ABC (e.g., missing `X:` header, invalid pitch character, unbalanced bar count where `abcjs` flags a warning) returns `{ ok: false, errors: [...] }` with one human-readable message per parser warning/error — never throws
-- [ ] Well-formed ABC (e.g., the "Twinkle Twinkle" example from ADR-0005 §2) returns `{ ok: true, pngBuffer }` with a non-empty PNG buffer
-- [ ] The MCP server's `validate_notation` tool:
-  - [ ] Accepts `{ format: "abc", content: string }`
-  - [ ] Calls `validateAbc` and returns errors as text, or the PNG as an MCP image content block
-- [ ] Unit tests in `scripts/lib/validate-abc.test.ts` cover: valid ABC returns a PNG, ABC missing a required header returns errors, ABC with an invalid pitch character returns errors, empty string input returns errors (not a crash)
-- [ ] `pnpm test`, `pnpm lint`, and `pnpm build` pass
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `abcjs` is available to the MCP server script (already a dependency post multi-instrument merge per ADR-0005; add it as a `devDependency` here if it is not present after that merge)
+- [x] A new module `scripts/lib/validate-abc.ts` exports a pure function `validateAbc(abcText: string): { ok: true; pngBuffer: Buffer } | { ok: false; errors: string[] }`
+- [x] `validateAbc` parses the input with `abcjs`'s headless/Node-compatible rendering path (using a DOM shim such as `jsdom` if `abcjs` requires a `document`, consistent with this project's existing `jsdom`-based test setup) and rasterizes the resulting SVG to a PNG buffer
+- [x] Malformed ABC (e.g., missing `X:` header, invalid pitch character, unbalanced bar count where `abcjs` flags a warning) returns `{ ok: false, errors: [...] }` with one human-readable message per parser warning/error — never throws
+- [x] Well-formed ABC (e.g., the "Twinkle Twinkle" example from ADR-0005 §2) returns `{ ok: true, pngBuffer }` with a non-empty PNG buffer
+- [x] The MCP server's `validate_notation` tool:
+  - [x] Accepts `{ format: "abc", content: string }`
+  - [x] Calls `validateAbc` and returns errors as text, or the PNG as an MCP image content block
+- [x] Unit tests in `scripts/lib/validate-abc.test.ts` cover: valid ABC returns a PNG, ABC missing a required header returns errors, ABC with an invalid pitch character returns errors, empty string input returns errors (not a crash)
+- [x] `pnpm test`, `pnpm lint`, and `pnpm build` pass
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
@@ -45,11 +45,16 @@ Add a `validate_notation` tool to the MCP server (ticket 002) that renders ABC t
 
 ## Implementation Plan
 
-_To be filled in before starting work._
+Headless recipe confirmed by prototype before writing code: abcjs loads without a DOM (globals are only needed at render time), `renderAbc` against a jsdom element produces SVG + a `warnings` array on the tune object, jsdom's `XMLSerializer` (not `outerHTML`, which drops `xmlns`) yields XML that `@resvg/resvg-js` rasterizes to a valid PNG. Two abcjs quirks the implementation must handle: warning strings contain embedded HTML markup (strip tags), and abcjs silently accepts ABC without an `X:` header (explicit check required to satisfy the acceptance criterion).
 
-1. Step 1
-2. Step 2
-3. Step 3
+1. Add `@resvg/resvg-js` as a devDependency (`abcjs` is already a production dependency per ADR-0005; jsdom is already a devDependency).
+2. Create `scripts/lib/validate-abc.ts` — pure sync `validateAbc(abcText)`:
+   - Static `import abcjs from "abcjs"` (default import — named imports break under CJS interop); lazily create one module-private JSDOM and set `globalThis.window`/`document` only if undefined, since `renderAbc` requires globals at render time.
+   - Reject empty/whitespace input; render into a fresh container; collect `tune.warnings` with HTML tags stripped; add an error if `/^X:\s*\d+/m` is missing; add an error if the tune has no music lines; wrap render in try/catch so nothing throws.
+   - On success, serialize the SVG with `XMLSerializer` and rasterize via `Resvg` (`fitTo` width 800, system fonts) to a PNG buffer.
+3. Extend `scripts/mcp-sheet-server.ts` with a `validate_notation` tool: `{ format: z.enum(["abc"]), content: string }` (ticket 004 extends the enum), returning errors as JSON text or the PNG as an MCP image content block plus a short text block; update the top-of-file tool list.
+4. Create `scripts/lib/validate-abc.test.ts`: valid Twinkle ABC → ok with non-empty PNG (magic bytes checked), missing `X:` header → errors, invalid pitch character → errors, empty string → errors without crashing.
+5. Run `pnpm test`, `pnpm lint`, `pnpm build`; smoke-test `validate_notation` over real stdio.
 
 ## Post-Implementation
 
