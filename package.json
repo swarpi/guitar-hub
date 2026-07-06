@@ -14,6 +14,7 @@
 		"pages:dev": "wrangler pages dev",
 		"seed": "tsx src/db/seed.ts",
 		"dev:ai": "tsx scripts/ai-proxy.ts",
+		"dev:mcp": "tsx --tsconfig tsconfig.mcp.json scripts/mcp-sheet-server.ts",
 		"dev:all": "tsx scripts/ai-proxy.ts & pnpm dev"
 	},
 	"dependencies": {
@@ -33,6 +34,7 @@
 		"@biomejs/biome": "^2.5.0",
 		"@cloudflare/next-on-pages": "^1.13.16",
 		"@cloudflare/workers-types": "^4.20260613.1",
+		"@modelcontextprotocol/sdk": "^1.29.0",
 		"@tailwindcss/postcss": "^4",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
@@ -48,6 +50,7 @@
 		"tsx": "^4.22.4",
 		"typescript": "^5",
 		"vitest": "^4.1.8",
-		"wrangler": "^4.100.0"
+		"wrangler": "^4.100.0",
+		"zod": "^4.4.3"
 	}
 }

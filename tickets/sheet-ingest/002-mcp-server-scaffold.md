@@ -1,7 +1,7 @@
 # Ticket: Local MCP Server Scaffold — add_sheet, list_sheets, update_sheet
 
 **Feature:** sheet-ingest
-**Status:** Open
+**Status:** Done
 **Priority:** P1
 **Estimate:** M
 **Related:** ADR-0007 (Decision §1 "Architecture", tool table)
@@ -21,25 +21,25 @@ A runnable local MCP server exposing `add_sheet`, `list_sheets`, and `update_she
 
 ## Acceptance Criteria
 
-- [ ] `@modelcontextprotocol/sdk` (or the current standard MCP TypeScript SDK) is added as a `devDependency` — the server is local tooling, not shipped to the edge build
-- [ ] A new script `scripts/mcp-sheet-server.ts` starts an MCP server over stdio transport, runnable via a new `pnpm dev:mcp` script (mirroring the existing `pnpm dev:ai` pattern)
-- [ ] The server connects to the local dev SQLite database using the same connection approach as `pnpm seed` (`better-sqlite3`), never inside code that could be bundled for the edge — consistent with the CLAUDE.md rule "production code never imports `better-sqlite3`"
-- [ ] Tool `add_sheet`:
-  - [ ] Accepts `title`, `artist`, `instrument` (`guitar` | `piano`), `content`, and optional `capo`, `notes`, `difficulty`, `key`, `sourceUrl`
-  - [ ] Builds a `FormData`-equivalent input and calls `createSongLogic` from `src/app/actions.ts` unchanged — no reimplementation of validation, slug generation, or duplicate detection
-  - [ ] On success, returns the created song's artist slug, song slug, and instrument
-  - [ ] On failure (validation error, duplicate), returns the `{ error }` message from `createSongLogic` as the tool result, not a thrown exception
-- [ ] Tool `list_sheets`:
-  - [ ] Accepts optional `instrument` and optional `artist` filters
-  - [ ] Returns an array of songs (id, title, artist, instrument, slug, difficulty, key) for duplicate detection and context — no full `content` field in the list response to keep tool output small
-- [ ] Tool `update_sheet`:
-  - [ ] Accepts a song `id` and the same optional fields as `add_sheet`
-  - [ ] Calls `updateSongLogic` from `src/app/actions.ts` unchanged
-  - [ ] Returns the same success/error shape pattern as `add_sheet`
-- [ ] A README or top-of-file comment in `scripts/mcp-sheet-server.ts` documents how to register the server with Claude Code (the `.mcp.json` or `claude mcp add` invocation)
-- [ ] Unit tests cover the three tool handlers against an in-memory `better-sqlite3` database, following the pattern in `src/app/actions.test.ts` (mock `@cloudflare/next-on-pages`, use `better-sqlite3` in-memory DB) — one success and one failure case per tool
-- [ ] `pnpm test`, `pnpm lint`, and `pnpm build` pass (the MCP server script is excluded from the Next.js/edge build the same way `scripts/ai-proxy.ts` is)
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `@modelcontextprotocol/sdk` (or the current standard MCP TypeScript SDK) is added as a `devDependency` — the server is local tooling, not shipped to the edge build
+- [x] A new script `scripts/mcp-sheet-server.ts` starts an MCP server over stdio transport, runnable via a new `pnpm dev:mcp` script (mirroring the existing `pnpm dev:ai` pattern)
+- [x] The server connects to the local dev SQLite database using the same connection approach as `pnpm seed` (`better-sqlite3`), never inside code that could be bundled for the edge — consistent with the CLAUDE.md rule "production code never imports `better-sqlite3`"
+- [x] Tool `add_sheet`:
+  - [x] Accepts `title`, `artist`, `instrument` (`guitar` | `piano`), `content`, and optional `capo`, `notes`, `difficulty`, `key`, `sourceUrl`
+  - [x] Builds a `FormData`-equivalent input and calls `createSongLogic` from `src/app/actions.ts` unchanged — no reimplementation of validation, slug generation, or duplicate detection
+  - [x] On success, returns the created song's artist slug, song slug, and instrument
+  - [x] On failure (validation error, duplicate), returns the `{ error }` message from `createSongLogic` as the tool result, not a thrown exception
+- [x] Tool `list_sheets`:
+  - [x] Accepts optional `instrument` and optional `artist` filters
+  - [x] Returns an array of songs (id, title, artist, instrument, slug, difficulty, key) for duplicate detection and context — no full `content` field in the list response to keep tool output small
+- [x] Tool `update_sheet`:
+  - [x] Accepts a song `id` and the same optional fields as `add_sheet`
+  - [x] Calls `updateSongLogic` from `src/app/actions.ts` unchanged
+  - [x] Returns the same success/error shape pattern as `add_sheet`
+- [x] A README or top-of-file comment in `scripts/mcp-sheet-server.ts` documents how to register the server with Claude Code (the `.mcp.json` or `claude mcp add` invocation)
+- [x] Unit tests cover the three tool handlers against an in-memory `better-sqlite3` database, following the pattern in `src/app/actions.test.ts` (mock `@cloudflare/next-on-pages`, use `better-sqlite3` in-memory DB) — one success and one failure case per tool
+- [x] `pnpm test`, `pnpm lint`, and `pnpm build` pass (the MCP server script is excluded from the Next.js/edge build the same way `scripts/ai-proxy.ts` is)
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
@@ -57,11 +57,15 @@ A runnable local MCP server exposing `add_sheet`, `list_sheets`, and `update_she
 
 ## Implementation Plan
 
-_To be filled in before starting work._
-
-1. Step 1
-2. Step 2
-3. Step 3
+1. Add `@modelcontextprotocol/sdk` and `zod` (SDK peer dep for tool input schemas) as devDependencies.
+2. Create `scripts/mcp-sheet-tools.ts` — testable handlers, mirroring the `url-import.ts` / `ai-proxy.ts` split:
+   - `addSheet(db, input)` — builds a `FormData` from the input and calls `createSongLogic` unchanged; returns its success/error result as-is.
+   - `listSheets(db, { instrument?, artist? })` — Drizzle select joining artists, returning id/title/artist/instrument/slug/difficulty/key (no `content`); artist filter matches via `slugify(artist)` against the artist slug so both "Sungha Jung" and "sungha-jung" work.
+   - `updateSheet(db, input)` — loads the current song by id, merges provided fields over current values (partial update), builds `FormData`, calls `updateSongLogic` unchanged. Rejects an `instrument` that differs from the existing song (instrument is fixed at creation, ADR-0005).
+3. Create `scripts/mcp-sheet-server.ts` — entry point: connects to the local dev SQLite database the same way `src/db/seed.ts` does (`better-sqlite3` + `DB_PATH` env override), registers the three tools on an `McpServer` with zod input schemas, and connects over `StdioServerTransport`. Top-of-file comment documents `claude mcp add` / `.mcp.json` registration.
+4. Add `"dev:mcp": "tsx scripts/mcp-sheet-server.ts"` to `package.json`, mirroring `dev:ai`.
+5. Create `scripts/mcp-sheet-tools.test.ts` — in-memory `better-sqlite3` DB following `src/app/actions.test.ts` (mock `@cloudflare/next-on-pages`, `next/cache`, `next/navigation`, `@/lib/nanoid`); one success and one failure case per tool.
+6. Run `pnpm test`, `pnpm lint`, `pnpm build`; verify the server starts and responds over stdio.
 
 ## Post-Implementation
 

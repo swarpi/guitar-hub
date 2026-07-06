@@ -1,0 +1,14 @@
+{
+	// Used only by `pnpm dev:mcp` (tsx --tsconfig tsconfig.mcp.json).
+	// Remaps `@cloudflare/next-on-pages` to a local shim so that
+	// `src/app/actions.ts` can be imported from a plain Node process —
+	// the real package only exposes an ESM export, which Node's CJS
+	// loader cannot resolve. See scripts/next-on-pages-shim.ts.
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"paths": {
+			"@/*": ["./src/*"],
+			"@cloudflare/next-on-pages": ["./scripts/next-on-pages-shim.ts"]
+		}
+	}
+}
