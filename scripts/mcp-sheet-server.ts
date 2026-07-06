@@ -37,6 +37,7 @@ import { z } from "zod";
 
 import * as schema from "../src/db/schema";
 import { validateAbc } from "./lib/validate-abc";
+import { validateMusicXml } from "./lib/validate-musicxml";
 import {
   addSheet,
   type Db,
@@ -165,16 +166,38 @@ server.registerTool(
     description:
       "Render candidate notation headlessly before saving it (ADR-0007's " +
       "validation loop). Returns parse/render errors to fix, or the rendered " +
-      "PNG to compare visually against the source. Currently supports ABC; " +
-      "MusicXML lands in a later ticket.",
+      "PNG to compare visually against the source. Supports ABC (abcjs) and " +
+      "MusicXML (Verovio).",
     inputSchema: {
-      // Ticket 004 extends this enum with "musicxml".
-      format: z.enum(["abc"]),
+      format: z.enum(["abc", "musicxml"]),
       content: z.string().describe("The notation source text to validate"),
     },
   },
   async (input) => {
-    const result = validateAbc(input.content);
+    // Unknown formats are rejected by the schema before reaching here; the
+    // else branch is defense in depth, not a reachable path.
+    let result: ReturnType<typeof validateAbc>;
+    let label: string;
+    if (input.format === "abc") {
+      result = validateAbc(input.content);
+      label = "ABC";
+    } else if (input.format === "musicxml") {
+      result = await validateMusicXml(input.content);
+      label = "MusicXML";
+    } else {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify({
+              valid: false,
+              errors: [`Unsupported format: ${String(input.format)}`],
+            }),
+          },
+        ],
+        isError: true,
+      };
+    }
     if (!result.ok) {
       return {
         content: [
@@ -189,7 +212,7 @@ server.registerTool(
       content: [
         {
           type: "text" as const,
-          text: "ABC parsed and rendered successfully. Compare the image against the source before saving.",
+          text: `${label} parsed and rendered successfully. Compare the image against the source before saving.`,
         },
         {
           type: "image" as const,
