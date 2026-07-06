@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-06 12:15 UTC
+> Last updated: 2026-07-06 14:44 UTC
 
 ## Current Phase
 
@@ -17,16 +17,17 @@
 
 ## Active Work
 
-sheet-ingest (ADR-0007) is underway. Ticket 002 (local MCP server scaffold) is Done and verified: `scripts/mcp-sheet-server.ts` exposes `add_sheet`/`list_sheets`/`update_sheet` over stdio via `pnpm dev:mcp`, delegating to `createSongLogic`/`updateSongLogic` unchanged against the local dev SQLite db. Work is uncommitted on `master`. Next up is ticket 003 — `validate_notation` for ABC via abcjs. Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy.
+sheet-ingest (ADR-0007) is underway. Ticket 002 (local MCP server scaffold) is Done and verified: `scripts/mcp-sheet-server.ts` exposes `add_sheet`/`list_sheets`/`update_sheet` over stdio via `pnpm dev:mcp`, delegating to `createSongLogic`/`updateSongLogic` unchanged against the local dev SQLite db. Committed to `master` (`283a3c4`). Next up is ticket 003 — `validate_notation` for ABC via abcjs. Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy.
 
 ## Branch & Commits
 
 <!-- AUTO:START -->
 **Branch:** `master`  
-**Last commit:** 2026-07-06 12:15 UTC
+**Last commit:** 2026-07-06 14:44 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `283a3c4` | 2026-07-06 | Add local MCP sheet server: add_sheet, list_sheets, update_sheet (sheet-ingest ticket 002) |
 | `3c05b20` | 2026-07-06 | Add sheet metadata columns: difficulty, key, source_url (sheet-ingest ticket 001) |
 | `b46f14d` | 2026-07-06 | Merge remote-tracking branch 'origin/master' |
 | `c6fed10` | 2026-07-05 | Close out route-consolidation: ticket 002 verified, dashboard synced |
@@ -36,7 +37,6 @@ sheet-ingest (ADR-0007) is underway. Ticket 002 (local MCP server scaffold) is D
 | `6ceca24` | 2026-07-05 | Add abcjs/ABC notation learning |
 | `89b934b` | 2026-07-05 | Merge multi-instrument feature into master |
 | `26efbb9` | 2026-07-05 | Sync ticket statuses and backlog: multi-instrument 007-010 verified done |
-| `0744d59` | 2026-07-05 | Add duplicate warning banner to AI import review step (ai-import ticket 003) |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -45,26 +45,26 @@ sheet-ingest (ADR-0007) is underway. Ticket 002 (local MCP server scaffold) is D
 **Files changed (last 5 commits):**
 
 ```
- .github/workflows/notify-site.yml                           |  21 ++
- STATUS.md                                                   |  67 ++---
- .../decisions/0008-consolidate-instrument-route-groups.md   | 262 +++++++++++++++++
+ .github/workflows/notify-site.yml                           |  21 +
+ STATUS.md                                                   |  66 +--
  migrations/0002_sheet-metadata.sql                          |   5 +
- src/app/[instrument]/[artistSlug]/[songSlug]/page.tsx       | 128 +++++++++
- src/app/{guitar => [instrument]}/[artistSlug]/page.tsx      |  23 +-
- src/app/{guitar => [instrument]}/add/page.tsx               |  39 ++-
- src/app/{piano => [instrument]}/edit/[songId]/page.tsx      |  23 +-
- src/app/{piano => [instrument]}/page.tsx                    |  42 ++-
- src/app/[instrument]/pages.test.tsx                         | 393 ++++++++++++++++++++++++++
- src/app/actions.test.ts                                     | 105 +++++++
- src/app/actions.ts                                          |  41 +++
- src/app/guitar/[artistSlug]/[songSlug]/page.tsx             |  83 ------
- src/app/guitar/edit/[songId]/page.tsx                       |  85 ------
- src/app/guitar/page.tsx                                     | 100 -------
- src/app/piano/[artistSlug]/[songSlug]/page.tsx              |  75 -----
- src/app/piano/[artistSlug]/page.tsx                         |  66 -----
- src/app/piano/add/page.tsx                                  |  52 ----
- src/components/SongForm.tsx                                 |  60 ++++
- src/db/migrations.test.ts                                   |  47 +++
+ package.json                                                |   5 +-
+ pnpm-lock.yaml                                              | 741 ++++++++++++++++++++++++++
+ scripts/mcp-sheet-server.ts                                 | 170 ++++++
+ scripts/mcp-sheet-tools.test.ts                             | 243 +++++++++
+ scripts/mcp-sheet-tools.ts                                  | 129 +++++
+ scripts/next-on-pages-shim.ts                               |  13 +
+ src/app/[instrument]/[artistSlug]/[songSlug]/page.tsx       |  38 +-
+ src/app/[instrument]/edit/[songId]/page.tsx                 |   3 +
+ src/app/[instrument]/pages.test.tsx                         |  57 ++
+ src/app/actions.test.ts                                     | 105 ++++
+ src/app/actions.ts                                          |  41 ++
+ src/components/SongForm.tsx                                 |  60 +++
+ src/db/migrations.test.ts                                   |  47 ++
+ src/db/queries.ts                                           |   6 +
+ src/db/schema.ts                                            |   3 +
+ tickets/_backlog.md                                         |  12 +-
+ .../001-consolidate-instrument-route-group.md               |  32 +-
 ```
 <!-- AUTO:FILES:END -->
 
