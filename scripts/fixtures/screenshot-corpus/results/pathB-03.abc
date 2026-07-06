@@ -1,0 +1,11 @@
+X:1
+% Path B: normalized to ABC from Audiveris OMR output (pathB-03.musicxml),
+% corrected against the source image. See ticket 005 Notes for correction counts.
+T:Air (after the Londonderry Air)
+C:Traditional
+M:4/4
+L:1/8
+K:D
+(3ABc | d2 e2 f3 e | f2 a2 g2 f2 | e2 d2 B3 G | A6 (3ABc |
+d2 e2 f3 e | f2 a2 g2 =c2 | B2 A2 F3 E | D6 (3DEF |
+G2 F2 G2 A2 | B2 A2 F3 D | E2 F2 G2 B2 | A6 |]

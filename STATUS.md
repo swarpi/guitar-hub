@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-06 15:31 UTC
+> Last updated: 2026-07-06 17:15 UTC
 
 ## Current Phase
 
@@ -17,16 +17,17 @@
 
 ## Active Work
 
-sheet-ingest (ADR-0007) is underway. Ticket 004 (`validate_notation`, MusicXML) is Done and verified: the tool now branches on format — ABC via abcjs, MusicXML via Verovio's WASM build — completing both render paths of the ADR's validation loop. Next up is ticket 005 — the screenshot ingestion prototype. Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy.
+sheet-ingest (ADR-0007) is underway. Ticket 005 (screenshot ingestion spike) is Done and verified: both paths ran against a 6-image corpus; the routing recommendation (vision-direct for anything with chord symbols and single-staff melodies, Audiveris-assisted for dense multi-voice scores) is documented in the ticket for ticket 008 to codify. Audiveris 5.10.2 is installed at `~/tools/Audiveris.app`. Next up: ticket 006 (local media tooling + audio pipeline) or 008 (the skill). Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy.
 
 ## Branch & Commits
 
 <!-- AUTO:START -->
 **Branch:** `master`  
-**Last commit:** 2026-07-06 15:31 UTC
+**Last commit:** 2026-07-06 17:15 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `1153d67` | 2026-07-06 | Extend validate_notation with MusicXML rendering via Verovio (sheet-ingest ticket 004) |
 | `dfcbadb` | 2026-07-06 | Add validate_notation MCP tool: headless ABC rendering via abcjs (sheet-ingest ticket 003) |
 | `156c00d` | 2026-07-06 | Sync STATUS.md dashboard after sheet-ingest ticket 002 commit |
 | `283a3c4` | 2026-07-06 | Add local MCP sheet server: add_sheet, list_sheets, update_sheet (sheet-ingest ticket 002) |
@@ -36,7 +37,6 @@ sheet-ingest (ADR-0007) is underway. Ticket 004 (`validate_notation`, MusicXML) 
 | `5baa775` | 2026-07-05 | Mark route-consolidation/001 done in ticket and backlog |
 | `bd8eb22` | 2026-07-05 | Consolidate /guitar and /piano into a dynamic [instrument] route group |
 | `c24ab46` | 2026-07-05 | Correct wrangler.toml D1 database name and deployment instructions |
-| `6ceca24` | 2026-07-05 | Add abcjs/ABC notation learning |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -45,14 +45,16 @@ sheet-ingest (ADR-0007) is underway. Ticket 004 (`validate_notation`, MusicXML) 
 **Files changed (last 5 commits):**
 
 ```
- .github/workflows/notify-site.yml                           |  21 +
- STATUS.md                                                   |  62 +-
+ STATUS.md                                                   |  65 +-
  migrations/0002_sheet-metadata.sql                          |   5 +
- package.json                                                |   7 +-
- pnpm-lock.yaml                                              | 898 ++++++++++++++++++++++++++
+ package.json                                                |   8 +-
+ pnpm-lock.yaml                                              | 907 ++++++++++++++++++++++++++
  scripts/lib/validate-abc.test.ts                            |  51 ++
  scripts/lib/validate-abc.ts                                 | 107 +++
- scripts/mcp-sheet-server.ts                                 | 214 ++++++
+ scripts/lib/validate-musicxml.test.ts                       |  70 ++
+ scripts/lib/validate-musicxml.ts                            | 126 ++++
+ scripts/lib/verovio.d.ts                                    |  26 +
+ scripts/mcp-sheet-server.ts                                 | 237 +++++++
  scripts/mcp-sheet-tools.test.ts                             | 243 +++++++
  scripts/mcp-sheet-tools.ts                                  | 129 ++++
  scripts/next-on-pages-shim.ts                               |  13 +
@@ -63,8 +65,6 @@ sheet-ingest (ADR-0007) is underway. Ticket 004 (`validate_notation`, MusicXML) 
  src/app/actions.ts                                          |  41 ++
  src/components/SongForm.tsx                                 |  60 ++
  src/db/migrations.test.ts                                   |  47 ++
- src/db/queries.ts                                           |   6 +
- src/db/schema.ts                                            |   3 +
 ```
 <!-- AUTO:FILES:END -->
 
@@ -73,7 +73,7 @@ sheet-ingest (ADR-0007) is underway. Ticket 004 (`validate_notation`, MusicXML) 
 | Ticket | Feature | Status |
 |--------|---------|--------|
 | [003 — Offline Fallback Page](tickets/pwa/003-offline-fallback-page.md) | pwa | In Review |
-| [005 — Screenshot Ingestion Prototype](tickets/sheet-ingest/005-screenshot-ingestion-prototype.md) | sheet-ingest | Open (next up) |
+| [006 — Local Media Tooling + Audio-to-MIDI Pipeline](tickets/sheet-ingest/006-local-media-tooling-audio-pipeline.md) | sheet-ingest | Open (next up) |
 
 ## Risks & Blockers
 
@@ -92,3 +92,4 @@ sheet-ingest (ADR-0007) is underway. Ticket 004 (`validate_notation`, MusicXML) 
 | 2026-07-06 | sheet-ingest/002 done: MCP server scaffold (`pnpm dev:mcp`, stdio) with add_sheet/list_sheets/update_sheet as thin adapters over createSongLogic/updateSongLogic; tsconfig.mcp.json shims @cloudflare/next-on-pages for plain-Node imports of actions.ts; 7 new handler tests (150/150 total); end-to-end stdio smoke test passed; verifier approved |
 | 2026-07-06 | sheet-ingest/003 done: validate_notation tool renders ABC headlessly (abcjs under jsdom, XMLSerializer, resvg → PNG); pure validateAbc with stripped abcjs warnings, explicit X: header check; 4 new tests (154/154); stdio smoke test returned correct staff-notation PNG as MCP image block; verifier approved |
 | 2026-07-06 | sheet-ingest/004 done: validate_notation gains musicxml branch via Verovio WASM (lazy toolkit singleton, buffered getLog diagnostics, DOMParser well-formedness pre-check since Verovio tolerates malformed XML); 4 new tests (158/158); stdio smoke test rendered correct one-measure score; verifier approved |
+| 2026-07-06 | sheet-ingest/005 spike done: 6-image PD corpus + Audiveris 5.10.2 installed and run both ways; key finding — OMR discards chord symbols (misread as dynamics) but preserves dense multi-voice structure ~80–90%; routing recommendation documented in ticket for the 008 skill; verifier approved |

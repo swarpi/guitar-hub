@@ -25,7 +25,6 @@ _sheet-ingest (ADR-0007) tickets 002–008 build on ticket 001, which merged to 
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| [005 — Screenshot Ingestion Prototype](sheet-ingest/005-screenshot-ingestion-prototype.md) | sheet-ingest | P2 | M |
 | [006 — Local Media Tooling + Audio-to-MIDI Pipeline](sheet-ingest/006-local-media-tooling-audio-pipeline.md) | sheet-ingest | P2 | M |
 | [007 — Falling-Notes Frame-to-MIDI Pipeline (Spike)](sheet-ingest/007-falling-notes-frame-to-midi.md) | sheet-ingest | P3 | M |
 | [008 — sheet-ingest Skill](sheet-ingest/008-sheet-ingest-skill.md) | sheet-ingest | P2 | S |
@@ -36,6 +35,7 @@ _Completed tickets. Move here when done, newest first._
 
 | Ticket | Feature | Completed |
 |--------|---------|-----------|
+| [005 — Screenshot Ingestion Prototype](sheet-ingest/005-screenshot-ingestion-prototype.md) | sheet-ingest | 2026-07-06 |
 | [004 — validate_notation: MusicXML via Verovio](sheet-ingest/004-validate-notation-musicxml.md) | sheet-ingest | 2026-07-06 |
 | [003 — validate_notation: ABC via abcjs](sheet-ingest/003-validate-notation-abc.md) | sheet-ingest | 2026-07-06 |
 | [002 — MCP Server Scaffold](sheet-ingest/002-mcp-server-scaffold.md) | sheet-ingest | 2026-07-06 |

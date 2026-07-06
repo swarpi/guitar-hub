@@ -1,0 +1,12 @@
+X:1
+% Path B: normalized to ABC from Audiveris OMR output (pathB-01.musicxml),
+% corrected against the source image. See ticket 005 Notes for correction counts.
+T:Amazing Grace
+C:Traditional
+M:3/4
+L:1/8
+K:G
+D2 | "G"G4 (B/G/)B | "G"B4 "D"A2 | "C"G4 E2 | "G"D4 D2 |
+"G"G4 (B/G/)B | "G"B4 "D"A2 | "D"d6- | d4 B2 |
+"G"d4 (B/d/)B | "G"d4 (B/G/)B | "C"G4 E2 | "G"D4 D2 |
+"G"G4 (B/G/)B | "D"B4 A2 | "G"G6- | G4 z2 |]

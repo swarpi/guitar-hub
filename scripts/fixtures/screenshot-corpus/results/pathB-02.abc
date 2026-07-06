@@ -1,0 +1,10 @@
+X:1
+% Path B: normalized to ABC from Audiveris OMR output (pathB-02.musicxml),
+% corrected against the source image. See ticket 005 Notes for correction counts.
+T:Greensleeves
+C:Traditional
+M:6/8
+L:1/8
+K:Am
+A | "Am"c2 d e>f e | "G"d2 B G>A B | "Am"c2 A A>^G A | "E"B2 ^G E2 A |
+"Am"c2 d e>f e | "G"d2 B G>A B | "Am"c>B A "E"^G>F ^G | "Am"A3 A2 :|
