@@ -1,7 +1,7 @@
 # Ticket: sheet-ingest Claude Code Skill — Routing, Conventions, and Validation Protocol
 
 **Feature:** sheet-ingest
-**Status:** Open
+**Status:** Done
 **Priority:** P2
 **Estimate:** S
 **Related:** ADR-0007 (Decision §5 "A Claude Code Skill Encodes the Pipeline")
@@ -22,15 +22,15 @@ Write `sheet-ingest/SKILL.md` encoding the input-type routing table, the collect
 
 ## Acceptance Criteria
 
-- [ ] `sheet-ingest/SKILL.md` exists at the repository root (or the project's standard skill location, consistent with other Claude Code skills in this repo if any exist) with frontmatter/description sufficient for Claude Code to discover and load it
-- [ ] A routing table section maps input type to pipeline: pasted text/URL (ADR-0006, unchanged), screenshot of simple material (Path A, vision-direct), screenshot of dense material (Path B, OMR-assisted), video with falling notes, video with sheet-music frames, video/audio-only performance — each row states which tools from tickets 002–007 to invoke and in what order
-- [ ] An ABC conventions section documents the subset of ABC syntax this collection uses, consistent with ADR-0005 §2 (header fields used, how chords/voices are represented, how the collection's existing seeded piano songs — if any exist post multi-instrument merge — are formatted), so Claude produces consistent output rather than reinventing conventions per song
-- [ ] An OMR error patterns section lists concrete misread patterns observed during ticket 005 (e.g., dropped courtesy accidentals, misread ties — whatever was actually observed) and the correction Claude should apply for each
-- [ ] A validation-loop protocol section states the render-compare-correct-repeat sequence explicitly: call `validate_notation`, on error fix and retry, on success visually compare the PNG to the source, on mismatch correct and re-validate, only call `add_sheet`/`update_sheet` once validation passes and the visual compare is clean
-- [ ] The skill references the outcome of ticket 005 (which image path won for which material) and ticket 007 (working/non-working status of the falling-notes pipeline) rather than restating the ADR's deferred/open framing as if still unresolved
-- [ ] A short "known limitations" section carries forward anything ticket 007 found unresolved (e.g., "falling-notes pipeline: no working open-source converter found as of \<date\>; fall back to vision-direct on sampled frames")
-- [ ] The skill file is proofread for the Alex Xu-style declarative tone consistent with this project's ADRs and tickets (per `CLAUDE.md` "Writing Style for Artifacts") — no hype, concrete guidance over vague adjectives
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `sheet-ingest/SKILL.md` exists at the repository root (or the project's standard skill location, consistent with other Claude Code skills in this repo if any exist) with frontmatter/description sufficient for Claude Code to discover and load it
+- [x] A routing table section maps input type to pipeline: pasted text/URL (ADR-0006, unchanged), screenshot of simple material (Path A, vision-direct), screenshot of dense material (Path B, OMR-assisted), video with falling notes, video with sheet-music frames, video/audio-only performance — each row states which tools from tickets 002–007 to invoke and in what order
+- [x] An ABC conventions section documents the subset of ABC syntax this collection uses, consistent with ADR-0005 §2 (header fields used, how chords/voices are represented, how the collection's existing seeded piano songs — if any exist post multi-instrument merge — are formatted), so Claude produces consistent output rather than reinventing conventions per song
+- [x] An OMR error patterns section lists concrete misread patterns observed during ticket 005 (e.g., dropped courtesy accidentals, misread ties — whatever was actually observed) and the correction Claude should apply for each
+- [x] A validation-loop protocol section states the render-compare-correct-repeat sequence explicitly: call `validate_notation`, on error fix and retry, on success visually compare the PNG to the source, on mismatch correct and re-validate, only call `add_sheet`/`update_sheet` once validation passes and the visual compare is clean
+- [x] The skill references the outcome of ticket 005 (which image path won for which material) and ticket 007 (working/non-working status of the falling-notes pipeline) rather than restating the ADR's deferred/open framing as if still unresolved
+- [x] A short "known limitations" section carries forward anything ticket 007 found unresolved (e.g., "falling-notes pipeline: no working open-source converter found as of \<date\>; fall back to vision-direct on sampled frames")
+- [x] The skill file is proofread for the Alex Xu-style declarative tone consistent with this project's ADRs and tickets (per `CLAUDE.md` "Writing Style for Artifacts") — no hype, concrete guidance over vague adjectives
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
@@ -42,6 +42,12 @@ Write `sheet-ingest/SKILL.md` encoding the input-type routing table, the collect
 
 - If tickets 005 or 007 are not yet complete when this ticket is picked up, either wait for them or write the skill with an explicit "pending prototype results, current best guess is..." section and a follow-up note — do not fabricate outcomes that were not actually observed.
 - Keep the skill file focused on operational guidance (what to do, in what order, with what tool) rather than re-deriving the architectural rationale already captured in ADR-0007 — link to the ADR for "why," keep the skill itself as the "how."
+
+### Verification (ticket-verifier, 2026-07-12)
+
+Placement: `.claude/skills/sheet-ingest/SKILL.md` (not a bare `sheet-ingest/SKILL.md` at repo root). ADR-0007 §5 names the path informally; the binding AC requires Claude Code to discover and load it, and no other skills exist in this repo to establish a competing convention. `.claude/skills/<name>/SKILL.md` is Claude Code's actual discovery path, so this placement satisfies the AC's "project's standard skill location" clause.
+
+Content was checked line-by-line against ADR-0007, ADR-0005 §2, and tickets 002–007 (all Done): routing table against ticket 005's decision table and recommendation; ABC header order, chord-symbol quoting, grand-staff `%%score`/voice layout, bracketed chords, and the tie example against the actual corpus files (`01-06-*.abc`) and `results/pathB-06.abc`; OMR error patterns against ticket 005's five numbered findings and Audiveris install/invocation notes; MCP tool contracts (`add_sheet`/`list_sheets`/`update_sheet`/`validate_notation`) against ticket 002's acceptance criteria and `validate-cli.ts`; env var names/defaults (`AUDIO_PIPELINE_*`, `FALLING_NOTES_*`) against `scripts/lib/audio-pipeline.ts` and `scripts/lib/falling-notes-pipeline.ts`; falling-notes tuning knobs, tick-scale math, and the unlicensed-tool posture against ticket 007's six numbered failure modes. No discrepancies found.
 
 ## Implementation Plan
 

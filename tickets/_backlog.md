@@ -25,7 +25,6 @@ _sheet-ingest (ADR-0007) tickets 002–008 build on ticket 001, which merged to 
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| [008 — sheet-ingest Skill](sheet-ingest/008-sheet-ingest-skill.md) | sheet-ingest | P2 | S |
 
 ## Done
 
@@ -33,6 +32,7 @@ _Completed tickets. Move here when done, newest first._
 
 | Ticket | Feature | Completed |
 |--------|---------|-----------|
+| [008 — sheet-ingest Claude Code Skill](sheet-ingest/008-sheet-ingest-skill.md) | sheet-ingest | 2026-07-12 |
 | [007 — Falling-Notes Frame-to-MIDI Pipeline (Spike)](sheet-ingest/007-falling-notes-frame-to-midi.md) | sheet-ingest | 2026-07-06 |
 | [006 — Local Media Tooling + Audio-to-MIDI Pipeline](sheet-ingest/006-local-media-tooling-audio-pipeline.md) | sheet-ingest | 2026-07-06 |
 | [005 — Screenshot Ingestion Prototype](sheet-ingest/005-screenshot-ingestion-prototype.md) | sheet-ingest | 2026-07-06 |

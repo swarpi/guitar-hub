@@ -17,7 +17,7 @@
 
 ## Active Work
 
-sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spike) is Done and verified: 41pha1/MIDI-Converter selected after evaluating six candidates (installed at `~/tools/MIDI-Converter`, no published license — local personal use only), `scripts/lib/falling-notes-pipeline.ts` exports `extractFrames`/`framesToMidi` (30 fps rationale documented), and a real 47 s Synthesia tutorial ran end-to-end to a VALID render with the full melody at correct relative pitches — six failure modes documented in the ticket for the 008 skill. Tickets 006 and 007 are committed on `master` (`c58666b`, `a883575`). Only ticket 008 (the sheet-ingest skill) remains in the feature. Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy.
+sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Code skill) is Done and verified: `.claude/skills/sheet-ingest/SKILL.md` encodes the routing table, ABC conventions, OMR error patterns, the validation-loop protocol, and known limitations, all checked line-by-line against the actual outcomes of tickets 002–007 (routing table against ticket 005's decision, ABC conventions against the corpus files, OMR findings and Audiveris invocation against ticket 005, falling-notes tuning and audio-onset findings against tickets 006–007) — no discrepancies found. All eight sheet-ingest tickets (001–008) are now Done. Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy (unrelated to ticket 008).
 
 ## Branch & Commits
 
@@ -27,6 +27,7 @@ sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spi
 
 | Hash | Date | Message |
 |------|------|---------|
+| `53589db` | 2026-07-12 | Sync STATUS.md dashboard after ticket 006/007 commits |
 | `a883575` | 2026-07-12 | Run falling-notes frame-to-MIDI spike: real Synthesia tutorial to validated MusicXML (sheet-ingest ticket 007) |
 | `c58666b` | 2026-07-12 | Add local media tooling and audio-to-MIDI pipeline (sheet-ingest ticket 006) |
 | `9282f3f` | 2026-07-06 | Run screenshot ingestion spike: vision-direct vs Audiveris OMR (sheet-ingest ticket 005) |
@@ -36,7 +37,6 @@ sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spi
 | `283a3c4` | 2026-07-06 | Add local MCP sheet server: add_sheet, list_sheets, update_sheet (sheet-ingest ticket 002) |
 | `3c05b20` | 2026-07-06 | Add sheet metadata columns: difficulty, key, source_url (sheet-ingest ticket 001) |
 | `b46f14d` | 2026-07-06 | Merge remote-tracking branch 'origin/master' |
-| `c6fed10` | 2026-07-05 | Close out route-consolidation: ticket 002 verified, dashboard synced |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -46,9 +46,9 @@ sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spi
 
 ```
  .gitignore                                                  |    3 +
- STATUS.md                                                   |   62 +-
- package.json                                                |    3 +
- pnpm-lock.yaml                                              |  166 +++
+ STATUS.md                                                   |   61 +-
+ package.json                                                |    1 +
+ pnpm-lock.yaml                                              |    9 +
  scripts/fixtures/audio-pipeline-e2e/README.md               |   17 +
  scripts/fixtures/audio-pipeline-e2e/twinkle-render.png      |  Bin 0 -> 10548 bytes
  scripts/fixtures/audio-pipeline-e2e/twinkle.mid             |  Bin 0 -> 2189 bytes
@@ -94,3 +94,4 @@ sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spi
 | 2026-07-06 | sheet-ingest/005 spike done: 6-image PD corpus + Audiveris 5.10.2 installed and run both ways; key finding — OMR discards chord symbols (misread as dynamics) but preserves dense multi-voice structure ~80–90%; routing recommendation documented in ticket for the 008 skill; verifier approved |
 | 2026-07-06 | sheet-ingest/006 done: yt-dlp/ffmpeg + Python 3.11 venv (basic-pitch, music21; four platform pins documented); audio-pipeline.ts (downloadAudio/audioToMidi/midiToNotation, descriptive stderr Errors); 18 spawn-mocked tests (176/176); e2e synthesized clip → MIDI → MusicXML → VALID render committed to fixtures; live YouTube download verified; verifier approved |
 | 2026-07-06 | sheet-ingest/007 spike done: evaluated 6 frame-to-MIDI projects, selected 41pha1/MIDI-Converter (user-approved clone to ~/tools, unlicensed → local-only posture); falling-notes-pipeline.ts (extractFrames 30 fps + framesToMidi stitch-and-detect with tuning options); 10 new mocked-spawn tests (187/187); real Synthesia tutorial e2e → VALID render, melody pitch-perfect, 6 failure modes documented for the 008 skill; verifier approved |
+| 2026-07-12 | sheet-ingest/008 done: `.claude/skills/sheet-ingest/SKILL.md` written (routing table, ABC conventions, OMR error patterns, validation-loop protocol, known limitations); documentation-only, verified by read-through against ADR-0007, ADR-0005 §2, and tickets 002–007's actual results (no code, no test suite impact); sheet-ingest feature complete (001–008 all Done); verifier approved |
