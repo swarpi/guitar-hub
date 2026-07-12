@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-12 20:39 UTC
+> Last updated: 2026-07-12 20:42 UTC
 
 ## Current Phase
 
@@ -23,10 +23,11 @@ sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Cod
 
 <!-- AUTO:START -->
 **Branch:** `master`  
-**Last commit:** 2026-07-12 20:39 UTC
+**Last commit:** 2026-07-12 20:42 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `70389f6` | 2026-07-12 | Apply 0002 sheet-metadata migration to production D1 |
 | `a0f810a` | 2026-07-12 | Add sheet-ingest Claude Code skill (sheet-ingest ticket 008) |
 | `53589db` | 2026-07-12 | Sync STATUS.md dashboard after ticket 006/007 commits |
 | `a883575` | 2026-07-12 | Run falling-notes frame-to-MIDI spike: real Synthesia tutorial to validated MusicXML (sheet-ingest ticket 007) |
@@ -36,7 +37,6 @@ sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Cod
 | `dfcbadb` | 2026-07-06 | Add validate_notation MCP tool: headless ABC rendering via abcjs (sheet-ingest ticket 003) |
 | `156c00d` | 2026-07-06 | Sync STATUS.md dashboard after sheet-ingest ticket 002 commit |
 | `283a3c4` | 2026-07-06 | Add local MCP sheet server: add_sheet, list_sheets, update_sheet (sheet-ingest ticket 002) |
-| `3c05b20` | 2026-07-06 | Add sheet metadata columns: difficulty, key, source_url (sheet-ingest ticket 001) |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -47,7 +47,7 @@ sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Cod
 ```
  .claude/skills/sheet-ingest/SKILL.md                        |  156 ++
  .gitignore                                                  |    3 +
- STATUS.md                                                   |   61 +-
+ STATUS.md                                                   |   63 +-
  scripts/fixtures/audio-pipeline-e2e/README.md               |   17 +
  scripts/fixtures/audio-pipeline-e2e/twinkle-render.png      |  Bin 0 -> 10548 bytes
  scripts/fixtures/audio-pipeline-e2e/twinkle.mid             |  Bin 0 -> 2189 bytes
@@ -56,15 +56,15 @@ sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Cod
  scripts/fixtures/falling-notes-e2e/tutorial-render.png      |  Bin 0 -> 61868 bytes
  scripts/fixtures/falling-notes-e2e/tutorial.mid             |  Bin 0 -> 610 bytes
  scripts/fixtures/falling-notes-e2e/tutorial.musicxml        | 1948 +++++++++++++++++++++++++
- .../fixtures/screenshot-corpus/01-guitar-chord-chart.abc    |   10 +
- .../fixtures/screenshot-corpus/01-guitar-chord-chart.png    |  Bin 0 -> 92461 bytes
- scripts/fixtures/screenshot-corpus/02-piano-lead-sheet.abc  |    8 +
- scripts/fixtures/screenshot-corpus/02-piano-lead-sheet.png  |  Bin 0 -> 67630 bytes
- scripts/fixtures/screenshot-corpus/03-folk-melody.abc       |    9 +
- scripts/fixtures/screenshot-corpus/03-folk-melody.png       |  Bin 0 -> 82548 bytes
- scripts/fixtures/screenshot-corpus/04-two-hand-piano.abc    |   13 +
- scripts/fixtures/screenshot-corpus/04-two-hand-piano.png    |  Bin 0 -> 100865 bytes
- .../fixtures/screenshot-corpus/05-dense-counterpoint.abc    |   13 +
+ scripts/lib/README.md                                       |  142 ++
+ scripts/lib/audio-pipeline.test.ts                          |  229 +++
+ scripts/lib/audio-pipeline.ts                               |  168 +++
+ scripts/lib/falling-notes-pipeline.test.ts                  |  173 +++
+ scripts/lib/falling-notes-pipeline.ts                       |  136 ++
+ scripts/lib/midi_to_musicxml.py                             |   56 +
+ scripts/lib/requirements.txt                                |   14 +
+ tickets/_backlog.md                                         |    6 +-
+ .../sheet-ingest/006-local-media-tooling-audio-pipeline.md  |   48 +-
 ```
 <!-- AUTO:FILES:END -->
 
@@ -96,3 +96,4 @@ sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Cod
 | 2026-07-06 | sheet-ingest/007 spike done: evaluated 6 frame-to-MIDI projects, selected 41pha1/MIDI-Converter (user-approved clone to ~/tools, unlicensed → local-only posture); falling-notes-pipeline.ts (extractFrames 30 fps + framesToMidi stitch-and-detect with tuning options); 10 new mocked-spawn tests (187/187); real Synthesia tutorial e2e → VALID render, melody pitch-perfect, 6 failure modes documented for the 008 skill; verifier approved |
 | 2026-07-12 | sheet-ingest/008 done: `.claude/skills/sheet-ingest/SKILL.md` written (routing table, ABC conventions, OMR error patterns, validation-loop protocol, known limitations); documentation-only, verified by read-through against ADR-0007, ADR-0005 §2, and tickets 002–007's actual results (no code, no test suite impact); sheet-ingest feature complete (001–008 all Done); verifier approved |
 | 2026-07-12 | Applied migration `0002_sheet-metadata.sql` to production D1 (`guitar-hub`) via `wrangler d1 execute --remote`; `difficulty`/`key`/`source_url` columns confirmed present on the production `songs` table; standing risk cleared |
+| 2026-07-12 | Deployed to Cloudflare Pages (`pnpm pages:build` → `wrangler pages deploy --project-name=guitar-hub`); 6 edge routes; live-smoke-tested `/`, `/guitar` (both 200) on `guitar-hub.pages.dev`; app now in sync with the migrated production schema |
