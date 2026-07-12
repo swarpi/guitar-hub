@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-06 17:15 UTC
+> Last updated: 2026-07-12 20:28 UTC
 
 ## Current Phase
 
@@ -17,16 +17,18 @@
 
 ## Active Work
 
-sheet-ingest (ADR-0007) is underway. Ticket 005 (screenshot ingestion spike) is Done and verified: both paths ran against a 6-image corpus; the routing recommendation (vision-direct for anything with chord symbols and single-staff melodies, Audiveris-assisted for dense multi-voice scores) is documented in the ticket for ticket 008 to codify. Audiveris 5.10.2 is installed at `~/tools/Audiveris.app`. Next up: ticket 006 (local media tooling + audio pipeline) or 008 (the skill). Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy.
+sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spike) is Done and verified: 41pha1/MIDI-Converter selected after evaluating six candidates (installed at `~/tools/MIDI-Converter`, no published license — local personal use only), `scripts/lib/falling-notes-pipeline.ts` exports `extractFrames`/`framesToMidi` (30 fps rationale documented), and a real 47 s Synthesia tutorial ran end-to-end to a VALID render with the full melody at correct relative pitches — six failure modes documented in the ticket for the 008 skill. Tickets 006 and 007 are both uncommitted on `master`. Only ticket 008 (the sheet-ingest skill) remains in the feature. Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy.
 
 ## Branch & Commits
 
 <!-- AUTO:START -->
 **Branch:** `master`  
-**Last commit:** 2026-07-06 17:15 UTC
+**Last commit:** 2026-07-12 20:28 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `c58666b` | 2026-07-12 | Add local media tooling and audio-to-MIDI pipeline (sheet-ingest ticket 006) |
+| `9282f3f` | 2026-07-06 | Run screenshot ingestion spike: vision-direct vs Audiveris OMR (sheet-ingest ticket 005) |
 | `1153d67` | 2026-07-06 | Extend validate_notation with MusicXML rendering via Verovio (sheet-ingest ticket 004) |
 | `dfcbadb` | 2026-07-06 | Add validate_notation MCP tool: headless ABC rendering via abcjs (sheet-ingest ticket 003) |
 | `156c00d` | 2026-07-06 | Sync STATUS.md dashboard after sheet-ingest ticket 002 commit |
@@ -35,8 +37,6 @@ sheet-ingest (ADR-0007) is underway. Ticket 005 (screenshot ingestion spike) is 
 | `b46f14d` | 2026-07-06 | Merge remote-tracking branch 'origin/master' |
 | `c6fed10` | 2026-07-05 | Close out route-consolidation: ticket 002 verified, dashboard synced |
 | `5baa775` | 2026-07-05 | Mark route-consolidation/001 done in ticket and backlog |
-| `bd8eb22` | 2026-07-05 | Consolidate /guitar and /piano into a dynamic [instrument] route group |
-| `c24ab46` | 2026-07-05 | Correct wrangler.toml D1 database name and deployment instructions |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -45,26 +45,26 @@ sheet-ingest (ADR-0007) is underway. Ticket 005 (screenshot ingestion spike) is 
 **Files changed (last 5 commits):**
 
 ```
- STATUS.md                                                   |  65 +-
- migrations/0002_sheet-metadata.sql                          |   5 +
- package.json                                                |   8 +-
- pnpm-lock.yaml                                              | 907 ++++++++++++++++++++++++++
- scripts/lib/validate-abc.test.ts                            |  51 ++
- scripts/lib/validate-abc.ts                                 | 107 +++
- scripts/lib/validate-musicxml.test.ts                       |  70 ++
- scripts/lib/validate-musicxml.ts                            | 126 ++++
- scripts/lib/verovio.d.ts                                    |  26 +
- scripts/mcp-sheet-server.ts                                 | 237 +++++++
- scripts/mcp-sheet-tools.test.ts                             | 243 +++++++
- scripts/mcp-sheet-tools.ts                                  | 129 ++++
- scripts/next-on-pages-shim.ts                               |  13 +
- src/app/[instrument]/[artistSlug]/[songSlug]/page.tsx       |  38 +-
- src/app/[instrument]/edit/[songId]/page.tsx                 |   3 +
- src/app/[instrument]/pages.test.tsx                         |  57 ++
- src/app/actions.test.ts                                     | 105 +++
- src/app/actions.ts                                          |  41 ++
- src/components/SongForm.tsx                                 |  60 ++
- src/db/migrations.test.ts                                   |  47 ++
+ .gitignore                                                  |    3 +
+ STATUS.md                                                   |   57 +-
+ package.json                                                |    3 +
+ pnpm-lock.yaml                                              |  166 ++++
+ scripts/fixtures/audio-pipeline-e2e/README.md               |   17 +
+ scripts/fixtures/audio-pipeline-e2e/twinkle-render.png      |  Bin 0 -> 10548 bytes
+ scripts/fixtures/audio-pipeline-e2e/twinkle.mid             |  Bin 0 -> 2189 bytes
+ scripts/fixtures/audio-pipeline-e2e/twinkle.musicxml        |  199 +++++
+ .../fixtures/screenshot-corpus/01-guitar-chord-chart.abc    |   10 +
+ .../fixtures/screenshot-corpus/01-guitar-chord-chart.png    |  Bin 0 -> 92461 bytes
+ scripts/fixtures/screenshot-corpus/02-piano-lead-sheet.abc  |    8 +
+ scripts/fixtures/screenshot-corpus/02-piano-lead-sheet.png  |  Bin 0 -> 67630 bytes
+ scripts/fixtures/screenshot-corpus/03-folk-melody.abc       |    9 +
+ scripts/fixtures/screenshot-corpus/03-folk-melody.png       |  Bin 0 -> 82548 bytes
+ scripts/fixtures/screenshot-corpus/04-two-hand-piano.abc    |   13 +
+ scripts/fixtures/screenshot-corpus/04-two-hand-piano.png    |  Bin 0 -> 100865 bytes
+ .../fixtures/screenshot-corpus/05-dense-counterpoint.abc    |   13 +
+ .../fixtures/screenshot-corpus/05-dense-counterpoint.png    |  Bin 0 -> 107532 bytes
+ scripts/fixtures/screenshot-corpus/06-satb-chorale.abc      |   15 +
+ scripts/fixtures/screenshot-corpus/06-satb-chorale.png      |  Bin 0 -> 70186 bytes
 ```
 <!-- AUTO:FILES:END -->
 
@@ -73,7 +73,6 @@ sheet-ingest (ADR-0007) is underway. Ticket 005 (screenshot ingestion spike) is 
 | Ticket | Feature | Status |
 |--------|---------|--------|
 | [003 — Offline Fallback Page](tickets/pwa/003-offline-fallback-page.md) | pwa | In Review |
-| [006 — Local Media Tooling + Audio-to-MIDI Pipeline](tickets/sheet-ingest/006-local-media-tooling-audio-pipeline.md) | sheet-ingest | Open (next up) |
 
 ## Risks & Blockers
 
@@ -93,3 +92,5 @@ sheet-ingest (ADR-0007) is underway. Ticket 005 (screenshot ingestion spike) is 
 | 2026-07-06 | sheet-ingest/003 done: validate_notation tool renders ABC headlessly (abcjs under jsdom, XMLSerializer, resvg → PNG); pure validateAbc with stripped abcjs warnings, explicit X: header check; 4 new tests (154/154); stdio smoke test returned correct staff-notation PNG as MCP image block; verifier approved |
 | 2026-07-06 | sheet-ingest/004 done: validate_notation gains musicxml branch via Verovio WASM (lazy toolkit singleton, buffered getLog diagnostics, DOMParser well-formedness pre-check since Verovio tolerates malformed XML); 4 new tests (158/158); stdio smoke test rendered correct one-measure score; verifier approved |
 | 2026-07-06 | sheet-ingest/005 spike done: 6-image PD corpus + Audiveris 5.10.2 installed and run both ways; key finding — OMR discards chord symbols (misread as dynamics) but preserves dense multi-voice structure ~80–90%; routing recommendation documented in ticket for the 008 skill; verifier approved |
+| 2026-07-06 | sheet-ingest/006 done: yt-dlp/ffmpeg + Python 3.11 venv (basic-pitch, music21; four platform pins documented); audio-pipeline.ts (downloadAudio/audioToMidi/midiToNotation, descriptive stderr Errors); 18 spawn-mocked tests (176/176); e2e synthesized clip → MIDI → MusicXML → VALID render committed to fixtures; live YouTube download verified; verifier approved |
+| 2026-07-06 | sheet-ingest/007 spike done: evaluated 6 frame-to-MIDI projects, selected 41pha1/MIDI-Converter (user-approved clone to ~/tools, unlicensed → local-only posture); falling-notes-pipeline.ts (extractFrames 30 fps + framesToMidi stitch-and-detect with tuning options); 10 new mocked-spawn tests (187/187); real Synthesia tutorial e2e → VALID render, melody pitch-perfect, 6 failure modes documented for the 008 skill; verifier approved |
