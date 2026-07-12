@@ -1,0 +1,14 @@
+# Python dependencies for the audio-to-MIDI pipeline (sheet-ingest ticket 006).
+# Installed into scripts/lib/.venv-audio — see scripts/lib/README.md.
+basic-pitch>=0.4.0
+music21>=9.1
+# Transitive pins: newer numba/llvmlite dropped macOS x86_64 wheels; these are
+# the last versions with cp311 wheels for that platform (numba is pulled in
+# via basic-pitch -> resampy).
+numba==0.60.0
+llvmlite==0.43.0
+# basic-pitch needs an inference backend; ONNX is the portable choice.
+onnxruntime>=1.18
+# resampy imports pkg_resources; uv venvs don't ship setuptools by default,
+# and setuptools >= 81 removed pkg_resources.
+setuptools<81

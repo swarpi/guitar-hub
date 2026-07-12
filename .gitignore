@@ -27,6 +27,9 @@
 # claude code agent worktrees
 /.claude/worktrees/
 
+# audio-pipeline python venv (sheet-ingest ticket 006 — see scripts/lib/README.md)
+/scripts/lib/.venv-audio/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
