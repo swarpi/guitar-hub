@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-12 20:28 UTC
+> Last updated: 2026-07-12 20:29 UTC
 
 ## Current Phase
 
@@ -17,16 +17,17 @@
 
 ## Active Work
 
-sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spike) is Done and verified: 41pha1/MIDI-Converter selected after evaluating six candidates (installed at `~/tools/MIDI-Converter`, no published license — local personal use only), `scripts/lib/falling-notes-pipeline.ts` exports `extractFrames`/`framesToMidi` (30 fps rationale documented), and a real 47 s Synthesia tutorial ran end-to-end to a VALID render with the full melody at correct relative pitches — six failure modes documented in the ticket for the 008 skill. Tickets 006 and 007 are both uncommitted on `master`. Only ticket 008 (the sheet-ingest skill) remains in the feature. Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy.
+sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spike) is Done and verified: 41pha1/MIDI-Converter selected after evaluating six candidates (installed at `~/tools/MIDI-Converter`, no published license — local personal use only), `scripts/lib/falling-notes-pipeline.ts` exports `extractFrames`/`framesToMidi` (30 fps rationale documented), and a real 47 s Synthesia tutorial ran end-to-end to a VALID render with the full melody at correct relative pitches — six failure modes documented in the ticket for the 008 skill. Tickets 006 and 007 are committed on `master` (`c58666b`, `a883575`). Only ticket 008 (the sheet-ingest skill) remains in the feature. Note: migration `0002_sheet-metadata.sql` has not yet been applied to production D1 — apply it alongside the next deploy.
 
 ## Branch & Commits
 
 <!-- AUTO:START -->
 **Branch:** `master`  
-**Last commit:** 2026-07-12 20:28 UTC
+**Last commit:** 2026-07-12 20:29 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `a883575` | 2026-07-12 | Run falling-notes frame-to-MIDI spike: real Synthesia tutorial to validated MusicXML (sheet-ingest ticket 007) |
 | `c58666b` | 2026-07-12 | Add local media tooling and audio-to-MIDI pipeline (sheet-ingest ticket 006) |
 | `9282f3f` | 2026-07-06 | Run screenshot ingestion spike: vision-direct vs Audiveris OMR (sheet-ingest ticket 005) |
 | `1153d67` | 2026-07-06 | Extend validate_notation with MusicXML rendering via Verovio (sheet-ingest ticket 004) |
@@ -36,7 +37,6 @@ sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spi
 | `3c05b20` | 2026-07-06 | Add sheet metadata columns: difficulty, key, source_url (sheet-ingest ticket 001) |
 | `b46f14d` | 2026-07-06 | Merge remote-tracking branch 'origin/master' |
 | `c6fed10` | 2026-07-05 | Close out route-consolidation: ticket 002 verified, dashboard synced |
-| `5baa775` | 2026-07-05 | Mark route-consolidation/001 done in ticket and backlog |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -46,13 +46,17 @@ sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spi
 
 ```
  .gitignore                                                  |    3 +
- STATUS.md                                                   |   57 +-
+ STATUS.md                                                   |   62 +-
  package.json                                                |    3 +
- pnpm-lock.yaml                                              |  166 ++++
+ pnpm-lock.yaml                                              |  166 +++
  scripts/fixtures/audio-pipeline-e2e/README.md               |   17 +
  scripts/fixtures/audio-pipeline-e2e/twinkle-render.png      |  Bin 0 -> 10548 bytes
  scripts/fixtures/audio-pipeline-e2e/twinkle.mid             |  Bin 0 -> 2189 bytes
- scripts/fixtures/audio-pipeline-e2e/twinkle.musicxml        |  199 +++++
+ scripts/fixtures/audio-pipeline-e2e/twinkle.musicxml        |  199 +++
+ scripts/fixtures/falling-notes-e2e/README.md                |   16 +
+ scripts/fixtures/falling-notes-e2e/tutorial-render.png      |  Bin 0 -> 61868 bytes
+ scripts/fixtures/falling-notes-e2e/tutorial.mid             |  Bin 0 -> 610 bytes
+ scripts/fixtures/falling-notes-e2e/tutorial.musicxml        | 1948 +++++++++++++++++++++++++
  .../fixtures/screenshot-corpus/01-guitar-chord-chart.abc    |   10 +
  .../fixtures/screenshot-corpus/01-guitar-chord-chart.png    |  Bin 0 -> 92461 bytes
  scripts/fixtures/screenshot-corpus/02-piano-lead-sheet.abc  |    8 +
@@ -61,10 +65,6 @@ sheet-ingest (ADR-0007) is underway. Ticket 007 (falling-notes frame-to-MIDI spi
  scripts/fixtures/screenshot-corpus/03-folk-melody.png       |  Bin 0 -> 82548 bytes
  scripts/fixtures/screenshot-corpus/04-two-hand-piano.abc    |   13 +
  scripts/fixtures/screenshot-corpus/04-two-hand-piano.png    |  Bin 0 -> 100865 bytes
- .../fixtures/screenshot-corpus/05-dense-counterpoint.abc    |   13 +
- .../fixtures/screenshot-corpus/05-dense-counterpoint.png    |  Bin 0 -> 107532 bytes
- scripts/fixtures/screenshot-corpus/06-satb-chorale.abc      |   15 +
- scripts/fixtures/screenshot-corpus/06-satb-chorale.png      |  Bin 0 -> 70186 bytes
 ```
 <!-- AUTO:FILES:END -->
 
