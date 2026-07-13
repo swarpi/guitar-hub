@@ -6,6 +6,7 @@ import {
   extractUrlFromMessage,
   fetchUrlAsText,
 } from "./url-import";
+import { runImageExtraction } from "./image-import";
 
 const PORT = Number(process.env.AI_PROXY_PORT) || 3456;
 const URL_FETCH_ERROR = "Could not fetch the URL. Check the link and try again.";
@@ -20,6 +21,8 @@ interface RequestBody {
   system?: string;
   model?: string;
   max_tokens?: number;
+  instrument?: "guitar" | "piano";
+  image?: { mediaType: string; data: string };
 }
 
 createServer((req, res) => {
@@ -48,6 +51,22 @@ createServer((req, res) => {
   req.on("end", async () => {
     try {
       const data = JSON.parse(body) as RequestBody;
+
+      // ADR-0009 Image mode: when the request carries base64 image data, write
+      // it to a temp file, point `claude -p` at that path, and return the same
+      // envelope. Checked BEFORE URL detection (ADR §5).
+      if (data.image) {
+        console.log(`-> image import (instrument: ${data.instrument ?? "guitar"})`);
+        const result = await runImageExtraction({
+          image: data.image,
+          instrument: data.instrument,
+          system: data.system,
+          model: data.model,
+        });
+        res.writeHead(result.status, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result.body));
+        return;
+      }
 
       // Phase 2 (ADR-0006): a single "URL: <url>" message means the proxy
       // fetches the page itself and prompts Claude with the page text.
