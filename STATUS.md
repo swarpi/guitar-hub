@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-12 20:42 UTC
+> Last updated: 2026-07-12 20:46 UTC
 
 ## Current Phase
 
@@ -8,8 +8,8 @@
 |-------|--------|
 | Decide | |
 | Map | |
-| Decompose | |
-| Execute | Active |
+| Decompose | Done |
+| Execute | Next |
 | Review | |
 | Audit | |
 | Learn | |
@@ -17,16 +17,19 @@
 
 ## Active Work
 
-sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Code skill) is Done and verified: `.claude/skills/sheet-ingest/SKILL.md` encodes the routing table, ABC conventions, OMR error patterns, the validation-loop protocol, and known limitations, all checked line-by-line against the actual outcomes of tickets 002–007 (routing table against ticket 005's decision, ABC conventions against the corpus files, OMR findings and Audiveris invocation against ticket 005, falling-notes tuning and audio-onset findings against tickets 006–007) — no discrepancies found. All eight sheet-ingest tickets (001–008) are now Done. Migration `0002_sheet-metadata.sql` was applied to production D1 on 2026-07-12 (`difficulty`/`key`/`source_url` columns verified present).
+New feature: **in-app image import** (ADR-0009, Accepted) — an "Image" mode in the "Import via AI" form (file / drag-drop / clipboard-paste) that transcribes a screenshot or photo of a song sheet one-shot and pre-fills the Add-a-Song form for review. Guitar → tab text, piano → ABC. Local-only, same posture as the existing text/URL AI import (reverses the ADR-0007 §7 descope of ADR-0006 Phase 3). Decomposed into four `ai-import` tickets (006–009); ready to execute — start with 006 (proxy image handling) and 007 (client normalization module), which are parallelizable. Next step: plan mode on ticket 006.
+
+sheet-ingest (ADR-0007) is feature-complete: all eight tickets (001–008) Done and verified, migration `0002_sheet-metadata.sql` applied to production D1 (2026-07-12), and the app is deployed and live on `guitar-hub.pages.dev`.
 
 ## Branch & Commits
 
 <!-- AUTO:START -->
 **Branch:** `master`  
-**Last commit:** 2026-07-12 20:42 UTC
+**Last commit:** 2026-07-12 20:46 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `5069d37` | 2026-07-12 | Deploy to Cloudflare Pages after 0002 migration |
 | `70389f6` | 2026-07-12 | Apply 0002 sheet-metadata migration to production D1 |
 | `a0f810a` | 2026-07-12 | Add sheet-ingest Claude Code skill (sheet-ingest ticket 008) |
 | `53589db` | 2026-07-12 | Sync STATUS.md dashboard after ticket 006/007 commits |
@@ -36,7 +39,6 @@ sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Cod
 | `1153d67` | 2026-07-06 | Extend validate_notation with MusicXML rendering via Verovio (sheet-ingest ticket 004) |
 | `dfcbadb` | 2026-07-06 | Add validate_notation MCP tool: headless ABC rendering via abcjs (sheet-ingest ticket 003) |
 | `156c00d` | 2026-07-06 | Sync STATUS.md dashboard after sheet-ingest ticket 002 commit |
-| `283a3c4` | 2026-07-06 | Add local MCP sheet server: add_sheet, list_sheets, update_sheet (sheet-ingest ticket 002) |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -45,26 +47,18 @@ sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Cod
 **Files changed (last 5 commits):**
 
 ```
- .claude/skills/sheet-ingest/SKILL.md                        |  156 ++
- .gitignore                                                  |    3 +
- STATUS.md                                                   |   63 +-
- scripts/fixtures/audio-pipeline-e2e/README.md               |   17 +
- scripts/fixtures/audio-pipeline-e2e/twinkle-render.png      |  Bin 0 -> 10548 bytes
- scripts/fixtures/audio-pipeline-e2e/twinkle.mid             |  Bin 0 -> 2189 bytes
- scripts/fixtures/audio-pipeline-e2e/twinkle.musicxml        |  199 +++
- scripts/fixtures/falling-notes-e2e/README.md                |   16 +
- scripts/fixtures/falling-notes-e2e/tutorial-render.png      |  Bin 0 -> 61868 bytes
- scripts/fixtures/falling-notes-e2e/tutorial.mid             |  Bin 0 -> 610 bytes
- scripts/fixtures/falling-notes-e2e/tutorial.musicxml        | 1948 +++++++++++++++++++++++++
- scripts/lib/README.md                                       |  142 ++
- scripts/lib/audio-pipeline.test.ts                          |  229 +++
- scripts/lib/audio-pipeline.ts                               |  168 +++
- scripts/lib/falling-notes-pipeline.test.ts                  |  173 +++
- scripts/lib/falling-notes-pipeline.ts                       |  136 ++
- scripts/lib/midi_to_musicxml.py                             |   56 +
- scripts/lib/requirements.txt                                |   14 +
- tickets/_backlog.md                                         |    6 +-
- .../sheet-ingest/006-local-media-tooling-audio-pipeline.md  |   48 +-
+ .claude/skills/sheet-ingest/SKILL.md                    |  156 +++
+ STATUS.md                                               |   66 +-
+ scripts/fixtures/falling-notes-e2e/README.md            |   16 +
+ scripts/fixtures/falling-notes-e2e/tutorial-render.png  |  Bin 0 -> 61868 bytes
+ scripts/fixtures/falling-notes-e2e/tutorial.mid         |  Bin 0 -> 610 bytes
+ scripts/fixtures/falling-notes-e2e/tutorial.musicxml    | 1948 +++++++++++++++++++++++++++++
+ scripts/lib/falling-notes-pipeline.test.ts              |  173 +++
+ scripts/lib/falling-notes-pipeline.ts                   |  136 ++
+ tickets/_backlog.md                                     |    6 +-
+ tickets/sheet-ingest/007-falling-notes-frame-to-midi.md |   66 +-
+ tickets/sheet-ingest/008-sheet-ingest-skill.md          |   26 +-
+ 11 files changed, 2535 insertions(+), 58 deletions(-)
 ```
 <!-- AUTO:FILES:END -->
 
@@ -72,6 +66,10 @@ sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Cod
 
 | Ticket | Feature | Status |
 |--------|---------|--------|
+| [006 — AI Proxy: Image Input Handling](tickets/ai-import/006-proxy-image-handling.md) | ai-import | Up Next |
+| [007 — Client-Side Image Normalization Module](tickets/ai-import/007-image-normalization-module.md) | ai-import | Up Next |
+| [008 — ImportForm: Image Input Mode](tickets/ai-import/008-import-form-image-input.md) | ai-import | Up Next |
+| [009 — Add Page: Widen AI-Import Gate to Guitar and Piano](tickets/ai-import/009-add-page-instrument-gate.md) | ai-import | Up Next |
 | [003 — Offline Fallback Page](tickets/pwa/003-offline-fallback-page.md) | pwa | In Review |
 
 ## Risks & Blockers
@@ -97,3 +95,4 @@ sheet-ingest (ADR-0007) is feature-complete. Ticket 008 (sheet-ingest Claude Cod
 | 2026-07-12 | sheet-ingest/008 done: `.claude/skills/sheet-ingest/SKILL.md` written (routing table, ABC conventions, OMR error patterns, validation-loop protocol, known limitations); documentation-only, verified by read-through against ADR-0007, ADR-0005 §2, and tickets 002–007's actual results (no code, no test suite impact); sheet-ingest feature complete (001–008 all Done); verifier approved |
 | 2026-07-12 | Applied migration `0002_sheet-metadata.sql` to production D1 (`guitar-hub`) via `wrangler d1 execute --remote`; `difficulty`/`key`/`source_url` columns confirmed present on the production `songs` table; standing risk cleared |
 | 2026-07-12 | Deployed to Cloudflare Pages (`pnpm pages:build` → `wrangler pages deploy --project-name=guitar-hub`); 6 edge routes; live-smoke-tested `/`, `/guitar` (both 200) on `guitar-hub.pages.dev`; app now in sync with the migrated production schema |
+| 2026-07-13 | ADR-0009 (in-app image import) authored and Accepted — "Image" mode in the AI import form (file/drop/clipboard-paste), one-shot review-in-form, guitar→tab & piano→ABC, local-only; reverses ADR-0007 §7 descope. Decomposed into ai-import tickets 006–009 (proxy image handling, client normalization module, ImportForm image UI, add-page gate widening); backlog updated, ready to execute |

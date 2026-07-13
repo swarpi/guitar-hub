@@ -14,14 +14,20 @@ _Tickets actively being worked on this cycle._
 
 _Tickets ready to be picked up in the next cycle._
 
+_ADR-0009 (in-app image import) reinstates and supersedes-in-detail ADR-0006 Phase 3 / reverses the ADR-0007 §7 descope. 006 and 007 have no code dependency on each other and can run in parallel; 008 depends on both (proxy contract from 006, normalization module from 007) but can be planned against their documented contracts before either merges; 009 is independent of all three and can be done anytime, though piano's Image mode is only usable end-to-end once 008 and 009 have both landed._
+
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
+| [006 — AI Proxy: Image Input Handling](ai-import/006-proxy-image-handling.md) | ai-import | P1 | M |
+| [007 — Client-Side Image Normalization Module](ai-import/007-image-normalization-module.md) | ai-import | P1 | M |
+| [008 — ImportForm: Image Input Mode](ai-import/008-import-form-image-input.md) | ai-import | P1 | L |
+| [009 — Add Page: Widen AI-Import Gate to Guitar and Piano](ai-import/009-add-page-instrument-gate.md) | ai-import | P1 | S |
 
 ## Backlog
 
-_Tickets that are planned but not yet scheduled. ai-import tickets should be picked up after multi-instrument lands (ADR-0005 renames `tabContent` → `content`; ImportForm adapts at that point)._
+_Tickets that are planned but not yet scheduled._
 
-_sheet-ingest (ADR-0007) tickets 002–008 build on ticket 001, which merged to `master` and was verified done. The multi-instrument dependency that previously blocked this feature (branch `worktree-multi-instrument-001`) has also merged to `master`, so no cross-feature block remains. ADR-0006 Phase 3 (in-app image import) is descoped per ADR-0007 §7 — no ai-import image tickets exist to remove; this is noted here so no one adds them later._
+_sheet-ingest (ADR-0007) tickets 002–008 build on ticket 001, which merged to `master` and was verified done. The multi-instrument dependency that previously blocked this feature (branch `worktree-multi-instrument-001`) has also merged to `master`, so no cross-feature block remains._
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
