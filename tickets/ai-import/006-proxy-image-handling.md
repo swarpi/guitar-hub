@@ -1,7 +1,7 @@
 # Ticket: AI Proxy — Image Input Handling
 
 **Feature:** ai-import
-**Status:** Todo
+**Status:** Done
 **Priority:** P1
 **Estimate:** M
 **Related:** ADR-0009 (Sections 4 "Proxy request/response shape", 5 "How the image reaches `claude -p`", 7), ai-import/004 (established the pure-module + mocked-I/O test pattern this ticket reuses)
@@ -20,31 +20,31 @@ Add a `scripts/image-import.ts` module that writes an incoming base64 image to a
 
 ## Acceptance Criteria
 
-- [ ] `scripts/image-import.ts` exports the following functions:
-  - [ ] `mediaTypeToExtension(mediaType: string): string` — pure. `"image/jpeg"` → `"jpg"`, `"image/png"` → `"png"`, `"image/webp"` → `"webp"`; any other value falls back to `"jpg"`.
-  - [ ] `buildImagePrompt(imagePath: string, instrument?: "guitar" | "piano"): string` — pure. Always includes the literal `imagePath` verbatim. When `instrument` is `"piano"`, the returned string mentions ABC notation (e.g. contains `"ABC"`). When `instrument` is `"guitar"` or omitted, it mentions tab/chord preservation (e.g. contains `"tab"` or `"chord"`, case-insensitive) and does **not** mention ABC.
-  - [ ] `writeTempImageFile(base64Data: string, mediaType: string): Promise<string>` — decodes `base64Data` into a `Buffer` and writes it via `node:fs/promises` `writeFile` to a path under `node:os` `tmpdir()` named `guitarhub-import-<unique>.<ext>` (ext from `mediaTypeToExtension`); resolves with the absolute path written.
-  - [ ] `cleanupTempImageFile(filePath: string): Promise<void>` — calls `node:fs/promises` `unlink(filePath)`; any rejection (e.g. the file is already gone) is caught and logged via `console.warn`, never re-thrown — cleanup failure must never crash the proxy or fail the request.
-  - [ ] `runImageExtraction(request: { image: { mediaType: string; data: string }; instrument?: "guitar" | "piano"; system?: string; model?: string }): Promise<{ status: number; body: unknown }>` orchestrates: `writeTempImageFile` → build the `claude -p` args (`["-p", buildImagePrompt(path, instrument), "--output-format", "text", "--model", model ?? "claude-sonnet-4-5", ...(system ? ["--system-prompt", system] : [])]`) → `node:child_process` `spawn("claude", args, { stdio: ["ignore","pipe","pipe"], timeout: 120_000 })` → on `close`, always `cleanupTempImageFile` (success or failure), then resolve:
-    - [ ] Exit code `0`: `{ status: 200, body: { content: [{ type: "text", text: stdout.trim() }], model: model ?? "claude-sonnet-4-5", role: "assistant" } }` — same envelope shape the literal/URL branches already return.
-    - [ ] Non-zero exit code: `{ status: 500, body: { error: { message: stderr.trim() || "Process exited with code <code>" } } }`.
-    - [ ] `spawn`'s `error` event (process could not start): cleanup runs, resolves `{ status: 500, body: { error: { message: err.message } } }`.
-- [ ] `scripts/ai-proxy.ts`'s `RequestBody` interface gains two optional fields: `instrument?: "guitar" | "piano"` and `image?: { mediaType: string; data: string }`.
-- [ ] The request handler gains a branch checked **before** the existing URL-detection logic: `if (data.image) { const result = await runImageExtraction({ image: data.image, instrument: data.instrument, system: data.system, model: data.model }); res.writeHead(result.status, { "Content-Type": "application/json" }); res.end(JSON.stringify(result.body)); return; }`.
-- [ ] Requests with no `image` field are handled exactly as before — no change to the literal-prompt or URL branches, and no change to their existing behavior for multi-message or single-message-without-`URL:` requests.
-- [ ] `pnpm test` passes, including new tests in `scripts/image-import.test.ts` covering, with `node:child_process` mocked (`vi.mock("node:child_process", () => ({ spawn: vi.fn() }))`, fake `EventEmitter` child driven through `stdout`/`stderr`/`close`/`error` per the `audio-pipeline.test.ts` pattern) and `node:fs/promises` mocked (`writeFile`, `unlink`):
-  - [ ] `mediaTypeToExtension`: all three known types plus an unknown-type fallback to `"jpg"`
-  - [ ] `buildImagePrompt`: guitar wording (default and explicit `"guitar"`), piano wording (contains ABC), and that the image path always appears verbatim in the output
-  - [ ] `writeTempImageFile`: `writeFile` is called with a path matching `/guitarhub-import-.+\.(jpg|png|webp)$/` under `os.tmpdir()`, and with a `Buffer` whose content matches the base64-decoded input; the returned path equals the path passed to `writeFile`
-  - [ ] `cleanupTempImageFile`: calls `unlink` with the given path; when `unlink` rejects, the returned promise still resolves (does not throw) and `console.warn` is called
-  - [ ] `runImageExtraction` success path: the fake child closes with code `0` and stdout text; the resolved value has `status: 200` and `body.content[0].text` equal to the trimmed stdout; `unlink` was called (cleanup ran) with the same path `writeFile` was called with
-  - [ ] `runImageExtraction` failure path: the fake child closes with a non-zero code and stderr text; resolves `status: 500` with `body.error.message` equal to the trimmed stderr; cleanup still ran
-  - [ ] `runImageExtraction` spawn-error path: the fake child emits `"error"`; resolves `status: 500` with `body.error.message` equal to the error's message; cleanup still ran
-  - [ ] `runImageExtraction` passes `instrument: "piano"` through to the `-p` argument passed to `spawn` (assert on the mocked `spawn` call's args containing ABC wording) and defaults to guitar wording when `instrument` is omitted
-  - [ ] `runImageExtraction` defaults `model` to `"claude-sonnet-4-5"` in both the `spawn` args and the success response body when `model` is omitted, and omits `--system-prompt` from the `spawn` args when `system` is omitted
-- [ ] `pnpm lint` passes on all changed files
-- [ ] `pnpm build` compiles without errors
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `scripts/image-import.ts` exports the following functions:
+  - [x] `mediaTypeToExtension(mediaType: string): string` — pure. `"image/jpeg"` → `"jpg"`, `"image/png"` → `"png"`, `"image/webp"` → `"webp"`; any other value falls back to `"jpg"`.
+  - [x] `buildImagePrompt(imagePath: string, instrument?: "guitar" | "piano"): string` — pure. Always includes the literal `imagePath` verbatim. When `instrument` is `"piano"`, the returned string mentions ABC notation (e.g. contains `"ABC"`). When `instrument` is `"guitar"` or omitted, it mentions tab/chord preservation (e.g. contains `"tab"` or `"chord"`, case-insensitive) and does **not** mention ABC.
+  - [x] `writeTempImageFile(base64Data: string, mediaType: string): Promise<string>` — decodes `base64Data` into a `Buffer` and writes it via `node:fs/promises` `writeFile` to a path under `node:os` `tmpdir()` named `guitarhub-import-<unique>.<ext>` (ext from `mediaTypeToExtension`); resolves with the absolute path written.
+  - [x] `cleanupTempImageFile(filePath: string): Promise<void>` — calls `node:fs/promises` `unlink(filePath)`; any rejection (e.g. the file is already gone) is caught and logged via `console.warn`, never re-thrown — cleanup failure must never crash the proxy or fail the request.
+  - [x] `runImageExtraction(request: { image: { mediaType: string; data: string }; instrument?: "guitar" | "piano"; system?: string; model?: string }): Promise<{ status: number; body: unknown }>` orchestrates: `writeTempImageFile` → build the `claude -p` args (`["-p", buildImagePrompt(path, instrument), "--output-format", "text", "--model", model ?? "claude-sonnet-4-5", ...(system ? ["--system-prompt", system] : [])]`) → `node:child_process` `spawn("claude", args, { stdio: ["ignore","pipe","pipe"], timeout: 120_000 })` → on `close`, always `cleanupTempImageFile` (success or failure), then resolve:
+    - [x] Exit code `0`: `{ status: 200, body: { content: [{ type: "text", text: stdout.trim() }], model: model ?? "claude-sonnet-4-5", role: "assistant" } }` — same envelope shape the literal/URL branches already return.
+    - [x] Non-zero exit code: `{ status: 500, body: { error: { message: stderr.trim() || "Process exited with code <code>" } } }`.
+    - [x] `spawn`'s `error` event (process could not start): cleanup runs, resolves `{ status: 500, body: { error: { message: err.message } } }`.
+- [x] `scripts/ai-proxy.ts`'s `RequestBody` interface gains two optional fields: `instrument?: "guitar" | "piano"` and `image?: { mediaType: string; data: string }`.
+- [x] The request handler gains a branch checked **before** the existing URL-detection logic: `if (data.image) { const result = await runImageExtraction({ image: data.image, instrument: data.instrument, system: data.system, model: data.model }); res.writeHead(result.status, { "Content-Type": "application/json" }); res.end(JSON.stringify(result.body)); return; }`.
+- [x] Requests with no `image` field are handled exactly as before — no change to the literal-prompt or URL branches, and no change to their existing behavior for multi-message or single-message-without-`URL:` requests.
+- [x] `pnpm test` passes, including new tests in `scripts/image-import.test.ts` covering, with `node:child_process` mocked (`vi.mock("node:child_process", () => ({ spawn: vi.fn() }))`, fake `EventEmitter` child driven through `stdout`/`stderr`/`close`/`error` per the `audio-pipeline.test.ts` pattern) and `node:fs/promises` mocked (`writeFile`, `unlink`):
+  - [x] `mediaTypeToExtension`: all three known types plus an unknown-type fallback to `"jpg"`
+  - [x] `buildImagePrompt`: guitar wording (default and explicit `"guitar"`), piano wording (contains ABC), and that the image path always appears verbatim in the output
+  - [x] `writeTempImageFile`: `writeFile` is called with a path matching `/guitarhub-import-.+\.(jpg|png|webp)$/` under `os.tmpdir()`, and with a `Buffer` whose content matches the base64-decoded input; the returned path equals the path passed to `writeFile`
+  - [x] `cleanupTempImageFile`: calls `unlink` with the given path; when `unlink` rejects, the returned promise still resolves (does not throw) and `console.warn` is called
+  - [x] `runImageExtraction` success path: the fake child closes with code `0` and stdout text; the resolved value has `status: 200` and `body.content[0].text` equal to the trimmed stdout; `unlink` was called (cleanup ran) with the same path `writeFile` was called with
+  - [x] `runImageExtraction` failure path: the fake child closes with a non-zero code and stderr text; resolves `status: 500` with `body.error.message` equal to the trimmed stderr; cleanup still ran
+  - [x] `runImageExtraction` spawn-error path: the fake child emits `"error"`; resolves `status: 500` with `body.error.message` equal to the error's message; cleanup still ran
+  - [x] `runImageExtraction` passes `instrument: "piano"` through to the `-p` argument passed to `spawn` (assert on the mocked `spawn` call's args containing ABC wording) and defaults to guitar wording when `instrument` is omitted
+  - [x] `runImageExtraction` defaults `model` to `"claude-sonnet-4-5"` in both the `spawn` args and the success response body when `model` is omitted, and omits `--system-prompt` from the `spawn` args when `system` is omitted
+- [x] `pnpm lint` passes on all changed files
+- [x] `pnpm build` compiles without errors
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
