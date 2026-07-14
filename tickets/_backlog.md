@@ -18,9 +18,6 @@ _ADR-0009 (in-app image import) reinstates and supersedes-in-detail ADR-0006 Pha
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| [007 — Client-Side Image Normalization Module](ai-import/007-image-normalization-module.md) | ai-import | P1 | M |
-| [008 — ImportForm: Image Input Mode](ai-import/008-import-form-image-input.md) | ai-import | P1 | L |
-| [009 — Add Page: Widen AI-Import Gate to Guitar and Piano](ai-import/009-add-page-instrument-gate.md) | ai-import | P1 | S |
 
 ## Backlog
 
@@ -37,6 +34,9 @@ _Completed tickets. Move here when done, newest first._
 
 | Ticket | Feature | Completed |
 |--------|---------|-----------|
+| [009 — Add Page: Widen AI-Import Gate to Guitar and Piano](ai-import/009-add-page-instrument-gate.md) | ai-import | 2026-07-14 |
+| [008 — ImportForm: Image Input Mode](ai-import/008-import-form-image-input.md) | ai-import | 2026-07-13 |
+| [007 — Client-Side Image Normalization Module](ai-import/007-image-normalization-module.md) | ai-import | 2026-07-13 |
 | [006 — AI Proxy: Image Input Handling](ai-import/006-proxy-image-handling.md) | ai-import | 2026-07-13 |
 | [008 — sheet-ingest Claude Code Skill](sheet-ingest/008-sheet-ingest-skill.md) | sheet-ingest | 2026-07-12 |
 | [007 — Falling-Notes Frame-to-MIDI Pipeline (Spike)](sheet-ingest/007-falling-notes-frame-to-midi.md) | sheet-ingest | 2026-07-06 |

@@ -1,7 +1,7 @@
 # Ticket: Add Page — Widen AI-Import Gate to Guitar and Piano
 
 **Feature:** ai-import
-**Status:** Todo
+**Status:** Done
 **Priority:** P1
 **Estimate:** S
 **Related:** ADR-0009 (Section 1a "Widening the AI-import gate to guitar and piano")
@@ -20,18 +20,18 @@ Route both guitar and piano through `AddPageClient` on `/[instrument]/add`, fetc
 
 ## Acceptance Criteria
 
-- [ ] `src/app/[instrument]/add/page.tsx`'s gate changes from `instrument === "guitar"` to admit both `"guitar"` and `"piano"` (e.g. `instrument === "guitar" || instrument === "piano"`, or equivalent using `INSTRUMENTS`/`isInstrument` from `@/lib/instruments` if cleaner)
-- [ ] `getAllSongsFlat(db, instrument)` is now called for both `"guitar"` and `"piano"` (previously only for `"guitar"`) — the `Promise.all` fetch no longer conditions the query on the instrument being guitar specifically
-- [ ] For both guitar and piano, the page renders `<AddPageClient artistNames={...} existingSongs={...} action={createSong} instrument={instrument} cancelHref={`/${instrument}`} />`
-- [ ] No other instrument (e.g. a hypothetical future `"ukulele"`) is admitted by this change — the gate remains exactly `"guitar" | "piano"`, matching the current `Instrument` union in `@/lib/instruments`
-- [ ] The stale comment above the `Promise.all` ("The AI import (and its duplicate check) is guitar-only...") is removed or updated to reflect the new guitar-and-piano behavior
-- [ ] `pnpm build` compiles without errors
-- [ ] `pnpm lint` passes on all changed files
-- [ ] `src/app/[instrument]/pages.test.tsx`'s `"add page"` describe block is updated:
-  - [ ] The existing guitar case (`"renders AddPageClient with the duplicate-check list for guitar"`) continues to pass unmodified
-  - [ ] The existing piano case (`"renders a plain SongForm for piano and skips the duplicate query"`) is replaced with a case asserting piano now renders `AddPageClient` with `data-instrument="piano"`, `data-cancel="/piano"`, and `data-existing` equal to the seeded piano song count, and that `getAllSongsFlat` **was** called with `"piano"` as its second argument
-  - [ ] The invalid-instrument 404 case (`"404s on the add route"`) continues to pass unmodified
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `src/app/[instrument]/add/page.tsx`'s gate changes from `instrument === "guitar"` to admit both `"guitar"` and `"piano"` (e.g. `instrument === "guitar" || instrument === "piano"`, or equivalent using `INSTRUMENTS`/`isInstrument` from `@/lib/instruments` if cleaner)
+- [x] `getAllSongsFlat(db, instrument)` is now called for both `"guitar"` and `"piano"` (previously only for `"guitar"`) — the `Promise.all` fetch no longer conditions the query on the instrument being guitar specifically
+- [x] For both guitar and piano, the page renders `<AddPageClient artistNames={...} existingSongs={...} action={createSong} instrument={instrument} cancelHref={`/${instrument}`} />`
+- [x] No other instrument (e.g. a hypothetical future `"ukulele"`) is admitted by this change — the gate remains exactly `"guitar" | "piano"`, matching the current `Instrument` union in `@/lib/instruments`
+- [x] The stale comment above the `Promise.all` ("The AI import (and its duplicate check) is guitar-only...") is removed or updated to reflect the new guitar-and-piano behavior
+- [x] `pnpm build` compiles without errors
+- [x] `pnpm lint` passes on all changed files
+- [x] `src/app/[instrument]/pages.test.tsx`'s `"add page"` describe block is updated:
+  - [x] The existing guitar case (`"renders AddPageClient with the duplicate-check list for guitar"`) continues to pass unmodified
+  - [x] The existing piano case (`"renders a plain SongForm for piano and skips the duplicate query"`) is replaced with a case asserting piano now renders `AddPageClient` with `data-instrument="piano"`, `data-cancel="/piano"`, and `data-existing` equal to the seeded piano song count, and that `getAllSongsFlat` **was** called with `"piano"` as its second argument
+  - [x] The invalid-instrument 404 case (`"404s on the add route"`) continues to pass unmodified
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 

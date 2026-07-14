@@ -233,13 +233,14 @@ describe("add page", () => {
 		expect(vi.mocked(getAllSongsFlat).mock.calls[0][1]).toBe("guitar");
 	});
 
-	it("renders a plain SongForm for piano and skips the duplicate query", async () => {
+	it("renders AddPageClient with the duplicate-check list for piano", async () => {
 		render(await AddSongPage({ params: p({ instrument: "piano" }) }));
-		expect(screen.queryByTestId("add-page-client")).not.toBeInTheDocument();
-		expect(screen.getByLabelText("Tab Content")).toBeInTheDocument();
-		const hidden = document.querySelector('input[name="instrument"]');
-		expect((hidden as HTMLInputElement).value).toBe("piano");
-		expect(getAllSongsFlat).not.toHaveBeenCalled();
+		const client = screen.getByTestId("add-page-client");
+		expect(client.dataset.instrument).toBe("piano");
+		expect(client.dataset.cancel).toBe("/piano");
+		expect(client.dataset.existing).toBe("1");
+		expect(getAllSongsFlat).toHaveBeenCalledTimes(1);
+		expect(vi.mocked(getAllSongsFlat).mock.calls[0][1]).toBe("piano");
 	});
 });
 

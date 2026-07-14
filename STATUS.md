@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-13 13:35 UTC
+> Last updated: 2026-07-14 17:08 UTC
 
 ## Current Phase
 
@@ -25,10 +25,13 @@ sheet-ingest (ADR-0007) is feature-complete: all eight tickets (001–008) Done 
 
 <!-- AUTO:START -->
 **Branch:** `master`  
-**Last commit:** 2026-07-13 13:35 UTC
+**Last commit:** 2026-07-14 17:08 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `fa536e2` | 2026-07-14 | Add ImportForm image input mode (ai-import ticket 008) |
+| `94acc17` | 2026-07-14 | Add client-side image normalization module (ai-import ticket 007) |
+| `f33e911` | 2026-07-13 | Mark ai-import ticket 006 Done (verifier approved) |
 | `d281b6c` | 2026-07-13 | Add AI proxy image-input branch (ai-import ticket 006) |
 | `ca5cbe0` | 2026-07-13 | Add ADR-0009 (in-app image import) and decompose into ai-import tickets 006-009 |
 | `5069d37` | 2026-07-12 | Deploy to Cloudflare Pages after 0002 migration |
@@ -36,9 +39,6 @@ sheet-ingest (ADR-0007) is feature-complete: all eight tickets (001–008) Done 
 | `a0f810a` | 2026-07-12 | Add sheet-ingest Claude Code skill (sheet-ingest ticket 008) |
 | `53589db` | 2026-07-12 | Sync STATUS.md dashboard after ticket 006/007 commits |
 | `a883575` | 2026-07-12 | Run falling-notes frame-to-MIDI spike: real Synthesia tutorial to validated MusicXML (sheet-ingest ticket 007) |
-| `c58666b` | 2026-07-12 | Add local media tooling and audio-to-MIDI pipeline (sheet-ingest ticket 006) |
-| `9282f3f` | 2026-07-06 | Run screenshot ingestion spike: vision-direct vs Audiveris OMR (sheet-ingest ticket 005) |
-| `1153d67` | 2026-07-06 | Extend validate_notation with MusicXML rendering via Verovio (sheet-ingest ticket 004) |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -47,19 +47,23 @@ sheet-ingest (ADR-0007) is feature-complete: all eight tickets (001–008) Done 
 **Files changed (last 5 commits):**
 
 ```
- .claude/skills/sheet-ingest/SKILL.md                | 156 +++++++++++++++++++++
- STATUS.md                                           |  62 +++++----
- architecture/decisions/0009-in-app-image-import.md  | 218 ++++++++++++++++++++++++++++++
- scripts/ai-proxy.ts                                 |  19 +++
- scripts/image-import.test.ts                        | 248 ++++++++++++++++++++++++++++++++++
- scripts/image-import.ts                             | 161 ++++++++++++++++++++++
- tickets/_backlog.md                                 |  12 +-
- tickets/ai-import/006-proxy-image-handling.md       |  84 ++++++++++++
- tickets/ai-import/007-image-normalization-module.md |  67 +++++++++
- tickets/ai-import/008-import-form-image-input.md    |  94 +++++++++++++
- tickets/ai-import/009-add-page-instrument-gate.md   |  59 ++++++++
- tickets/sheet-ingest/008-sheet-ingest-skill.md      |  26 ++--
- 12 files changed, 1163 insertions(+), 43 deletions(-)
+ STATUS.md                                           |  57 +++---
+ architecture/decisions/0009-in-app-image-import.md  | 218 +++++++++++++++++++++++
+ scripts/ai-proxy.ts                                 |  19 ++
+ scripts/image-import.test.ts                        | 248 ++++++++++++++++++++++++++
+ scripts/image-import.ts                             | 161 +++++++++++++++++
+ src/components/AddPageClient.test.tsx               |  70 +++++---
+ src/components/AddPageClient.tsx                    |   3 +-
+ src/components/ImportForm.test.tsx                  | 319 +++++++++++++++++++++++++++++++++-
+ src/components/ImportForm.tsx                       | 269 +++++++++++++++++++++++++---
+ src/lib/image-normalize.test.ts                     | 165 ++++++++++++++++++
+ src/lib/image-normalize.ts                          | 138 +++++++++++++++
+ tickets/_backlog.md                                 |  10 +-
+ tickets/ai-import/006-proxy-image-handling.md       |  84 +++++++++
+ tickets/ai-import/007-image-normalization-module.md |  67 +++++++
+ tickets/ai-import/008-import-form-image-input.md    |  97 +++++++++++
+ tickets/ai-import/009-add-page-instrument-gate.md   |  59 +++++++
+ 16 files changed, 1901 insertions(+), 83 deletions(-)
 ```
 <!-- AUTO:FILES:END -->
 

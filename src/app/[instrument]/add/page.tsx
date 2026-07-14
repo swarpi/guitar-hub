@@ -5,7 +5,6 @@ import type { Metadata } from "next";
 import { AddPageClient } from "@/components/AddPageClient";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Header } from "@/components/Header";
-import { SongForm } from "@/components/SongForm";
 import { getDb } from "@/db/client";
 import { getAllSongsFlat } from "@/db/queries";
 import { artists } from "@/db/schema";
@@ -28,11 +27,9 @@ export default async function AddSongPage({ params }: AddSongPageProps) {
 	const instrument = assertInstrument(rawInstrument);
 	const db = getDb(getRequestContext().env);
 
-	// The AI import (and its duplicate check) is guitar-only; the flat song
-	// list is not queried for piano.
 	const [allArtists, existingSongs] = await Promise.all([
 		db.select({ name: artists.name }).from(artists).orderBy(asc(artists.name)),
-		instrument === "guitar" ? getAllSongsFlat(db, "guitar") : null,
+		getAllSongsFlat(db, instrument),
 	]);
 
 	const artistNames = allArtists.map((a) => a.name);
@@ -51,22 +48,13 @@ export default async function AddSongPage({ params }: AddSongPageProps) {
 				<h1 className="mb-6 font-serif text-[28px] font-medium leading-tight text-ink">
 					Add a Song
 				</h1>
-				{instrument === "guitar" && existingSongs ? (
-					<AddPageClient
-						artistNames={artistNames}
-						existingSongs={existingSongs}
-						action={createSong}
-						instrument="guitar"
-						cancelHref="/guitar"
-					/>
-				) : (
-					<SongForm
-						artistNames={artistNames}
-						action={createSong}
-						instrument={instrument}
-						cancelHref={`/${instrument}`}
-					/>
-				)}
+				<AddPageClient
+					artistNames={artistNames}
+					existingSongs={existingSongs}
+					action={createSong}
+					instrument={instrument}
+					cancelHref={`/${instrument}`}
+				/>
 			</main>
 		</>
 	);
