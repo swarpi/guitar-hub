@@ -1,7 +1,7 @@
 # Ticket: Client-Side Image Normalization Module
 
 **Feature:** ai-import
-**Status:** Todo
+**Status:** Done
 **Priority:** P1
 **Estimate:** M
 **Related:** ADR-0009 (Section 3 "Client-side normalization (format + size in one step)", Section 6 "Error handling")
@@ -18,25 +18,25 @@ Add `src/lib/image-normalize.ts`: pure geometry and validation helpers plus one 
 
 ## Acceptance Criteria
 
-- [ ] `src/lib/image-normalize.ts` exports the following constants: `MAX_LONG_EDGE = 1600`, `JPEG_QUALITY = 0.8`, `MAX_UPLOAD_BYTES = 25 * 1024 * 1024`, `ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"]` (as a readonly array).
-- [ ] `computeDownscaledDimensions(width: number, height: number, maxEdge?: number): { width: number; height: number }` — pure, no browser APIs:
-  - [ ] When the longer of `width`/`height` is ≤ `maxEdge` (default `MAX_LONG_EDGE`), returns `{ width, height }` unchanged (never upscales)
-  - [ ] When `width` is the longer edge and exceeds `maxEdge`, returns dimensions scaled down so `width === maxEdge`, with `height` scaled by the same ratio and rounded to the nearest integer
-  - [ ] When `height` is the longer edge and exceeds `maxEdge`, scales symmetrically on `height`
-  - [ ] A square image exactly at `maxEdge` is returned unchanged
-- [ ] `isAcceptedImageType(mimeType: string): boolean` — pure. Returns `true` for each of `ACCEPTED_IMAGE_TYPES`, `false` for anything else (e.g. `"application/pdf"`, `"text/plain"`, `""`).
-- [ ] `validateImageInput(file: Blob): string | null` — pure (reads only `file.type`/`file.size`, no I/O). Returns `null` when `file` is an accepted type and `file.size <= MAX_UPLOAD_BYTES`. Otherwise returns a non-empty, user-facing error string that names the accepted formats (PNG, JPEG, WebP) when the type is rejected, or the size cap when the file is too large. Type is checked before size when both are invalid.
-- [ ] `blobToBase64(blob: Blob): Promise<string>` — resolves with the base64-encoded content of `blob`, with no `data:` URL prefix (strip it if the implementation uses `FileReader.readAsDataURL` internally).
-- [ ] `normalizeImageToJpeg(source: Blob): Promise<Blob>` — decodes `source` (via `createImageBitmap` or an equivalent browser API), computes target dimensions via `computeDownscaledDimensions` from the decoded image's natural width/height, draws it onto an in-memory `<canvas>` sized to those target dimensions, and resolves with the result of `canvas.toBlob("image/jpeg", JPEG_QUALITY)` as a `Promise<Blob>`. The resolved blob's `type` is `"image/jpeg"`.
-- [ ] `pnpm build` compiles without errors
-- [ ] `pnpm lint` passes on all changed files
-- [ ] Tests in `src/lib/image-normalize.test.ts` (`// @vitest-environment jsdom`) cover:
-  - [ ] `computeDownscaledDimensions`: landscape image over the cap scales down preserving aspect ratio; portrait image over the cap scales down by height; an image already under the cap is returned unchanged; a square image exactly at the cap is unchanged
-  - [ ] `isAcceptedImageType`: true for `image/png`, `image/jpeg`, `image/webp`; false for `application/pdf`, `text/plain`, empty string
-  - [ ] `validateImageInput`: `null` for an accepted type under the size cap; an error message naming the accepted formats for a rejected type; an error message naming the size cap for an oversized accepted-type file; type-rejection message takes precedence when both are invalid
-  - [ ] `blobToBase64`: encodes a small known `Blob` (e.g. `new Blob(["hi"], { type: "text/plain" })`) to the expected base64 string (`"aGk="`) with no `data:` prefix
-  - [ ] `normalizeImageToJpeg`: with `global.createImageBitmap` stubbed (`vi.stubGlobal`) to resolve a fake bitmap of known width/height, and `HTMLCanvasElement.prototype.getContext`/`toBlob` stubbed to a fake 2D context (`drawImage` spy) and a synchronous callback invocation respectively — asserts the canvas is sized to the value `computeDownscaledDimensions` would return for the fake bitmap's dimensions, `drawImage` is called with the bitmap, and `toBlob` is called with `("image/jpeg", JPEG_QUALITY)`; the function resolves with the `Blob` the stub handed to the callback
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `src/lib/image-normalize.ts` exports the following constants: `MAX_LONG_EDGE = 1600`, `JPEG_QUALITY = 0.8`, `MAX_UPLOAD_BYTES = 25 * 1024 * 1024`, `ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"]` (as a readonly array).
+- [x] `computeDownscaledDimensions(width: number, height: number, maxEdge?: number): { width: number; height: number }` — pure, no browser APIs:
+  - [x] When the longer of `width`/`height` is ≤ `maxEdge` (default `MAX_LONG_EDGE`), returns `{ width, height }` unchanged (never upscales)
+  - [x] When `width` is the longer edge and exceeds `maxEdge`, returns dimensions scaled down so `width === maxEdge`, with `height` scaled by the same ratio and rounded to the nearest integer
+  - [x] When `height` is the longer edge and exceeds `maxEdge`, scales symmetrically on `height`
+  - [x] A square image exactly at `maxEdge` is returned unchanged
+- [x] `isAcceptedImageType(mimeType: string): boolean` — pure. Returns `true` for each of `ACCEPTED_IMAGE_TYPES`, `false` for anything else (e.g. `"application/pdf"`, `"text/plain"`, `""`).
+- [x] `validateImageInput(file: Blob): string | null` — pure (reads only `file.type`/`file.size`, no I/O). Returns `null` when `file` is an accepted type and `file.size <= MAX_UPLOAD_BYTES`. Otherwise returns a non-empty, user-facing error string that names the accepted formats (PNG, JPEG, WebP) when the type is rejected, or the size cap when the file is too large. Type is checked before size when both are invalid.
+- [x] `blobToBase64(blob: Blob): Promise<string>` — resolves with the base64-encoded content of `blob`, with no `data:` URL prefix (strip it if the implementation uses `FileReader.readAsDataURL` internally).
+- [x] `normalizeImageToJpeg(source: Blob): Promise<Blob>` — decodes `source` (via `createImageBitmap` or an equivalent browser API), computes target dimensions via `computeDownscaledDimensions` from the decoded image's natural width/height, draws it onto an in-memory `<canvas>` sized to those target dimensions, and resolves with the result of `canvas.toBlob("image/jpeg", JPEG_QUALITY)` as a `Promise<Blob>`. The resolved blob's `type` is `"image/jpeg"`.
+- [x] `pnpm build` compiles without errors
+- [x] `pnpm lint` passes on all changed files
+- [x] Tests in `src/lib/image-normalize.test.ts` (`// @vitest-environment jsdom`) cover:
+  - [x] `computeDownscaledDimensions`: landscape image over the cap scales down preserving aspect ratio; portrait image over the cap scales down by height; an image already under the cap is returned unchanged; a square image exactly at the cap is unchanged
+  - [x] `isAcceptedImageType`: true for `image/png`, `image/jpeg`, `image/webp`; false for `application/pdf`, `text/plain`, empty string
+  - [x] `validateImageInput`: `null` for an accepted type under the size cap; an error message naming the accepted formats for a rejected type; an error message naming the size cap for an oversized accepted-type file; type-rejection message takes precedence when both are invalid
+  - [x] `blobToBase64`: encodes a small known `Blob` (e.g. `new Blob(["hi"], { type: "text/plain" })`) to the expected base64 string (`"aGk="`) with no `data:` prefix
+  - [x] `normalizeImageToJpeg`: with `global.createImageBitmap` stubbed (`vi.stubGlobal`) to resolve a fake bitmap of known width/height, and `HTMLCanvasElement.prototype.getContext`/`toBlob` stubbed to a fake 2D context (`drawImage` spy) and a synchronous callback invocation respectively — asserts the canvas is sized to the value `computeDownscaledDimensions` would return for the fake bitmap's dimensions, `drawImage` is called with the bitmap, and `toBlob` is called with `("image/jpeg", JPEG_QUALITY)`; the function resolves with the `Blob` the stub handed to the callback
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
@@ -56,11 +56,11 @@ Add `src/lib/image-normalize.ts`: pure geometry and validation helpers plus one 
 
 ## Implementation Plan
 
-_To be filled in before starting work._
-
-1. Step 1
-2. Step 2
-3. Step 3
+1. Add `src/lib/image-normalize.ts` with the four constants (`MAX_LONG_EDGE`, `JPEG_QUALITY`, `MAX_UPLOAD_BYTES`, `ACCEPTED_IMAGE_TYPES` as a `readonly` tuple).
+2. Implement the pure helpers: `computeDownscaledDimensions` (aspect-preserving, never upscales, rounds the short edge), `isAcceptedImageType`, and `validateImageInput` (type checked before size, messages name the formats / size cap).
+3. Implement `blobToBase64` via `FileReader.readAsDataURL`, stripping the `data:` prefix.
+4. Implement `normalizeImageToJpeg`: `createImageBitmap` → `computeDownscaledDimensions` → sized `<canvas>` → `drawImage` → `canvas.toBlob("image/jpeg", JPEG_QUALITY)`, closing the bitmap in `finally`.
+5. Add `src/lib/image-normalize.test.ts` (`@vitest-environment jsdom`) stubbing `createImageBitmap`, `getContext`, and `toBlob` for the canvas path; run tests, lint, and build.
 
 ## Post-Implementation
 
