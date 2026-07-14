@@ -195,7 +195,10 @@ export function ImportForm({
 		let parsed: ExtractedSong;
 		try {
 			const data = (await response.json()) as ProxyResponse;
-			parsed = JSON.parse(data.content[0].text) as ExtractedSong;
+			let raw = data.content[0].text;
+			const fenced = raw.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
+			if (fenced) raw = fenced[1];
+			parsed = JSON.parse(raw) as ExtractedSong;
 		} catch {
 			setError(ERROR_INVALID_JSON);
 			setIsLoading(false);
