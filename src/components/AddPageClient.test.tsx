@@ -22,34 +22,37 @@ const sampleFields: SongFormInitialValues = {
 	notes: null,
 };
 
+const importFormSpy = vi.fn();
+
 vi.mock("./ImportForm", () => ({
-	ImportForm: ({
-		onExtracted,
-		onUseManual,
-	}: {
+	ImportForm: (props: {
 		onExtracted: (fields: SongFormInitialValues) => void;
 		onUseManual: () => void;
-	}) => (
-		<div>
-			<button
-				type="button"
-				onClick={() =>
-					onExtracted({
-						title: "Dust in the Wind",
-						artist: "Kansas",
-						capo: 0,
-						content: "Am  C  G\nI close my eyes...",
-						notes: null,
-					})
-				}
-			>
-				Extract
-			</button>
-			<button type="button" onClick={onUseManual}>
-				Use manual entry
-			</button>
-		</div>
-	),
+		instrument?: "guitar" | "piano";
+	}) => {
+		importFormSpy(props);
+		return (
+			<div>
+				<button
+					type="button"
+					onClick={() =>
+						props.onExtracted({
+							title: "Dust in the Wind",
+							artist: "Kansas",
+							capo: 0,
+							content: "Am  C  G\nI close my eyes...",
+							notes: null,
+						})
+					}
+				>
+					Extract
+				</button>
+				<button type="button" onClick={props.onUseManual}>
+					Use manual entry
+				</button>
+			</div>
+		);
+	},
 }));
 
 const mockAction = vi.fn();
@@ -81,6 +84,23 @@ describe("AddPageClient", () => {
 			screen.getByRole("button", { name: /import via ai/i }),
 		).toBeInTheDocument();
 		expect(screen.getByLabelText(/song title/i)).toBeInTheDocument();
+	});
+
+	it("forwards the instrument prop into ImportForm", () => {
+		render(
+			<AddPageClient
+				artistNames={artistNames}
+				existingSongs={existingSongs}
+				action={mockAction}
+				instrument="piano"
+			/>,
+		);
+
+		fireEvent.click(screen.getByRole("button", { name: /import via ai/i }));
+
+		expect(importFormSpy).toHaveBeenCalledWith(
+			expect.objectContaining({ instrument: "piano" }),
+		);
 	});
 
 	it("renders the ImportForm when switching to import mode", () => {

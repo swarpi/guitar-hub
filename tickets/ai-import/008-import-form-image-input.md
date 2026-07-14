@@ -1,7 +1,7 @@
 # Ticket: ImportForm — Image Input Mode
 
 **Feature:** ai-import
-**Status:** Todo
+**Status:** Done
 **Priority:** P1
 **Estimate:** L
 **Related:** ADR-0009 (Sections 1-2 "Scope", "Three inputs, one code path", 4 "Proxy request/response shape", 6 "Error handling"), ai-import/002, ai-import/005, ai-import/006, ai-import/007
@@ -22,41 +22,41 @@ Add an Image sub-mode to `ImportForm`: a third toggle pill, a dropzone accepting
 
 ## Acceptance Criteria
 
-- [ ] `ImportForm`'s `InputMethod` type becomes `"paste" | "url" | "image"`; the toggle row renders a third pill labeled "Image" using the existing `METHOD_TOGGLE_BASE`/`METHOD_TOGGLE_ACTIVE`/`METHOD_TOGGLE_INACTIVE` classes, consistent with the "Paste Text" and "URL" pills
-- [ ] `ImportForm` accepts a new optional prop `instrument?: "guitar" | "piano"` (default `"guitar"` when omitted or any other value); `AddPageClient` is updated to pass `instrument={instrument}` into its existing `<ImportForm ... />` render (its only change in this ticket)
-- [ ] Switching to "Image" mode hides the textarea and URL input (neither paste nor URL mode is rendered) and shows an Image mode UI: a dropzone area with an embedded, visually-hidden `<input type="file" accept="image/png,image/jpeg,image/webp">` triggerable by clicking the dropzone, and a visible hint that clipboard paste (Cmd+V) also works
-- [ ] Switching input method clears any currently displayed error message (unchanged behavior from ticket 005, now also true when switching to/from "image")
-- [ ] The shared "Extract" button from paste/URL mode is not rendered while in Image mode — image selection itself triggers extraction (no separate manual "Extract" click step), matching the ADR §1 flow diagram (`image (picker | drop | Cmd+V) -> normalize -> base64 -> POST`)
-- [ ] **File picker.** Selecting a file via the hidden input's `onChange` passes `e.target.files[0]` into `handleImageSelected`
-- [ ] **Drag-and-drop.** The dropzone's `onDragOver` calls `preventDefault()` (and applies a visual "active" state); `onDrop` calls `preventDefault()` and passes `e.dataTransfer.files[0]` into `handleImageSelected`
-- [ ] **Clipboard paste.** A `paste` listener is attached (e.g. via a `useEffect` on `window`, or on the dropzone element) **only while `method === "image"`**, and removed on cleanup/mode change so it never intercepts a Cmd+V into the Paste Text textarea:
-  - [ ] When `e.clipboardData.items` contains an item whose `type` starts with `image/`, calls `item.getAsFile()` and passes the resulting `Blob` into `handleImageSelected`
-  - [ ] When no such item exists (e.g. the user pasted plain text while in Image mode), the paste is ignored and a non-blocking hint is shown: "Paste an image, or use the file picker." — this is not an error state (no "Try again" / "Use manual entry" buttons)
-  - [ ] A paste event while in "paste" or "url" mode is not intercepted by this listener at all (the textarea's native paste behavior is unaffected)
-- [ ] `handleImageSelected(source: File | Blob)` is the single convergence point for all three inputs:
-  - [ ] Calls `validateImageInput` (ai-import/007) first; if it returns a message, shows that message as an inline error naming the accepted formats and/or size cap (per ADR §6), does **not** proceed to normalize/send, and leaves the dropzone/file input available to try a different file (no "Try again" button needed since nothing was sent — "Use manual entry" is still offered)
-  - [ ] On a valid file, calls `normalizeImageToJpeg` then `blobToBase64` (ai-import/007), sets the loading state (same `role="status"` indicator and disabled affordances as paste/URL mode), and sends the extraction request
-  - [ ] If `normalizeImageToJpeg` rejects (the browser could not decode the image, e.g. an undecodable file silently accepted by the file picker's `accept` filter), shows an inline error consistent with "Claude cannot read the image" guidance (ADR §6) plus "Use manual entry"
-- [ ] **"Still too large after downscale."** If the base64-encoded payload built from the first normalization pass exceeds a defined cap (document the chosen cap, e.g. derived from `MAX_UPLOAD_BYTES` accounting for base64 inflation), the component re-normalizes once more at a smaller target (e.g. a smaller `maxEdge` passed to a second `normalizeImageToJpeg` call, or an equivalent one-shot retry); if it is still over the cap after that single retry, shows a size-guidance error (ADR §6) instead of sending, with "Use manual entry" offered
-- [ ] The image extraction request is `POST` to the existing `PROXY_URL` with body `{ messages: [{ role: "user", content: "Transcribe the attached sheet." }], system: IMAGE_SYSTEM_PROMPT, model: "claude-sonnet-4-5", instrument, image: { mediaType: "image/jpeg", data: <base64> } }`, where `IMAGE_SYSTEM_PROMPT` is a new constant in `ImportForm.tsx` distinct from the existing Paste/URL `SYSTEM_PROMPT` (see Notes) and `instrument` is the active `instrument` prop
-- [ ] The response-handling tail (parse `content[0].text` as JSON, map to `SongFormInitialValues` via the existing `tabContent` → `content` mapping, call `onExtracted`) is reused via the same shared code path already used by paste and URL mode — not duplicated for image mode
-- [ ] All existing shared error states (proxy unreachable, HTTP `502`, generic non-OK HTTP, invalid JSON, empty `tabContent`) behave identically when triggered from an image-mode request, via the same shared request/error-handling logic already exercised by ticket 005's tests
-- [ ] "Try again" in an error state raised from image mode retries with the **same already-normalized base64 image** (it does not re-open the file picker or require the user to reselect/re-paste)
-- [ ] All acceptance criteria and tests from tickets 002 and 005 continue to pass unmodified — default mode remains "Paste Text", and paste/URL request shapes and error strings are unaffected
-- [ ] `pnpm build` compiles without errors
-- [ ] `pnpm lint` passes on all changed files
-- [ ] Tests added to `src/components/ImportForm.test.tsx` (and a new `AddPageClient.test.tsx` case) cover, using `vi.stubGlobal`/mocks for `fetch` (existing pattern) plus mocked `src/lib/image-normalize` functions (`vi.mock("@/lib/image-normalize", ...)` so canvas/File internals from ai-import/007 do not need to be re-stubbed here):
-  - [ ] Switching to "Image" mode hides the textarea/URL input and shows the dropzone; no "Extract" button is rendered in Image mode
-  - [ ] Selecting a file via the hidden file input's `onChange` triggers `handleImageSelected` → the mocked `validateImageInput`/`normalizeImageToJpeg`/`blobToBase64` are called → a request is sent whose body's `image.mediaType` is `"image/jpeg"`, `image.data` matches the mocked base64 output, and `instrument` matches the `instrument` prop passed to `ImportForm`
-  - [ ] Simulating `dragOver` then `drop` with `dataTransfer.files` on the dropzone triggers the same flow as the file picker (asserted via the same request-body expectations)
-  - [ ] Simulating a `paste` event with `clipboardData.items` containing an `image/png` item (with a `getAsFile` mock) while in Image mode triggers the same flow
-  - [ ] Simulating a `paste` event with only `text/plain` clipboard items while in Image mode shows the non-blocking hint and does **not** send a request
-  - [ ] Simulating a `paste` event while in "paste" (Paste Text) mode does not invoke `handleImageSelected` or send an image request
-  - [ ] `validateImageInput` mocked to return an error string: the error is shown inline, no request is sent, and a "Use manual entry" button is present
-  - [ ] Successful image extraction: `onExtracted` is called with correctly mapped fields (mirroring ticket 002's mapping assertions)
-  - [ ] An HTTP-error response triggered from image mode shows the same generic error message as paste/URL mode (regression assertion that the shared error path is reused)
-  - [ ] `AddPageClient.test.tsx` gains a case asserting the mocked `ImportForm` receives an `instrument` prop matching the `instrument` passed into `AddPageClient`
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `ImportForm`'s `InputMethod` type becomes `"paste" | "url" | "image"`; the toggle row renders a third pill labeled "Image" using the existing `METHOD_TOGGLE_BASE`/`METHOD_TOGGLE_ACTIVE`/`METHOD_TOGGLE_INACTIVE` classes, consistent with the "Paste Text" and "URL" pills
+- [x] `ImportForm` accepts a new optional prop `instrument?: "guitar" | "piano"` (default `"guitar"` when omitted or any other value); `AddPageClient` is updated to pass `instrument={instrument}` into its existing `<ImportForm ... />` render (its only change in this ticket)
+- [x] Switching to "Image" mode hides the textarea and URL input (neither paste nor URL mode is rendered) and shows an Image mode UI: a dropzone area with an embedded, visually-hidden `<input type="file" accept="image/png,image/jpeg,image/webp">` triggerable by clicking the dropzone, and a visible hint that clipboard paste (Cmd+V) also works
+- [x] Switching input method clears any currently displayed error message (unchanged behavior from ticket 005, now also true when switching to/from "image")
+- [x] The shared "Extract" button from paste/URL mode is not rendered while in Image mode — image selection itself triggers extraction (no separate manual "Extract" click step), matching the ADR §1 flow diagram (`image (picker | drop | Cmd+V) -> normalize -> base64 -> POST`)
+- [x] **File picker.** Selecting a file via the hidden input's `onChange` passes `e.target.files[0]` into `handleImageSelected`
+- [x] **Drag-and-drop.** The dropzone's `onDragOver` calls `preventDefault()` (and applies a visual "active" state); `onDrop` calls `preventDefault()` and passes `e.dataTransfer.files[0]` into `handleImageSelected`
+- [x] **Clipboard paste.** A `paste` listener is attached (e.g. via a `useEffect` on `window`, or on the dropzone element) **only while `method === "image"`**, and removed on cleanup/mode change so it never intercepts a Cmd+V into the Paste Text textarea:
+  - [x] When `e.clipboardData.items` contains an item whose `type` starts with `image/`, calls `item.getAsFile()` and passes the resulting `Blob` into `handleImageSelected`
+  - [x] When no such item exists (e.g. the user pasted plain text while in Image mode), the paste is ignored and a non-blocking hint is shown: "Paste an image, or use the file picker." — this is not an error state (no "Try again" / "Use manual entry" buttons)
+  - [x] A paste event while in "paste" or "url" mode is not intercepted by this listener at all (the textarea's native paste behavior is unaffected)
+- [x] `handleImageSelected(source: File | Blob)` is the single convergence point for all three inputs:
+  - [x] Calls `validateImageInput` (ai-import/007) first; if it returns a message, shows that message as an inline error naming the accepted formats and/or size cap (per ADR §6), does **not** proceed to normalize/send, and leaves the dropzone/file input available to try a different file (no "Try again" button needed since nothing was sent — "Use manual entry" is still offered)
+  - [x] On a valid file, calls `normalizeImageToJpeg` then `blobToBase64` (ai-import/007), sets the loading state (same `role="status"` indicator and disabled affordances as paste/URL mode), and sends the extraction request
+  - [x] If `normalizeImageToJpeg` rejects (the browser could not decode the image, e.g. an undecodable file silently accepted by the file picker's `accept` filter), shows an inline error consistent with "Claude cannot read the image" guidance (ADR §6) plus "Use manual entry"
+- [x] **"Still too large after downscale."** If the base64-encoded payload built from the first normalization pass exceeds a defined cap (document the chosen cap, e.g. derived from `MAX_UPLOAD_BYTES` accounting for base64 inflation), the component re-normalizes once more at a smaller target (e.g. a smaller `maxEdge` passed to a second `normalizeImageToJpeg` call, or an equivalent one-shot retry); if it is still over the cap after that single retry, shows a size-guidance error (ADR §6) instead of sending, with "Use manual entry" offered
+- [x] The image extraction request is `POST` to the existing `PROXY_URL` with body `{ messages: [{ role: "user", content: "Transcribe the attached sheet." }], system: IMAGE_SYSTEM_PROMPT, model: "claude-sonnet-4-5", instrument, image: { mediaType: "image/jpeg", data: <base64> } }`, where `IMAGE_SYSTEM_PROMPT` is a new constant in `ImportForm.tsx` distinct from the existing Paste/URL `SYSTEM_PROMPT` (see Notes) and `instrument` is the active `instrument` prop
+- [x] The response-handling tail (parse `content[0].text` as JSON, map to `SongFormInitialValues` via the existing `tabContent` → `content` mapping, call `onExtracted`) is reused via the same shared code path already used by paste and URL mode — not duplicated for image mode
+- [x] All existing shared error states (proxy unreachable, HTTP `502`, generic non-OK HTTP, invalid JSON, empty `tabContent`) behave identically when triggered from an image-mode request, via the same shared request/error-handling logic already exercised by ticket 005's tests
+- [x] "Try again" in an error state raised from image mode retries with the **same already-normalized base64 image** (it does not re-open the file picker or require the user to reselect/re-paste)
+- [x] All acceptance criteria and tests from tickets 002 and 005 continue to pass unmodified — default mode remains "Paste Text", and paste/URL request shapes and error strings are unaffected
+- [x] `pnpm build` compiles without errors
+- [x] `pnpm lint` passes on all changed files
+- [x] Tests added to `src/components/ImportForm.test.tsx` (and a new `AddPageClient.test.tsx` case) cover, using `vi.stubGlobal`/mocks for `fetch` (existing pattern) plus mocked `src/lib/image-normalize` functions (`vi.mock("@/lib/image-normalize", ...)` so canvas/File internals from ai-import/007 do not need to be re-stubbed here):
+  - [x] Switching to "Image" mode hides the textarea/URL input and shows the dropzone; no "Extract" button is rendered in Image mode
+  - [x] Selecting a file via the hidden file input's `onChange` triggers `handleImageSelected` → the mocked `validateImageInput`/`normalizeImageToJpeg`/`blobToBase64` are called → a request is sent whose body's `image.mediaType` is `"image/jpeg"`, `image.data` matches the mocked base64 output, and `instrument` matches the `instrument` prop passed to `ImportForm`
+  - [x] Simulating `dragOver` then `drop` with `dataTransfer.files` on the dropzone triggers the same flow as the file picker (asserted via the same request-body expectations)
+  - [x] Simulating a `paste` event with `clipboardData.items` containing an `image/png` item (with a `getAsFile` mock) while in Image mode triggers the same flow
+  - [x] Simulating a `paste` event with only `text/plain` clipboard items while in Image mode shows the non-blocking hint and does **not** send a request
+  - [x] Simulating a `paste` event while in "paste" (Paste Text) mode does not invoke `handleImageSelected` or send an image request
+  - [x] `validateImageInput` mocked to return an error string: the error is shown inline, no request is sent, and a "Use manual entry" button is present
+  - [x] Successful image extraction: `onExtracted` is called with correctly mapped fields (mirroring ticket 002's mapping assertions)
+  - [x] An HTTP-error response triggered from image mode shows the same generic error message as paste/URL mode (regression assertion that the shared error path is reused)
+  - [x] `AddPageClient.test.tsx` gains a case asserting the mocked `ImportForm` receives an `instrument` prop matching the `instrument` passed into `AddPageClient`
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
@@ -83,11 +83,14 @@ Add an Image sub-mode to `ImportForm`: a third toggle pill, a dropzone accepting
 
 ## Implementation Plan
 
-_To be filled in before starting work._
-
-1. Step 1
-2. Step 2
-3. Step 3
+1. **Refactor the shared tail.** Turn `runExtraction(content)` into `sendExtraction(body)` taking a full request-body object; `handleExtract` builds the paste/URL body (`messages`/`system`/`model`, no `instrument`) and calls it. The parse/error/`onExtracted` tail stays in `sendExtraction`, unduplicated.
+2. **Widen the mode.** `InputMethod` → `"paste" | "url" | "image"`; add a third "Image" pill; add optional `instrument?: "guitar" | "piano"` prop (resolved to `"guitar"` for any non-`"piano"` value).
+3. **Image UI.** In image mode render a clickable dropzone (drag-over active state, `onDrop`) wrapping a visually-hidden `<input type="file" accept="image/png,image/jpeg,image/webp">`, a paste hint, and no Extract button.
+4. **Convergence point.** `handleImageSelected(source)` → `validateImageInput` guard → `normalizeImageToJpeg` → `blobToBase64` → build the image body (`instrument` + `image:{mediaType,data}`, `IMAGE_SYSTEM_PROMPT`) → `sendExtraction`. Decode-failure and too-large errors offer only "Use manual entry"; a sent-request error offers "Try again" that re-sends the same normalized body.
+5. **Payload cap + one-shot retry.** Cap the base64 length at `MAX_IMAGE_BASE64_LENGTH` (derived from `MAX_UPLOAD_BYTES` × 4/3 base64 inflation); one re-normalize pass, then a size-guidance error.
+6. **Clipboard paste.** A `window` `paste` listener mounted only while `method === "image"` (via `useEffect` + a ref to the latest `handleImageSelected`); image item → `handleImageSelected`, non-image → non-blocking hint.
+7. **Thread the prop.** `AddPageClient` narrows its `instrument` prop to `"guitar" | "piano"` and passes `instrument={instrument}` into `<ImportForm />`.
+8. **Tests.** Extend `ImportForm.test.tsx` (mock `@/lib/image-normalize`) and add an `AddPageClient.test.tsx` case; run tests, lint, build.
 
 ## Post-Implementation
 

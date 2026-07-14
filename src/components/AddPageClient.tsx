@@ -19,7 +19,7 @@ interface AddPageClientProps {
 	readonly action: (
 		formData: FormData,
 	) => Promise<{ error: string } | undefined>;
-	readonly instrument?: string;
+	readonly instrument?: "guitar" | "piano";
 	readonly cancelHref?: string;
 }
 
@@ -106,6 +106,7 @@ export function AddPageClient({
 				<ImportForm
 					onExtracted={handleExtracted}
 					onUseManual={handleUseManual}
+					instrument={instrument}
 				/>
 			)}
 
