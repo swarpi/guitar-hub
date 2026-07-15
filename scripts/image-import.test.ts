@@ -224,6 +224,8 @@ describe("runImageExtraction", () => {
       "text",
       "--model",
       "claude-sonnet-4-5",
+      "--add-dir",
+      expect.any(String),
     ]);
     expect(args).not.toContain("--system-prompt");
     expect((result.body as { model: string }).model).toBe("claude-sonnet-4-5");

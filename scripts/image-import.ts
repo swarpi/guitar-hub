@@ -114,6 +114,12 @@ export async function runImageExtraction(
     "text",
     "--model",
     resolvedModel,
+    // The temp file lives in os.tmpdir(), outside the proxy's working
+    // directory. Headless `claude -p` cannot prompt for read permission on
+    // out-of-cwd paths — without this it answers with a permission request
+    // instead of the transcription.
+    "--add-dir",
+    tmpdir(),
     ...(system ? ["--system-prompt", system] : []),
   ];
 
