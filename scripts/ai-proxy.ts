@@ -22,7 +22,10 @@ interface RequestBody {
   model?: string;
   max_tokens?: number;
   instrument?: "guitar" | "piano";
+  /** Legacy single-image field (ADR-0009). Superseded by `images`. */
   image?: { mediaType: string; data: string };
+  /** Multi-image field (ADR-0010). Takes precedence over `image`. */
+  images?: Array<{ mediaType: string; data: string }>;
 }
 
 createServer((req, res) => {
@@ -52,13 +55,20 @@ createServer((req, res) => {
     try {
       const data = JSON.parse(body) as RequestBody;
 
-      // ADR-0009 Image mode: when the request carries base64 image data, write
-      // it to a temp file, point `claude -p` at that path, and return the same
-      // envelope. Checked BEFORE URL detection (ADR §5).
-      if (data.image) {
-        console.log(`-> image import (instrument: ${data.instrument ?? "guitar"})`);
+      // Image mode (ADR-0009, multi-image + multi-turn per ADR-0010): when the
+      // request carries base64 image data — legacy singular `image` or plural
+      // `images` — write temp files, point `claude -p` at those paths with the
+      // conversation history threaded in, and return the same envelope.
+      // Checked BEFORE URL detection (ADR-0009 §5).
+      if (data.image || data.images) {
+        const count = data.images?.length ?? 1;
+        console.log(
+          `-> image import (${count} image${count === 1 ? "" : "s"}, instrument: ${data.instrument ?? "guitar"})`
+        );
         const result = await runImageExtraction({
           image: data.image,
+          images: data.images,
+          messages: data.messages,
           instrument: data.instrument,
           system: data.system,
           model: data.model,
