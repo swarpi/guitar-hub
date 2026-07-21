@@ -14,13 +14,10 @@ _Tickets actively being worked on this cycle._
 
 _Tickets ready to be picked up in the next cycle._
 
-_ADR-0010 (chat-based import) replaces ImportForm's three-tab UI with a multi-turn, multi-image chat interface, superseding ADR-0009's UI and single-image contract while reusing its normalization/proxy patterns. chat-import/001 (proxy `images` array contract + multi-image handling) has no dependency on the client tickets and can be built and fully unit-tested first, in parallel with chat-import/002 starting. chat-import/002 (chat thread core, multi-turn text-only) has no dependency on 001 — its requests never populate `image`/`images` — and can proceed independently. chat-import/003 (multi-image attachment) is a hard dependency on 002 (attaches onto its composer/message model) and a contract-level dependency on 001 (can be planned/tested against 001's documented shape before 001 merges, but needs it merged for real end-to-end verification). chat-import/004 (ADR-0009 status update) is documentation-only and independent of all three, though it reads best once 001 and 003 have landed._
+_ADR-0010 (chat-based import) replaces ImportForm's three-tab UI with a multi-turn, multi-image chat interface, superseding ADR-0009's UI and single-image contract while reusing its normalization/proxy patterns. chat-import/001 (proxy `images` array contract + multi-image handling), chat-import/002 (chat thread core, multi-turn text-only), chat-import/003 (multi-image attachment), and chat-import/004 (ADR-0009 status update) have all merged._
 
 | Ticket | Feature | Priority | Estimate |
 |--------|---------|----------|----------|
-| [002 — ImportForm: Chat Thread Core (Multi-Turn Text, Drop URL Mode)](chat-import/002-import-form-chat-core.md) | chat-import | P1 | L |
-| [003 — ImportForm: Multi-Image Attachment and Proxy Wiring](chat-import/003-import-form-multi-image-attachment.md) | chat-import | P1 | L |
-| [004 — Update ADR-0009 Status to Superseded by ADR-0010](chat-import/004-update-adr-0009-status.md) | chat-import | P3 | XS |
 
 ## Backlog
 
@@ -37,6 +34,9 @@ _Completed tickets. Move here when done, newest first._
 
 | Ticket | Feature | Completed |
 |--------|---------|-----------|
+| [004 — Update ADR-0009 Status to Superseded by ADR-0010](chat-import/004-update-adr-0009-status.md) | chat-import | 2026-07-21 |
+| [003 — ImportForm: Multi-Image Attachment and Proxy Wiring](chat-import/003-import-form-multi-image-attachment.md) | chat-import | 2026-07-19 |
+| [002 — ImportForm: Chat Thread Core (Multi-Turn Text, Drop URL Mode)](chat-import/002-import-form-chat-core.md) | chat-import | 2026-07-18 |
 | [001 — Proxy: Multi-Image Array Contract and Handling](chat-import/001-proxy-multi-image-contract.md) | chat-import | 2026-07-18 |
 | [009 — Add Page: Widen AI-Import Gate to Guitar and Piano](ai-import/009-add-page-instrument-gate.md) | ai-import | 2026-07-14 |
 | [008 — ImportForm: Image Input Mode](ai-import/008-import-form-image-input.md) | ai-import | 2026-07-13 |

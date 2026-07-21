@@ -1,6 +1,6 @@
 # Project Status
 
-> Last updated: 2026-07-18 07:51 UTC
+> Last updated: 2026-07-21 18:32 UTC
 
 ## Current Phase
 
@@ -9,26 +9,35 @@
 | Decide | |
 | Map | |
 | Decompose | Done |
-| Execute | Next |
-| Review | |
+| Execute | Done |
+| Review | Done |
 | Audit | |
 | Learn | |
 | Report | |
 
 ## Active Work
 
-New feature: **chat-based import** (ADR-0010, Proposed) — replaces the three-tab ImportForm (Paste Text / URL / Image) with a single chat interface: free-form text, multi-image attachments (2-4 typical, 10 cap), multi-turn refinement, in-chat result cards with "Use this result". URL mode dropped. Decomposed into four `chat-import` tickets. **Ticket 001 (proxy multi-image contract) is Done and verified** (commit `35c07c9`) — the proxy accepts an `images` array with a legacy `image` shim, threads conversation history into the `-p` prompt, and bulk-cleans temp files. Next step: ticket 002 (ImportForm chat core rewrite), then 003 (multi-image attachment UI, depends on 001+002) and 004 (ADR-0009 status note, doc-only).
+**chat-based import (ADR-0010) is feature-complete — all four `chat-import` tickets Done and verifier-approved.** The three-tab ImportForm (Paste Text / URL / Image) is replaced by a single chat interface: free-form text, multi-image attachments (2-4 typical, 10 cap), multi-turn refinement, and in-chat result cards with "Use this result"; URL mode dropped.
 
-ai-import (ADR-0009) is feature-complete: tickets 006–009 all Done, deployed to `guitar-hub.pages.dev`. Two post-release bug fixes landed: markdown-fence stripping in the client JSON parser, and `--add-dir tmpdir()` so headless `claude -p` can read the proxy's temp image files (the root cause of the "Could not parse the AI response" error).
+- **001 (proxy multi-image contract)** — Done, committed (`35c07c9`): proxy accepts an `images` array with a legacy `image` shim, threads conversation history into the `-p` prompt, bulk-cleans temp files.
+- **002 (ImportForm chat core)** — Done: full rewrite to a chat thread + composer, multi-turn text-only flow, in-chat result cards, retry, URL mode removed.
+- **003 (multi-image attachment)** — Done: file-picker/drag-drop/paste convergence, removable thumbnails, 10-image cap, per-image normalization with the size-retry guard, per-turn `IMAGE_SYSTEM_PROMPT` selection, default-message substitution, `images` array wiring, `instrument` forwarding restored.
+- **004 (ADR-0009 status note, doc-only)** — Done: ADR-0009 marked Superseded by ADR-0010 for its UI/single-image contract, with a pointer callout; normalization/proxy patterns noted as still in effect.
+
+**Uncommitted:** tickets 002–004's work (ImportForm rewrite + multi-image UI + tests + the ADR-0009 status note) is in the working tree, not yet committed. Next step: commit the chat-import feature. `pnpm build`, `pnpm lint`, and `pnpm test` (245/245) are all green.
+
+ai-import (ADR-0009) remains feature-complete and deployed to `guitar-hub.pages.dev`; ADR-0009's status line now points forward to ADR-0010.
 
 ## Branch & Commits
 
 <!-- AUTO:START -->
-**Branch:** `master`  
-**Last commit:** 2026-07-18 07:51 UTC
+**Branch:** `feature/chat-import`  
+**Last commit:** 2026-07-21 18:32 UTC
 
 | Hash | Date | Message |
 |------|------|---------|
+| `5aee8c2` | 2026-07-21 | Add chat-based import: multi-turn, multi-image ImportForm (chat-import 002-004) |
+| `5cf5f5f` | 2026-07-18 | Update STATUS.md for chat-import 001; add verifier-suggested test assertion |
 | `35c07c9` | 2026-07-18 | Add ADR-0010 and proxy multi-image contract (chat-import ticket 001) |
 | `890794f` | 2026-07-15 | Pass --add-dir to claude -p so it can read temp image files |
 | `640d1c3` | 2026-07-14 | Fix JSON parsing when AI response is wrapped in markdown fences |
@@ -37,8 +46,6 @@ ai-import (ADR-0009) is feature-complete: tickets 006–009 all Done, deployed t
 | `94acc17` | 2026-07-14 | Add client-side image normalization module (ai-import ticket 007) |
 | `f33e911` | 2026-07-13 | Mark ai-import ticket 006 Done (verifier approved) |
 | `d281b6c` | 2026-07-13 | Add AI proxy image-input branch (ai-import ticket 006) |
-| `ca5cbe0` | 2026-07-13 | Add ADR-0009 (in-app image import) and decompose into ai-import tickets 006-009 |
-| `5069d37` | 2026-07-12 | Deploy to Cloudflare Pages after 0002 migration |
 <!-- AUTO:END -->
 
 ## Recent File Changes
@@ -47,25 +54,20 @@ ai-import (ADR-0009) is feature-complete: tickets 006–009 all Done, deployed t
 **Files changed (last 5 commits):**
 
 ```
- STATUS.md                                                   |  40 ++--
- architecture/decisions/0010-chat-import-redesign.md         | 244 ++++++++++++++++++++
- scripts/ai-proxy.ts                                         |  20 +-
- scripts/image-import.test.ts                                | 211 +++++++++++++++++
- scripts/image-import.ts                                     | 129 +++++++++--
- src/app/[instrument]/add/page.tsx                           |  28 +--
- src/app/[instrument]/pages.test.tsx                         |  13 +-
- src/components/AddPageClient.test.tsx                       |  70 ++++--
- src/components/AddPageClient.tsx                            |   3 +-
- src/components/ImportForm.test.tsx                          | 319 +++++++++++++++++++++++++-
- src/components/ImportForm.tsx                               | 274 +++++++++++++++++++---
- tickets/_backlog.md                                         |  12 +-
- tickets/ai-import/008-import-form-image-input.md            |  85 +++----
- tickets/ai-import/009-add-page-instrument-gate.md           |  26 +--
- tickets/chat-import/001-proxy-multi-image-contract.md       |  77 +++++++
- tickets/chat-import/002-import-form-chat-core.md            |  83 +++++++
- .../chat-import/003-import-form-multi-image-attachment.md   |  80 +++++++
- tickets/chat-import/004-update-adr-0009-status.md           |  44 ++++
- 18 files changed, 1576 insertions(+), 182 deletions(-)
+ STATUS.md                                                   |   75 +-
+ architecture/decisions/0009-in-app-image-import.md          |    4 +-
+ architecture/decisions/0010-chat-import-redesign.md         |  244 ++++++
+ scripts/ai-proxy.ts                                         |   20 +-
+ scripts/image-import.test.ts                                |  211 ++++++
+ scripts/image-import.ts                                     |  129 +++-
+ src/components/ImportForm.test.tsx                          | 1003 +++++++++++++------------
+ src/components/ImportForm.tsx                               |  834 +++++++++++++-------
+ tickets/_backlog.md                                         |    6 +-
+ tickets/chat-import/001-proxy-multi-image-contract.md       |   77 ++
+ tickets/chat-import/002-import-form-chat-core.md            |   83 ++
+ .../chat-import/003-import-form-multi-image-attachment.md   |   81 ++
+ tickets/chat-import/004-update-adr-0009-status.md           |   42 ++
+ 13 files changed, 1980 insertions(+), 829 deletions(-)
 ```
 <!-- AUTO:FILES:END -->
 
@@ -74,9 +76,9 @@ ai-import (ADR-0009) is feature-complete: tickets 006–009 all Done, deployed t
 | Ticket | Feature | Status |
 |--------|---------|--------|
 | [001 — Proxy: Multi-Image Array Contract](tickets/chat-import/001-proxy-multi-image-contract.md) | chat-import | Done |
-| [002 — ImportForm: Chat Core](tickets/chat-import/002-import-form-chat-core.md) | chat-import | Up Next |
-| [003 — ImportForm: Multi-Image Attachment](tickets/chat-import/003-import-form-multi-image-attachment.md) | chat-import | Up Next |
-| [004 — Update ADR-0009 Status](tickets/chat-import/004-update-adr-0009-status.md) | chat-import | Up Next |
+| [002 — ImportForm: Chat Core](tickets/chat-import/002-import-form-chat-core.md) | chat-import | Done |
+| [003 — ImportForm: Multi-Image Attachment](tickets/chat-import/003-import-form-multi-image-attachment.md) | chat-import | Done |
+| [004 — Update ADR-0009 Status](tickets/chat-import/004-update-adr-0009-status.md) | chat-import | Done |
 | [003 — Offline Fallback Page](tickets/pwa/003-offline-fallback-page.md) | pwa | In Review |
 
 ## Risks & Blockers
@@ -107,3 +109,6 @@ ai-import (ADR-0009) is feature-complete: tickets 006–009 all Done, deployed t
 | 2026-07-14 | ai-import 007–009 done and deployed: client normalization module (canvas downscale → JPEG), ImportForm Image mode (picker/drop/paste), add-page gate widened to piano; all verifier-approved; feature complete and live on guitar-hub.pages.dev |
 | 2026-07-15 | Two image-import bug fixes: markdown-fence stripping before JSON.parse in ImportForm, and `--add-dir tmpdir()` in the `claude -p` spawn (headless claude could not read the temp image outside its cwd — the actual cause of the "Could not parse the AI response" error, reproduced and verified with the user's Tanjiro no uta screenshot). ADR-0010 (chat-based import) authored; decomposed into chat-import tickets 001–004 |
 | 2026-07-18 | chat-import/001 done: proxy accepts `images` array (legacy `image` shimmed), `buildExtractionPrompt` threads Human:/Assistant: history before current turn + image paths, bulk temp-file cleanup on every outcome; 13 new tests (243/243); live-verified 2-image + 3-message request → stitched transcription, zero temp files left; verifier approved |
+| 2026-07-18 | chat-import/002 done: ImportForm rewritten from three-tab UI to a chat thread + auto-expanding composer (Enter-to-send/Shift+Enter-newline), full multi-turn history sent per request, in-chat result cards with "Use this result", raw-text/empty-tab fallbacks, in-thread errors + retry, URL mode removed; test suite rewritten; verifier approved |
+| 2026-07-19 | chat-import/003 done: multi-image attachment on the composer — file-picker/drag-drop/paste funnel through one `addImages` with a 10-image cap, removable thumbnails, per-image normalization reusing ai-import/008's one-shot size-retry guard, per-turn `IMAGE_SYSTEM_PROMPT` selection, "Transcribe the attached sheet(s)." default substitution, `images` array wiring, `instrument` forwarding restored, attachments cleared after send; +20 tests (245/245); build/lint/test green; verifier approved |
+| 2026-07-21 | chat-import/004 done (doc-only): ADR-0009 status set to "Superseded by ADR-0010 (UI and single-image contract); normalization and proxy patterns remain in effect" with a pointer callout to ADR-0010; no other ADR content changed; verifier approved. chat-import feature complete (001–004 all Done); work 002–004 still uncommitted in the working tree |

@@ -1,7 +1,7 @@
 # Ticket: Update ADR-0009 Status to Superseded by ADR-0010
 
 **Feature:** chat-import
-**Status:** Todo
+**Status:** Done
 **Priority:** P3
 **Estimate:** XS
 **Related:** ADR-0010 (Section 9 "Relationship to prior ADRs"), ADR-0009 (`architecture/decisions/0009-in-app-image-import.md`)
@@ -16,10 +16,10 @@ Update `architecture/decisions/0009-in-app-image-import.md`'s status line and ad
 
 ## Acceptance Criteria
 
-- [ ] `architecture/decisions/0009-in-app-image-import.md`'s `**Status:**` line changes from `Accepted` to a value that communicates it is superseded for its UI and single-image contract while its underlying patterns remain in effect (e.g. `Superseded by ADR-0010 (UI and single-image contract); normalization and proxy patterns remain in effect`)
-- [ ] A short note (1-3 sentences) is added near the top of the document (immediately below the status/date/author block, or as a clearly labeled callout) that: names `ADR-0010` and its file path (`architecture/decisions/0010-chat-import-redesign.md`), states that the three-tab UI and single-image-per-request contract are superseded, and states that canvas normalization, base64 transport, temp-file lifecycle, and instrument-aware prompts remain in effect and are reused
-- [ ] No other content in `architecture/decisions/0009-in-app-image-import.md` is altered — this is a status/pointer update only, not a rewrite of the ADR's Context, Decision, or Consequences sections
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `architecture/decisions/0009-in-app-image-import.md`'s `**Status:**` line changes from `Accepted` to a value that communicates it is superseded for its UI and single-image contract while its underlying patterns remain in effect (e.g. `Superseded by ADR-0010 (UI and single-image contract); normalization and proxy patterns remain in effect`)
+- [x] A short note (1-3 sentences) is added near the top of the document (immediately below the status/date/author block, or as a clearly labeled callout) that: names `ADR-0010` and its file path (`architecture/decisions/0010-chat-import-redesign.md`), states that the three-tab UI and single-image-per-request contract are superseded, and states that canvas normalization, base64 transport, temp-file lifecycle, and instrument-aware prompts remain in effect and are reused
+- [x] No other content in `architecture/decisions/0009-in-app-image-import.md` is altered — this is a status/pointer update only, not a rewrite of the ADR's Context, Decision, or Consequences sections
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
@@ -33,11 +33,9 @@ This ticket has no code dependency and can be done at any point in the sequence.
 
 ## Implementation Plan
 
-_To be filled in before starting work._
-
-1. Step 1
-2. Step 2
-3. Step 3
+1. Change ADR-0009's `**Status:**` line from `Accepted` to `Superseded by ADR-0010 (UI and single-image contract); normalization and proxy patterns remain in effect`.
+2. Add a blockquote callout immediately below the status/date/author block naming ADR-0010 and its file path, stating the three-tab UI and single-image contract are superseded, and that canvas normalization, base64 transport, temp-file lifecycle, and instrument-aware prompts remain in effect and are reused (extended to arrays).
+3. Leave all Context/Decision/Consequences content untouched — status/pointer update only.
 
 ## Post-Implementation
 

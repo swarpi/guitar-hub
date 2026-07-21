@@ -1,8 +1,10 @@
 # ADR-0009: In-App Image Import — One-Shot Screenshot/Photo Transcription in the AI Import Form
 
-**Status:** Accepted  
+**Status:** Superseded by ADR-0010 (UI and single-image contract); normalization and proxy patterns remain in effect  
 **Date:** 2026-07-13  
 **Author:** Architect Agent
+
+> **Superseded (in part) by [ADR-0010](0010-chat-import-redesign.md)** (`architecture/decisions/0010-chat-import-redesign.md`). ADR-0010 replaces this ADR's three-tab (Paste Text / URL / Image) UI and its single-image-per-request contract with a multi-turn, multi-image chat interface. What this ADR established that *remains in effect* and is reused (extended to arrays) by chat-import: client-side canvas normalization, base64 transport, the proxy-side temp-file lifecycle, and instrument-aware prompts. The sections below are retained as the historical record of the single-image design.
 
 ## Context
 

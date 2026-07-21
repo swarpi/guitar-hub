@@ -1,7 +1,7 @@
 # Ticket: ImportForm — Chat Thread Core (Multi-Turn Text, Drop URL Mode)
 
 **Feature:** chat-import
-**Status:** Todo
+**Status:** Done
 **Priority:** P1
 **Estimate:** L
 **Related:** ADR-0010 (Sections 1 "Interaction model: multi-turn chat with structured extraction", 2 "Dropping URL mode", 6 "Client-side state shape", 7 "Error handling", 8 "What changes in existing code"), ai-import/002 and ai-import/005 (established the `runExtraction`/`sendExtraction` shared parse/error tail this ticket rebuilds the UI around)
@@ -20,35 +20,35 @@ Rewrite `ImportForm.tsx` around a chat thread and composer bar supporting multi-
 
 ## Acceptance Criteria
 
-- [ ] `ImportForm` renders a scrollable chat thread (empty on first load, top-to-bottom message order) above a composer bar; the three-pill toggle (`Paste Text`/`URL`/`Image`) and the `InputMethod` union are removed from the component entirely
-- [ ] Composer bar: an auto-expanding `<textarea>` (starts at 1 line, grows up to roughly 4 lines as content wraps, e.g. driven by `scrollHeight` capped at a max height) and a Send button; Send is disabled when the textarea is empty or whitespace-only (image-attached sends are ticket 003's concern — this ticket's Send-enablement rule is text-only)
-- [ ] Enter (no modifier held) submits the composer and prevents the default newline; Shift+Enter inserts a newline instead of submitting
-- [ ] On send: the current textarea text is appended to `messages` React state as a `{ role: "user", text }` entry (per ADR §6's `ChatMessage` shape, `id`/`role`/`text` populated; `imageCount`/`extractedFields` omitted for a text-only user message), the textarea clears, a loading indicator (`role="status"`, e.g. "Extracting...") appears in the thread, and a request is `POST`ed to `PROXY_URL` whose `messages` field contains **the full prior history plus the new user message**, mapped to `{ role, content }` pairs in order, and whose `system` field is the existing text `SYSTEM_PROMPT`
-- [ ] On a successful response, the client attempts to parse `content[0].text` as the 5-field extraction JSON, reusing the existing fence-stripping parse logic (the `` ```json ``-fence-stripping regex already present in `sendExtraction`) — this is not reimplemented, only relocated/reused
-- [ ] An assistant `ChatMessage` is appended to `messages` with `text` set to the raw response and `extractedFields` set (mapped to `SongFormInitialValues`: `title`, `artist`, `capo`, `content` from `tabContent`, `notes`) only when parsing succeeds **and** `tabContent` is a non-empty string
-- [ ] When `extractedFields` is present on an assistant message, the thread renders it as a **result card**: the extracted `title`, `artist`, `capo`, and `notes` are visibly displayed for review (a preview of `tabContent`/`content` is acceptable rather than the full text), with a "Use this result" button; clicking it calls `onExtracted(message.extractedFields)` — unchanged from the existing callback contract `AddPageClient` already handles
-- [ ] When parsing fails (malformed JSON, conversational text), the assistant message renders as **plain chat text** (the raw response), with no result card and no "Use this result" button
-- [ ] When parsing succeeds but `tabContent` is missing or an empty string, the message does **not** render as an actionable result card; it visibly notes "No tab content found" (or equivalent) per ADR §7, without a "Use this result" affordance
-- [ ] **Multi-turn history round-trips correctly:** sending a second message after one exchange results in the second request's `messages` array containing, in order, the first user message, the first assistant response's raw `text` (not re-serialized/re-parsed JSON), and the new user message
-- [ ] Errors render as an in-thread message (not a separate panel below/outside the chat thread): proxy unreachable, non-OK HTTP status, and invalid-JSON-that-still-needs-a-fallback-message each preserve their existing user-facing strings verbatim from the current implementation
-- [ ] A retry affordance re-sends the most recent user message (equivalent in effect to the current `canRetry`/`retryRef` pattern) without requiring the user to retype it
-- [ ] "Use manual entry" remains available (e.g. as a persistent link/button near the composer) and calls `onUseManual()` unchanged
-- [ ] Chat state (`messages`) is **not** cleared when `onExtracted` fires — per ADR §6, if the user later returns via `AddPageClient`'s existing "Back to Import" button (`handleBackToImport`, which only resets `extractedFields`, not the `ImportForm` component itself — `ImportForm` is never unmounted by that action), the thread still shows the full prior conversation
-- [ ] URL mode is fully removed: no URL `<input>`, no `URL:`-prefixed message construction, no 502-specific `ERROR_URL_FETCH` handling remains reachable from this component (the proxy's URL branch and `url-import.ts` are untouched and simply unreachable, per ADR §2)
-- [ ] `pnpm build` compiles without errors
-- [ ] `pnpm lint` passes on all changed files
-- [ ] `src/components/ImportForm.test.tsx` is rewritten (the existing Paste Text/URL/Image-toggle-specific tests are removed, not adapted — Image-specific tests return in chat-import/003) to cover:
-  - [ ] Enter submits; Shift+Enter inserts a newline and does not submit
-  - [ ] Send is disabled while the textarea is empty/whitespace-only, enabled once non-whitespace text is entered
-  - [ ] A single-turn send producing a valid extraction renders a result card, and clicking "Use this result" calls `onExtracted` with the correctly mapped fields
-  - [ ] A response that fails JSON parsing renders as plain text with no result card / no "Use this result" button
-  - [ ] A response with empty `tabContent` renders without a "Use this result" affordance and with a "No tab content found"-style note
-  - [ ] A two-turn conversation: the second `fetch` call's request body `messages` includes the first user message and the first assistant's raw text, followed by the new user message, in order
-  - [ ] Proxy-unreachable (`fetch` throws), non-OK HTTP, and invalid-JSON responses each render as an in-thread message with the existing error strings
-  - [ ] Retry re-sends the last user message without requiring re-entry
-  - [ ] `onUseManual` fires when the manual-entry control is activated
-- [ ] `pnpm test` passes, including the rewritten `ImportForm.test.tsx` and the unmodified `AddPageClient.test.tsx` (image-attachment and multi-image request-shape tests are ticket 003's scope and are not expected here)
-- [ ] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
+- [x] `ImportForm` renders a scrollable chat thread (empty on first load, top-to-bottom message order) above a composer bar; the three-pill toggle (`Paste Text`/`URL`/`Image`) and the `InputMethod` union are removed from the component entirely
+- [x] Composer bar: an auto-expanding `<textarea>` (starts at 1 line, grows up to roughly 4 lines as content wraps, e.g. driven by `scrollHeight` capped at a max height) and a Send button; Send is disabled when the textarea is empty or whitespace-only (image-attached sends are ticket 003's concern — this ticket's Send-enablement rule is text-only)
+- [x] Enter (no modifier held) submits the composer and prevents the default newline; Shift+Enter inserts a newline instead of submitting
+- [x] On send: the current textarea text is appended to `messages` React state as a `{ role: "user", text }` entry (per ADR §6's `ChatMessage` shape, `id`/`role`/`text` populated; `imageCount`/`extractedFields` omitted for a text-only user message), the textarea clears, a loading indicator (`role="status"`, e.g. "Extracting...") appears in the thread, and a request is `POST`ed to `PROXY_URL` whose `messages` field contains **the full prior history plus the new user message**, mapped to `{ role, content }` pairs in order, and whose `system` field is the existing text `SYSTEM_PROMPT`
+- [x] On a successful response, the client attempts to parse `content[0].text` as the 5-field extraction JSON, reusing the existing fence-stripping parse logic (the `` ```json ``-fence-stripping regex already present in `sendExtraction`) — this is not reimplemented, only relocated/reused
+- [x] An assistant `ChatMessage` is appended to `messages` with `text` set to the raw response and `extractedFields` set (mapped to `SongFormInitialValues`: `title`, `artist`, `capo`, `content` from `tabContent`, `notes`) only when parsing succeeds **and** `tabContent` is a non-empty string
+- [x] When `extractedFields` is present on an assistant message, the thread renders it as a **result card**: the extracted `title`, `artist`, `capo`, and `notes` are visibly displayed for review (a preview of `tabContent`/`content` is acceptable rather than the full text), with a "Use this result" button; clicking it calls `onExtracted(message.extractedFields)` — unchanged from the existing callback contract `AddPageClient` already handles
+- [x] When parsing fails (malformed JSON, conversational text), the assistant message renders as **plain chat text** (the raw response), with no result card and no "Use this result" button
+- [x] When parsing succeeds but `tabContent` is missing or an empty string, the message does **not** render as an actionable result card; it visibly notes "No tab content found" (or equivalent) per ADR §7, without a "Use this result" affordance
+- [x] **Multi-turn history round-trips correctly:** sending a second message after one exchange results in the second request's `messages` array containing, in order, the first user message, the first assistant response's raw `text` (not re-serialized/re-parsed JSON), and the new user message
+- [x] Errors render as an in-thread message (not a separate panel below/outside the chat thread): proxy unreachable, non-OK HTTP status, and invalid-JSON-that-still-needs-a-fallback-message each preserve their existing user-facing strings verbatim from the current implementation
+- [x] A retry affordance re-sends the most recent user message (equivalent in effect to the current `canRetry`/`retryRef` pattern) without requiring the user to retype it
+- [x] "Use manual entry" remains available (e.g. as a persistent link/button near the composer) and calls `onUseManual()` unchanged
+- [x] Chat state (`messages`) is **not** cleared when `onExtracted` fires — per ADR §6, if the user later returns via `AddPageClient`'s existing "Back to Import" button (`handleBackToImport`, which only resets `extractedFields`, not the `ImportForm` component itself — `ImportForm` is never unmounted by that action), the thread still shows the full prior conversation
+- [x] URL mode is fully removed: no URL `<input>`, no `URL:`-prefixed message construction, no 502-specific `ERROR_URL_FETCH` handling remains reachable from this component (the proxy's URL branch and `url-import.ts` are untouched and simply unreachable, per ADR §2)
+- [x] `pnpm build` compiles without errors
+- [x] `pnpm lint` passes on all changed files
+- [x] `src/components/ImportForm.test.tsx` is rewritten (the existing Paste Text/URL/Image-toggle-specific tests are removed, not adapted — Image-specific tests return in chat-import/003) to cover:
+  - [x] Enter submits; Shift+Enter inserts a newline and does not submit
+  - [x] Send is disabled while the textarea is empty/whitespace-only, enabled once non-whitespace text is entered
+  - [x] A single-turn send producing a valid extraction renders a result card, and clicking "Use this result" calls `onExtracted` with the correctly mapped fields
+  - [x] A response that fails JSON parsing renders as plain text with no result card / no "Use this result" button
+  - [x] A response with empty `tabContent` renders without a "Use this result" affordance and with a "No tab content found"-style note
+  - [x] A two-turn conversation: the second `fetch` call's request body `messages` includes the first user message and the first assistant's raw text, followed by the new user message, in order
+  - [x] Proxy-unreachable (`fetch` throws), non-OK HTTP, and invalid-JSON responses each render as an in-thread message with the existing error strings
+  - [x] Retry re-sends the last user message without requiring re-entry
+  - [x] `onUseManual` fires when the manual-entry control is activated
+- [x] `pnpm test` passes, including the rewritten `ImportForm.test.tsx` and the unmodified `AddPageClient.test.tsx` (image-attachment and multi-image request-shape tests are ticket 003's scope and are not expected here)
+- [x] **`/ticket-verifier` invoked and approved** — do NOT check this box manually. Only the ticket-verifier agent marks this criterion.
 
 ## Out of Scope
 
