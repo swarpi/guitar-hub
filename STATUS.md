@@ -36,7 +36,7 @@ ai-import (ADR-0009) remains feature-complete and deployed to `guitar-hub.pages.
 
 | Hash | Date | Message |
 |------|------|---------|
-| `5aee8c2` | 2026-07-21 | Add chat-based import: multi-turn, multi-image ImportForm (chat-import 002-004) |
+| `c4e37f3` | 2026-07-21 | Add chat-based import: multi-turn, multi-image ImportForm (chat-import 002-004) |
 | `5cf5f5f` | 2026-07-18 | Update STATUS.md for chat-import 001; add verifier-suggested test assertion |
 | `35c07c9` | 2026-07-18 | Add ADR-0010 and proxy multi-image contract (chat-import ticket 001) |
 | `890794f` | 2026-07-15 | Pass --add-dir to claude -p so it can read temp image files |
@@ -54,7 +54,7 @@ ai-import (ADR-0009) remains feature-complete and deployed to `guitar-hub.pages.
 **Files changed (last 5 commits):**
 
 ```
- STATUS.md                                                   |   75 +-
+ STATUS.md                                                   |   78 +-
  architecture/decisions/0009-in-app-image-import.md          |    4 +-
  architecture/decisions/0010-chat-import-redesign.md         |  244 ++++++
  scripts/ai-proxy.ts                                         |   20 +-
@@ -67,7 +67,7 @@ ai-import (ADR-0009) remains feature-complete and deployed to `guitar-hub.pages.
  tickets/chat-import/002-import-form-chat-core.md            |   83 ++
  .../chat-import/003-import-form-multi-image-attachment.md   |   81 ++
  tickets/chat-import/004-update-adr-0009-status.md           |   42 ++
- 13 files changed, 1980 insertions(+), 829 deletions(-)
+ 13 files changed, 1981 insertions(+), 831 deletions(-)
 ```
 <!-- AUTO:FILES:END -->
 
